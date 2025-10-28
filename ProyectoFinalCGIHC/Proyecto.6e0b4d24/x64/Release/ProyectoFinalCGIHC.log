@@ -1,7 +1,0 @@
-﻿Model.obj : error LNK2001: símbolo externo aiGetMaterialTextureCount sin resolver
-Model.obj : error LNK2001: símbolo externo "public: char const * __cdecl Assimp::Importer::GetErrorString(void)const " (?GetErrorString@Importer@Assimp@@QEBAPEBDXZ) sin resolver
-Model.obj : error LNK2001: símbolo externo "public: struct aiScene const * __cdecl Assimp::Importer::ReadFile(char const *,unsigned int)" (?ReadFile@Importer@Assimp@@QEAAPEBUaiScene@@PEBDI@Z) sin resolver
-Model.obj : error LNK2001: símbolo externo "public: __cdecl Assimp::Importer::~Importer(void)" (??1Importer@Assimp@@QEAA@XZ) sin resolver
-Model.obj : error LNK2001: símbolo externo "public: __cdecl Assimp::Importer::Importer(void)" (??0Importer@Assimp@@QEAA@XZ) sin resolver
-Model.obj : error LNK2001: símbolo externo aiGetMaterialTexture sin resolver
-C:\Users\famva\Downloads\ProyectosGrafica\ProyectoFinalCGIHC\ProyectoFinalCGIHC\x64\Release\ProyectoFinalCGIHC.exe : fatal error LNK1120: 6 externos sin resolver

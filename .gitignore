@@ -1,1 +1,12 @@
 .vs
+CppProperties.json
+*.exe
+*.pdb
+x64/
+ProyectoFinalCGIHC/Textures/
+ProyectoFinalCGIHC/Models/
+ProyectoFinalCGIHC/x64/Debug/
+ProyectoFinalCGIHC/Proyecto.6e0b4d24/
+ProyectoFinalCGIHC/Debug/
+ProyectoFinalCGIHC/Practica7x64
+
