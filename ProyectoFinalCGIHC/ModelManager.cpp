@@ -6,8 +6,16 @@ ModelManager::ModelManager()
 
 }
 
+
+void ModelManager::loadModel(const std::string& modelName, const std::string& modelPath)
+{
+	Model* model = new Model();
+	model->LoadModel(modelPath);
+	models[modelName] = model;
+}
+
 // Renderiza un modelo por su nombre
-void ModelManager::renderModel(std::string modelName)
+void ModelManager::renderModel(const std::string& modelName)
 {
 	auto it = models.find(modelName);
 	if (it != models.end()) {

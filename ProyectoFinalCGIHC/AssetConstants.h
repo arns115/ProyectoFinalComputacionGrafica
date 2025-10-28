@@ -7,10 +7,10 @@ namespace AssetConstants {
 	
 	// Nombres de texturas
 	namespace TextureNames{
-		const std::string AGAVE = "AGAVE";
-		const std::string PASTO = "PASTO";
-		const std::string LADRILLO = "BRICK";
-		const std::string TIERRA = "DIRT";
+		const std::string AGAVE = "agave";
+		const std::string PASTO = "pasto";
+		const std::string LADRILLO = "brick";
+		const std::string TIERRA = "dirt";
 
 		
 	}
@@ -34,6 +34,26 @@ namespace AssetConstants {
 	namespace ModelPaths {
 		const std::string MODEL_PATH = "Models/";
 
+	}
+
+
+	// Nombres de skybox
+
+	namespace SkyboxNames {
+		const std::string DAY = "dia";
+		const std::string NIGHT = "noche";
+	}
+
+	// Rutas de texturas de skybox
+	namespace SkyboxPaths {
+		const std::string SKYBOX_PATH = "Textures/Skybox/";
+
+		const std::string RIGHT = "right.tga";
+		const std::string LEFT = "left.tga";
+		const std::string TOP =  "top.tga";
+		const std::string BOTTOM = "bottom.tga";
+		const std::string BACK = "back.tga";
+		const std::string FRONT = "front.tga";
 	}
 
 }

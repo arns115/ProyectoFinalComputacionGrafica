@@ -10,17 +10,14 @@ public:
 
 	TextureManager();
 
-	void renderTexture(std::string);
+	void renderTexture(const std::string& textureName);
 
 	~TextureManager();
 
 private:	
 	std::map<std::string, Texture*> textures;
 
-	void loadPastoTexture();
-	void loadLadrilloTexture();
-	void loadTierraTexture();
-	void loadAgaveTexture();
+	void loadTexture(const std::string& textureName, const std::string& texturePath);
 
 
 

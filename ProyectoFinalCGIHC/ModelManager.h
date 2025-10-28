@@ -10,14 +10,14 @@ public:
 
 	ModelManager();
 
-	void renderModel(std::string);
+	void renderModel(const std::string& modelName);
 
 	~ModelManager();
 
 private:
 	std::map<std::string, Model*> models;
 
-
+	void loadModel(const std::string& modelName, const std::string& modelPath);
 
 
 };
