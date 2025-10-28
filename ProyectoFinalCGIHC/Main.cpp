@@ -19,10 +19,11 @@
 #include "Mesh.h"
 #include "Shader_light.h"
 #include "Camera.h"
-#include "Texture.h"
+#include "TextureManager.h"
+#include "ModelManager.h"
+#include "SkyboxManager.h"
 #include "Sphere.h"
 #include"Model.h"
-#include "Skybox.h"
 
 // Iluminación
 #include "CommonValues.h"
@@ -38,18 +39,6 @@ std::vector<Shader> shaderList;
 
 Camera camera;
 
-Texture brickTexture;
-Texture dirtTexture;
-Texture plainTexture;
-Texture pisoTexture;
-Texture AgaveTexture;
-
-Model Kitt_M;
-Model Llanta_M;
-Model Blackhawk_M;
-
-
-Skybox skybox;
 
 // TODO: Modularizar esto
 Material Material_brillante;
@@ -188,25 +177,18 @@ int main()
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
 	mainWindow.Initialise();
 
+	// se crean los manejadores de texturas, modelos y skybox
+	TextureManager textureManager;
+	ModelManager modelManager;
+	SkyboxManager skyboxManager;
+
 	CreateObjects();
 	CreateShaders();
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
-	pisoTexture = Texture("Textures/textura_pasto.png");
-	pisoTexture.LoadTextureA();
 
-	
 
-	std::vector<std::string> skyboxFaces;
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
-
-	skybox = Skybox(skyboxFaces);
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
@@ -266,7 +248,7 @@ int main()
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		skyboxManager.renderSkybox(AssetConstants::SkyboxNames::DAY, camera.calculateViewMatrix(), projection);
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -303,8 +285,7 @@ int main()
 		model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-
-		pisoTexture.UseTexture();
+		textureManager.renderTexture(AssetConstants::TextureNames::PASTO);
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 
 		meshList[2]->RenderMesh();
