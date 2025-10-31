@@ -144,6 +144,7 @@
     <ClInclude Include="CommonValues.h" />
     <ClInclude Include="definition.h" />
     <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="Entidad.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -163,6 +164,8 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="EjemploUsoEntidad.cpp" />
+    <ClCompile Include="Entidad.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh_tn.cpp" />
@@ -180,10 +183,19 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="GUIA_MovimientoTerceraPersona.md" />
+    <None Include="QUICKSTART_CamaraTerceraPersona.md" />
+    <None Include="README_CamaraTerceraPersona.md" />
+    <None Include="README_Entidad.md" />
+    <None Include="RESUMEN_Entidad.md" />
     <None Include="shaders\shader_light.frag" />
     <None Include="shaders\shader_light.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
+    <None Include="SOLUCION_PersonajeDesaparece.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="EjemploUsoCamaraTerceraPersona.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
