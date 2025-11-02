@@ -7,6 +7,7 @@ ModelManager::ModelManager()
 }
 
 
+// Carga un modelo en el manager
 void ModelManager::loadModel(const std::string& modelName, const std::string& modelPath)
 {
 	Model* model = new Model();
@@ -14,14 +15,14 @@ void ModelManager::loadModel(const std::string& modelName, const std::string& mo
 	models[modelName] = model;
 }
 
-// Renderiza un modelo por su nombre
-void ModelManager::renderModel(const std::string& modelName)
+// Obtiene un modelo por su nombre (retorna puntero)
+Model* ModelManager::getModel(const std::string& modelName)
 {
 	auto it = models.find(modelName);
 	if (it != models.end()) {
-		it->second->RenderModel();
+		return it->second;
 	}
-
+	return nullptr;
 }
 
 ModelManager::~ModelManager()
