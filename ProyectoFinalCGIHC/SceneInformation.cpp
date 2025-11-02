@@ -1,8 +1,11 @@
 #include "SceneInformation.h"
 
 SceneInformation::SceneInformation()
+    : skyboxActual(nullptr)
 {
-    // Constructor vacío - los managers se inicializan automáticamente
+    // Constructor - los managers se inicializan automáticamente
+    // Establecer el skybox por defecto
+    setSkyboxActual(AssetConstants::SkyboxNames::DAY);
 }
 
 SceneInformation::~SceneInformation()
@@ -11,6 +14,8 @@ SceneInformation::~SceneInformation()
         delete entidad;
     }
     entidades.clear();
+    // Limpiar referencia al skybox
+    skyboxActual = nullptr;
 }
 
 void SceneInformation::inicializarEscena()
@@ -37,9 +42,13 @@ void SceneInformation::removerEntidad(Entidad* entidad)
         entidades.erase(it);
     }
     // Nota: NO se elimina la entidad, solo se remueve del vector
+    }
+    
+
+void SceneInformation::setSkyboxActual(const std::string& skyboxName)
+{
+    skyboxActual = skyboxManager.getSkybox(skyboxName);
 }
-
-
 
 Entidad* SceneInformation::buscarEntidad(const std::string& nombre)
 {

@@ -22,10 +22,14 @@ void SkyboxManager::loadSkybox(const std::string& skyboxName)
 	skyboxes[skyboxName] = Skybox(skyboxFaces);
 }
 
-// Renderiza un skybox por su nombre
-void SkyboxManager::renderSkybox(const std::string& skyboxName, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+// Obtiene un skybox por su nombre
+Skybox* SkyboxManager::getSkybox(const std::string& skyboxName)
 {
-	skyboxes[skyboxName].DrawSkybox(viewMatrix, projectionMatrix);
+	auto it = skyboxes.find(skyboxName);
+	if (it != skyboxes.end()) {
+		return &(it->second);
+	}
+	return nullptr;
 }
 
 SkyboxManager::~SkyboxManager()

@@ -9,17 +9,20 @@
 #include "Texture.h"
 #include "Mesh.h"
 
+// Forward declaration
+class SceneRenderer;
+
 // Enum para el tipo de geometría de la entidad
 enum class TipoGeometria {
     MODELO,     // Usa un modelo 3D
     MESH        // Usa un mesh
 };
 
-// Clase principal Entidad para manejar modelos jerárquicos
+// Clase principal Entidad para manejar entidades en la escena
 class Entidad {
 public:
-    // Constructor con nombre de modelo
-    Entidad(const std::string& modelo, 
+    // Constructor con nombre de objeto
+    Entidad(const std::string& nombreObjeto = "", 
             glm::vec3 pos = glm::vec3(0.0f), 
             glm::vec3 rot = glm::vec3(0.0f), 
             glm::vec3 escala = glm::vec3(1.0f));
@@ -61,6 +64,9 @@ public:
     
     // Obtener tipo de geometría
     TipoGeometria getTipoGeometria() const { return tipoGeometria; }
+    
+    // SceneRenderer necesita acceso a los miembros privados
+    friend class SceneRenderer;
     
 private:
     // Tipo de geometría que usa esta entidad

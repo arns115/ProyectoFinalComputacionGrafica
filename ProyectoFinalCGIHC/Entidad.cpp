@@ -1,11 +1,11 @@
 #include "Entidad.h"
 
 
-Entidad::Entidad(const std::string& modeloNombre, 
+Entidad::Entidad(const std::string& nombreObj, 
                  glm::vec3 pos, 
                  glm::vec3 rot, 
                  glm::vec3 escala)
-    : nombreObjeto(""), nombreModelo(modeloNombre), nombreMesh(""), nombreTextura(""),
+    : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""),
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
       tipoGeometria(TipoGeometria::MODELO), modelo(nullptr), mesh(nullptr), 
