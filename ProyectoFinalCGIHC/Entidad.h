@@ -5,98 +5,69 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
-#include "ModelManager.h"
+#include "Model.h"
+#include "Texture.h"
+#include "Mesh.h"
 
-// TODO: Crear una superclase GameObject y heredar Entidad de ella para futuras mejoras
-
-// Estructura auxiliar para representar una parte de la entidad con su transformación
-struct EntidadParte {
-    std::string nombreModelo;          // Nombre del modelo a renderizar
-    glm::vec3 posicionLocal;           // Posición relativa al padre
-    glm::vec3 rotacionLocal;           // Rotación en grados (X, Y, Z)
-    glm::vec3 escalaLocal;             // Escala local
-    glm::mat4 transformacionLocal;     // Matriz de transformación local
-    
-    std::vector<EntidadParte*> hijos;  // Partes hijas (jerarquía)
-    
-    // Constructor
-    EntidadParte(const std::string& modelo, 
-                 glm::vec3 pos = glm::vec3(0.0f), 
-                 glm::vec3 rot = glm::vec3(0.0f), 
-                 glm::vec3 escala = glm::vec3(1.0f));
-    
-    // Destructor
-    ~EntidadParte();
-    
-    // Actualiza la matriz de transformación local
-    void actualizarTransformacion();
-    
-    // Agregar una parte hija
-    void agregarHijo(EntidadParte* hijo);
+// Enum para el tipo de geometría de la entidad
+enum class TipoGeometria {
+    MODELO,     // Usa un modelo 3D
+    MESH        // Usa un mesh
 };
 
 // Clase principal Entidad para manejar modelos jerárquicos
 class Entidad {
 public:
-    // Constructor principal con transformaciones y raíz opcional
-    Entidad(glm::vec3 posicion = glm::vec3(0.0f), 
-            glm::vec3 rotacion = glm::vec3(0.0f), 
-            glm::vec3 escala = glm::vec3(1.0f),
-            EntidadParte* raizModelo = nullptr);
-    
-    // Constructor alternativo: solo la raíz con transformaciones por defecto
-    Entidad(EntidadParte* raizModelo);
-    
-    // Constructor con nombre de modelo: crea automáticamente la raíz
-    Entidad(const std::string& nombreModeloRaiz,
-            glm::vec3 posicion = glm::vec3(0.0f), 
-            glm::vec3 rotacion = glm::vec3(0.0f), 
+    // Constructor con nombre de modelo
+    Entidad(const std::string& modelo, 
+            glm::vec3 pos = glm::vec3(0.0f), 
+            glm::vec3 rot = glm::vec3(0.0f), 
             glm::vec3 escala = glm::vec3(1.0f));
     
     // Destructor
     ~Entidad();
     
-    // Establece la parte raíz de la entidad
-    void setRaiz(EntidadParte* nuevaRaiz);
+    // Actualiza la matriz de transformación local
+    void actualizarTransformacion();
     
-    // Obtiene la parte raíz
-    EntidadParte* getRaiz();
+    // Agregar una entidad hija
+    void agregarHijo(Entidad* hijo);
     
-    // Renderiza toda la jerarquía de modelos
-    void renderizar(ModelManager& modelManager, GLuint uniformModel);
+    // Establecer el tipo de geometría y asignar modelo o mesh
+    // Acepta tanto el nombre como el puntero al recurso
+    void setModelo(const std::string& nombreModelo, Model* modelo);
+    void setMesh(const std::string& nombreMesh, Mesh* mesh);
     
-    // Actualiza la transformación global de la entidad
-    void actualizarTransformacionMundo();
+    // Establecer textura con nombre y puntero
+    void setTextura(const std::string& nombreTextura, Texture* texture);
     
-    // Métodos de acceso y modificación de transformaciones globales
-    void setPosicion(const glm::vec3& pos);
-    void setRotacion(const glm::vec3& rot);
-    void setEscala(const glm::vec3& escala);
+    // Limpiar geometría y textura
+    void limpiarGeometria();
+    void limpiarTextura();
     
-    // Métodos para modificar transformaciones de forma incremental
-    void trasladar(const glm::vec3& delta);
-    void rotar(const glm::vec3& delta);
-    void escalar(const glm::vec3& factor);
+    // Acceso público a propiedades
+    std::string nombreObjeto;          // Nombre único del objeto/entidad
+    std::string nombreModelo;          // Nombre del modelo
+    std::string nombreMesh;            // Nombre del mesh
+    std::string nombreTextura;         // Nombre de la textura
     
-    // Getters
-    glm::vec3 getPosicion() const;
-    glm::vec3 getRotacion() const;
-    glm::vec3 getEscala() const;
-    glm::mat4 getTransformacion() const;
+    // Acceso a transformaciones locales
+    glm::vec3 posicionLocal;           // Posición relativa al padre
+    glm::vec3 rotacionLocal;           // Rotación en grados (X, Y, Z)
+    glm::vec3 escalaLocal;             // Escala local
+    glm::mat4 transformacionLocal;     // Matriz de transformación local
+    
+    std::vector<Entidad*> hijos;       // Entidades hijas (jerarquía)
+    
+    // Obtener tipo de geometría
+    TipoGeometria getTipoGeometria() const { return tipoGeometria; }
     
 private:
-    // Transformaciones globales de la entidad
-    glm::vec3 posicionMundo;
-    glm::vec3 rotacionMundo;
-    glm::vec3 escalaMundo;
-    glm::mat4 transformacionMundo;
+    // Tipo de geometría que usa esta entidad
+    TipoGeometria tipoGeometria;
     
-    // Parte raíz de la jerarquía
-    EntidadParte* raiz;
-    
-    // Función recursiva para renderizar la jerarquía
-    void renderizarRecursivo(EntidadParte* parte, 
-                            const glm::mat4& transformacionPadre, 
-                            ModelManager& modelManager, 
-                            GLuint uniformModel);
+    // Punteros directos a recursos
+    Model* modelo;
+    Mesh* mesh;
+    Texture* texture;
 };
