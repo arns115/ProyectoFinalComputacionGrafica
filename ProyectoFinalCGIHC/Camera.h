@@ -7,6 +7,9 @@
 
 #include <glfw3.h>
 
+// Forward declaration
+class Entidad;
+
 class Camera
 {
 public:
@@ -19,6 +22,14 @@ public:
 	glm::vec3 getCameraPosition();
 	glm::vec3 getCameraDirection();
 	glm::mat4 calculateViewMatrix();
+
+	// Métodos para tercera persona
+	void setThirdPersonMode(bool enable);
+	void setThirdPersonTarget(Entidad* target);
+	void setThirdPersonDistance(float distance);
+	void setThirdPersonHeight(float height);
+	void setThirdPersonMoveSpeed(float speed);
+	bool isThirdPersonMode() const;
 
 	~Camera();
 
@@ -35,6 +46,18 @@ private:
 	GLfloat moveSpeed;
 	GLfloat turnSpeed;
 
+	// Variables para tercera persona
+	bool thirdPersonMode;
+	Entidad* thirdPersonTarget;
+	float thirdPersonDistance;
+	float thirdPersonHeight;
+	float thirdPersonMoveSpeed;
+
+	// Variable para detectar pulsación de tecla Q
+	bool qKeyPressed;
+
 	void update();
+	void updateThirdPerson();
+	void moveThirdPersonTarget(bool* keys, GLfloat deltaTime);
 };
 

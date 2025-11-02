@@ -24,6 +24,8 @@
 #include "SkyboxManager.h"
 #include "Sphere.h"
 #include"Model.h"
+#include "Entidad.h"
+#include "AssetConstants.h"
 
 // Iluminación
 #include "CommonValues.h"
@@ -186,13 +188,18 @@ int main()
 	CreateShaders();
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
-
-
-
+	// Crear entidad de prueba con una raíz
+	EntidadParte* raizTest = new EntidadParte("cuphead");
+	
+	Entidad *testCharacter = new Entidad(glm::vec3(0.0f, 0.0f, 0.0f), // Posición
+									glm::vec3(-90.0f, 0.0f, 0.0f), // Rotación
+									glm::vec3(1.5f, 1.5f, 1.5f), // Escala
+									raizTest);
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
+	camera.setThirdPersonTarget(testCharacter);
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
@@ -287,8 +294,10 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		textureManager.renderTexture(AssetConstants::TextureNames::PASTO);
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-
 		meshList[2]->RenderMesh();
+
+		//testCharacter.setRotacion(glm::vec3(toRadians * -90, 0.0f, 0.0f));
+		testCharacter->renderizar(modelManager, uniformModel);
 
 		glUseProgram(0);
 

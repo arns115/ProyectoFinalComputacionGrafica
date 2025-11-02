@@ -3,7 +3,7 @@
 // Carga todos los modelos al inicializar el ModelManager
 ModelManager::ModelManager()
 {
-
+	loadModel("cuphead", AssetConstants::ModelPaths::CUPHEAD);
 }
 
 
