@@ -6,7 +6,7 @@ SceneInformation::SceneInformation()
     // Llamar a las funciones de inicialización separadas
     inicializarSkybox();
     inicializarEntidades();
-    inicializarLuces();
+
 }
 
 SceneInformation::~SceneInformation()
@@ -16,13 +16,11 @@ SceneInformation::~SceneInformation()
         delete entidad;
     }
     entidades.clear();
-
+    
     // Limpiar referencia al skybox
     skyboxActual = nullptr;
-
+    
 }
-
-
 
 
 
@@ -35,18 +33,9 @@ void SceneInformation::inicializarSkybox()
 void SceneInformation::inicializarEntidades()
 {
     // Aquí se pueden crear entidades iniciales de la escena
-    // Por ahora, la escena comienza vacía
-}
-
-void SceneInformation::inicializarLuces()
-{
-    // Inicializar luz direccional por defecto (blanca, suave, apuntando hacia abajo)
-    luzDireccional = DirectionalLight(1.0f, 1.0f, 1.0f,
-                                     0.3f, 0.3f,
-                                     0.0f, -1.0f, 0.0f);
-    
 
 }
+
 
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {

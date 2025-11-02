@@ -32,6 +32,18 @@ namespace AssetConstants {
 		const std::string OPACO = "opaco";
 	}
 
+	// Nombres de luces
+	namespace LightNames{
+		// Luces direccionales
+		const std::string SOL = "sol";
+		
+		// Luces puntuales
+		const std::string PUNTUAL_ROJA = "puntual_roja";
+		
+		// Spotlights
+		const std::string LINTERNA = "linterna";
+	}
+
 	// Rutas de texturas
 	namespace TexturePaths{
 		const std::string TEXTURE_PATH = "Textures/";

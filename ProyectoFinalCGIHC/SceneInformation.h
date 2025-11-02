@@ -8,6 +8,7 @@
 #include "MeshManager.h"
 #include "SkyboxManager.h"
 #include "MaterialManager.h"
+#include "LightManager.h"
 #include "Skybox.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -81,6 +82,7 @@ private:
     MeshManager meshManager;
     SkyboxManager skyboxManager;
     MaterialManager materialManager;
+    LightManager lightManager;
     
     // Skybox actual de la escena
     Skybox* skyboxActual;
@@ -88,10 +90,6 @@ private:
     
     // Luz direccional
     DirectionalLight luzDireccional;
-    
-	// Arrays para todas las luces posibles en la escena
-    PointLight pointLights[MAX_LUCES_DIFERENTES];
-    SpotLight spotLights[MAX_LUCES_DIFERENTES];
     
     // Arrays para luces actualmente activas 
     PointLight pointLightsActuales[MAX_POINT_LIGHTS];
@@ -107,8 +105,6 @@ private:
     // Inicializar entidades de la escena
     void inicializarEntidades();
     
-    // Inicializar sistema de iluminación
-    void inicializarLuces();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
