@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "Material.h"
 
 // Forward declaration
 class SceneRenderer;
@@ -36,13 +37,17 @@ public:
     // Agregar una entidad hija
     void agregarHijo(Entidad* hijo);
     
-    // Establecer el tipo de geometría y asignar modelo o mesh
-    // Acepta tanto el nombre como el puntero al recurso
+    // Establecer modelo con nombre y apuntador
     void setModelo(const std::string& nombreModelo, Model* modelo);
+
+    // Establecer Mesh con nombre y apuntador
     void setMesh(const std::string& nombreMesh, Mesh* mesh);
-    
-    // Establecer textura con nombre y puntero
+
+    // Establecer textura con nombre y apuntador
     void setTextura(const std::string& nombreTextura, Texture* texture);
+    
+    // Establecer material con nombre y apuntador
+    void setMaterial(const std::string& nombreMaterial, Material* mat);
     
     // Limpiar geometría y textura
     void limpiarGeometria();
@@ -53,6 +58,7 @@ public:
     std::string nombreModelo;          // Nombre del modelo
     std::string nombreMesh;            // Nombre del mesh
     std::string nombreTextura;         // Nombre de la textura
+    std::string nombreMaterial;        // Nombre del material
     
     // Acceso a transformaciones locales
     glm::vec3 posicionLocal;           // Posición relativa al padre
@@ -76,4 +82,5 @@ private:
     Model* modelo;
     Mesh* mesh;
     Texture* texture;
+    Material* material;
 };

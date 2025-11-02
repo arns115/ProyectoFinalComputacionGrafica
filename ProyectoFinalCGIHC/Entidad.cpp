@@ -5,11 +5,11 @@ Entidad::Entidad(const std::string& nombreObj,
                  glm::vec3 pos, 
                  glm::vec3 rot, 
                  glm::vec3 escala)
-    : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""),
+    : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
       tipoGeometria(TipoGeometria::MODELO), modelo(nullptr), mesh(nullptr), 
-      texture(nullptr)
+      texture(nullptr), material(nullptr), banderasAnimacion(0)
 {
     actualizarTransformacion();
 }
@@ -70,6 +70,12 @@ void Entidad::setTextura(const std::string& nombreTextura, Texture* texture)
 {
     this->nombreTextura = nombreTextura;
     this->texture = texture;
+}
+
+void Entidad::setMaterial(const std::string& nombreMaterial, Material* mat)
+{
+    this->nombreMaterial = nombreMaterial;
+    this->material = mat;
 }
 
 void Entidad::limpiarGeometria()

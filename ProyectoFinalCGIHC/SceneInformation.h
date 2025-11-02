@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "MeshManager.h"
 #include "SkyboxManager.h"
+#include "MaterialManager.h"
 #include "Skybox.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -42,7 +43,7 @@ public:
     Skybox* getSkyboxActual() { return skyboxActual; }
     const Skybox* getSkyboxActual() const { return skyboxActual; }
     
-    // Buscar una entidad por nombre (opcional, útil para debugging)
+    // Buscar una entidad por nombre 
     Entidad* buscarEntidad(const std::string& nombre);
 
     
@@ -79,6 +80,7 @@ private:
     TextureManager textureManager;
     MeshManager meshManager;
     SkyboxManager skyboxManager;
+    MaterialManager materialManager;
     
     // Skybox actual de la escena
     Skybox* skyboxActual;
@@ -98,7 +100,7 @@ private:
     // Contadores de luces activas
     unsigned int pointLightCountActual;
     unsigned int spotLightCountActual;
-        
+    
     // Inicializar skybox por defecto
     void inicializarSkybox();
     

@@ -165,6 +165,15 @@ void SceneInformation::vincularRecursos(Entidad* entidad)
         }
     }
     
+    // Vincular material si la entidad tiene un nombre de material
+    std::string materialName = entidad->nombreMaterial;
+    if (!materialName.empty()) {
+        Material* material = materialManager.getMaterial(materialName);
+        if (material != nullptr) {
+            entidad->setMaterial(materialName, material);
+        }
+    }
+    
     // Vincular recursos recursivamente para todas las entidades hijas
     for (auto* hijo : entidad->hijos) {
         vincularRecursos(hijo);
