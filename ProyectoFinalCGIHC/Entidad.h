@@ -46,7 +46,7 @@ public:
     void limpiarTextura();
     
     // Acceso público a propiedades
-    std::string nombreObjeto;          // Nombre único del objeto/entidad
+    std::string nombreObjeto;          // Nombre de la entidad
     std::string nombreModelo;          // Nombre del modelo
     std::string nombreMesh;            // Nombre del mesh
     std::string nombreTextura;         // Nombre de la textura

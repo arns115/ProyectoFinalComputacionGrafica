@@ -126,7 +126,8 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 
 	// Aplicar el movimiento al personaje
 	if (glm::length(movement) > 0.0f) {
-		thirdPersonTarget->trasladar(movement);
+		thirdPersonTarget->posicionLocal += movement;
+		thirdPersonTarget->actualizarTransformacion();
 
 		// Solo rotar el personaje si hay movimiento horizontal (X o Z)
 		// Esto evita valores NaN cuando solo hay movimiento en Y
@@ -136,11 +137,12 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
 			glm::vec3 moveDir = glm::normalize(horizontalMovement);
 			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
-			thirdPersonTarget->setRotacion(glm::vec3(
-				thirdPersonTarget->getRotacion().x,
+			thirdPersonTarget->rotacionLocal = glm::vec3(
+				thirdPersonTarget->rotacionLocal.x,
 				targetYaw,
-				thirdPersonTarget->getRotacion().z
-			));
+				thirdPersonTarget->rotacionLocal.z
+			);
+			thirdPersonTarget->actualizarTransformacion();
 		}
 		// Si solo hay movimiento en Y, no rotamos el personaje
 	}
@@ -224,8 +226,8 @@ void Camera::updateThirdPerson()
 	}
 
 	// Obtener la posición del objetivo
-	glm::vec3 targetPos = thirdPersonTarget->getPosicion();
-	glm::vec3 targetRot = thirdPersonTarget->getRotacion();
+	glm::vec3 targetPos = thirdPersonTarget->posicionLocal;
+	glm::vec3 targetRot = thirdPersonTarget->rotacionLocal;
 
 	// Calcular la dirección de la cámara basada en yaw y pitch
 	glm::vec3 direction;
