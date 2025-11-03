@@ -44,14 +44,12 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
 
 // Funcion para actualizar cada frame con el input del usuario
-void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime)
+void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
 {
     // Actualizar cámara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
-    
-
-
+    camera.mouseScrollControl(scrollChange);  // Agregar control del scroll
 }
 
 // Funcion para inicializar la skybox

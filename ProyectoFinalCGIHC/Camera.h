@@ -18,6 +18,7 @@ public:
 
 	void keyControl(bool* keys, GLfloat deltaTime);
 	void mouseControl(GLfloat xChange, GLfloat yChange);
+	void mouseScrollControl(GLfloat yOffset);  // Nuevo método para zoom con scroll
 
 	glm::vec3 getCameraPosition();
 	glm::vec3 getCameraDirection();
@@ -30,6 +31,12 @@ public:
 	void setThirdPersonHeight(float height);
 	void setThirdPersonMoveSpeed(float speed);
 	bool isThirdPersonMode() const;
+
+	// Métodos para vista aérea
+	void setAerialViewMode(bool enable);
+	void setAerialViewHeight(float height);
+	void setAerialViewCenter(glm::vec3 center);
+	bool isAerialViewMode() const;
 
 	~Camera();
 
@@ -56,8 +63,31 @@ private:
 	// Variable para detectar pulsación de tecla Q
 	bool qKeyPressed;
 
+	// Variables para vista aérea
+	bool aerialViewMode;
+	float aerialViewHeight;
+	glm::vec3 aerialViewCenter;
+	bool zeroKeyPressed;
+	
+	// Variables para movimiento de cámara aérea
+	GLfloat aerialYaw;
+	GLfloat aerialPitch;
+	GLfloat aerialMoveSpeed;
+	
+	// Variables para guardar estado anterior
+	glm::vec3 savedPosition;
+	glm::vec3 savedFront;
+	glm::vec3 savedUp;
+	glm::vec3 savedRight;
+	GLfloat savedYaw;
+	GLfloat savedPitch;
+	bool savedThirdPersonMode;
+
 	void update();
 	void updateThirdPerson();
+	void updateAerialView();
+	void saveCurrentState();
+	void restoreState();
 	void moveThirdPersonTarget(bool* keys, GLfloat deltaTime);
 };
 

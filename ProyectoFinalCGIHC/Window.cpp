@@ -4,6 +4,10 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
+	xChange = 0.0f;
+	yChange = 0.0f;
+	scrollChange = 0.0f;
+	mouseFirstMoved = true;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -14,6 +18,10 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	muevex = 2.0f;
+	xChange = 0.0f;
+	yChange = 0.0f;
+	scrollChange = 0.0f;
+	mouseFirstMoved = true;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -81,6 +89,7 @@ void Window::createCallbacks()
 {
 	glfwSetKeyCallback(mainWindow, ManejaTeclado);
 	glfwSetCursorPosCallback(mainWindow, ManejaMouse);
+	glfwSetScrollCallback(mainWindow, ManejaScroll);
 }
 GLfloat Window::getXChange()
 {
@@ -95,8 +104,6 @@ GLfloat Window::getYChange()
 	yChange = 0.0f;
 	return theChange;
 }
-
-
 
 
 void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode)
@@ -115,6 +122,8 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow-> muevex -= 1.0;
 	}
+
+
 
 
 
@@ -149,6 +158,17 @@ void Window::ManejaMouse(GLFWwindow* window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
+}
+
+void Window::ManejaScroll(GLFWwindow* window, double xOffset, double yOffset) {
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	theWindow->scrollChange = (GLfloat)yOffset;
+}
+
+GLfloat Window::getScrollChange() {
+	GLfloat change = scrollChange;
+	scrollChange = 0.0f;  // Resetear scrollChange, no change
+	return change;
 }
 
 

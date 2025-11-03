@@ -24,11 +24,60 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	// Inicializar detección de tecla Q
 	qKeyPressed = false;
 
+	// Inicializar modo vista aérea
+	aerialViewMode = false;
+	aerialViewHeight = 100.0f;  // Altura más alta para mejor vista del escenario
+	aerialViewCenter = glm::vec3(0.0f, 0.0f, 0.0f);  // Centro de la escena
+	zeroKeyPressed = false;
+	
+	// Inicializar movimiento de cámara aérea
+	aerialYaw = 0.0f;
+	aerialPitch = -90.0f;  // Mirando directamente hacia abajo
+	aerialMoveSpeed = 1.0f;  // Velocidad muy reducida de movimiento en vista aérea
+
 	update();
 }
 
 void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
+	// Alternar vista aérea con la tecla 0
+	if (keys[GLFW_KEY_0]) {
+		if (!zeroKeyPressed) {
+			setAerialViewMode(!aerialViewMode);
+			zeroKeyPressed = true;
+		}
+	} else {
+		zeroKeyPressed = false;
+	}
+
+	// Si está en vista aérea, permitir movimiento limitado
+	if (aerialViewMode) {
+		GLfloat velocity = aerialMoveSpeed * deltaTime;
+		
+		// Movimiento horizontal (WASD) - Solo en plano XZ
+		if (keys[GLFW_KEY_W])
+		{
+			aerialViewCenter.z -= velocity;  // Mover hacia adelante (norte)
+		}
+
+		if (keys[GLFW_KEY_S])
+		{
+			aerialViewCenter.z += velocity;  // Mover hacia atrás (sur)
+		}
+
+		if (keys[GLFW_KEY_A])
+		{
+			aerialViewCenter.x -= velocity;  // Mover a la izquierda (oeste)
+		}
+
+		if (keys[GLFW_KEY_D])
+		{
+			aerialViewCenter.x += velocity;  // Mover a la derecha (este)
+		}
+		
+		return;
+	}
+
 	// Alternar entre cámara libre y tercera persona con la tecla Q
 	if (keys[GLFW_KEY_Q]) {
 		if (!qKeyPressed) {
@@ -129,8 +178,6 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		thirdPersonTarget->posicionLocal += movement;
 		thirdPersonTarget->actualizarTransformacion();
 
-		// Solo rotar el personaje si hay movimiento horizontal (X o Z)
-		// Esto evita valores NaN cuando solo hay movimiento en Y
 		glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
 		float horizontalLength = glm::length(horizontalMovement);
 		
@@ -150,6 +197,31 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 {
+	// En vista aérea, permitir rotación limitada
+	if (aerialViewMode) {
+		xChange *= turnSpeed * 0.5f;  // Reducir sensibilidad en vista aérea
+		yChange *= turnSpeed * 0.5f;
+		
+		aerialYaw += xChange;
+		aerialPitch += yChange;
+		
+		// Limitar pitch a 90 grados (de -90 a 0 grados)
+		// -90 = mirando directamente hacia abajo
+		// 0 = mirando horizontalmente
+		if (aerialPitch > 0.0f) {
+			aerialPitch = 0.0f;
+		}
+		if (aerialPitch < -90.0f) {
+			aerialPitch = -90.0f;
+		}
+		
+		// Normalizar yaw entre -180 y 180
+		while (aerialYaw > 180.0f) aerialYaw -= 360.0f;
+		while (aerialYaw < -180.0f) aerialYaw += 360.0f;
+		
+		return;
+	}
+
 	xChange *= turnSpeed;
 	yChange *= turnSpeed;
 
@@ -169,10 +241,34 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 	update();
 }
 
+void Camera::mouseScrollControl(GLfloat yOffset)
+{
+	// Solo aplicar zoom en vista aérea
+	if (aerialViewMode) {
+		// Ajustar altura con la rueda del mouse
+		// yOffset positivo = scroll hacia arriba = alejar (aumentar altura)
+		// yOffset negativo = scroll hacia abajo = acercar (disminuir altura)
+		GLfloat zoomSpeed = 5.0f;
+		aerialViewHeight -= yOffset * zoomSpeed;
+		
+		// Limitar altura mínima y máxima
+		if (aerialViewHeight < 10.0f) {
+			aerialViewHeight = 10.0f;
+		}
+		if (aerialViewHeight > 200.0f) {
+			aerialViewHeight = 200.0f;
+		}
+	}
+}
+
 glm::mat4 Camera::calculateViewMatrix()
 {
+	// Si está en modo vista aérea, actualizar la posición de la cámara
+	if (aerialViewMode) {
+		updateAerialView();
+	}
 	// Si está en modo tercera persona, actualizar la posición de la cámara
-	if (thirdPersonMode && thirdPersonTarget != nullptr) {
+	else if (thirdPersonMode && thirdPersonTarget != nullptr) {
 		updateThirdPerson();
 	}
 
@@ -217,6 +313,92 @@ void Camera::setThirdPersonMoveSpeed(float speed)
 bool Camera::isThirdPersonMode() const
 {
 	return thirdPersonMode;
+}
+
+void Camera::setAerialViewMode(bool enable)
+{
+	if (enable && !aerialViewMode) {
+		// Guardar el estado actual antes de cambiar a vista aérea
+		saveCurrentState();
+		aerialViewMode = true;
+		updateAerialView();
+	}
+	else if (!enable && aerialViewMode) {
+		// Restaurar el estado previo
+		aerialViewMode = false;
+		restoreState();
+	}
+}
+
+void Camera::setAerialViewHeight(float height)
+{
+	aerialViewHeight = height;
+	if (aerialViewMode) {
+		updateAerialView();
+	}
+}
+
+void Camera::setAerialViewCenter(glm::vec3 center)
+{
+	aerialViewCenter = center;
+	if (aerialViewMode) {
+		updateAerialView();
+	}
+}
+
+bool Camera::isAerialViewMode() const
+{
+	return aerialViewMode;
+}
+
+void Camera::updateAerialView()
+{
+	// Calcular dirección de la cámara basada en aerialYaw y aerialPitch
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(aerialYaw)) * cos(glm::radians(aerialPitch));
+	direction.y = sin(glm::radians(aerialPitch));
+	direction.z = sin(glm::radians(aerialYaw)) * cos(glm::radians(aerialPitch));
+	direction = glm::normalize(direction);
+	
+	// Posicionar la cámara encima del centro
+	position = aerialViewCenter + glm::vec3(0.0f, aerialViewHeight, 0.0f);
+	
+	// La cámara mira en la dirección calculada
+	front = direction;
+	
+	// Calcular vectores right y up
+	right = glm::normalize(glm::cross(front, worldUp));
+	up = glm::normalize(glm::cross(right, front));
+}
+
+void Camera::saveCurrentState()
+{
+	savedPosition = position;
+	savedFront = front;
+	savedUp = up;
+	savedRight = right;
+	savedYaw = yaw;
+	savedPitch = pitch;
+	savedThirdPersonMode = thirdPersonMode;
+	
+	// Resetear ángulos de vista aérea al entrar
+	aerialYaw = 0.0f;
+	aerialPitch = -90.0f;  // Mirando hacia abajo por defecto
+}
+
+void Camera::restoreState()
+{
+	position = savedPosition;
+	front = savedFront;
+	up = savedUp;
+	right = savedRight;
+	yaw = savedYaw;
+	pitch = savedPitch;
+	
+	// Restaurar el modo de tercera persona si estaba activo
+	if (savedThirdPersonMode && thirdPersonTarget != nullptr) {
+		thirdPersonMode = savedThirdPersonMode;
+	}
 }
 
 void Camera::updateThirdPerson()
