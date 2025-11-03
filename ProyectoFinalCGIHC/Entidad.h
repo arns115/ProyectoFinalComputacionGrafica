@@ -34,6 +34,12 @@ public:
     // Actualiza la matriz de transformación local
     void actualizarTransformacion();
     
+    // Aplicar física (gravedad) - NUEVO
+    void aplicarFisica(float deltaTime, float nivelSuelo = -1.0f);
+    
+    // Aplicar salto - NUEVO
+    void saltar(float fuerzaSalto = 5.0f);
+    
     // Agregar una entidad hija
     void agregarHijo(Entidad* hijo);
     
@@ -55,6 +61,12 @@ public:
     // Establecer número de animaciones
     void setNumeroAnimaciones(unsigned int numAnimaciones) { numeroAnimaciones = numAnimaciones; }
 
+    // Habilitar/deshabilitar física - NUEVO
+    void habilitarFisica(bool habilitar) { fisicaHabilitada = habilitar; }
+    bool tieneFisicaHabilitada() const { return fisicaHabilitada; }
+    
+    // Verificar si está en el suelo - NUEVO
+    bool estaEnSuelo() const { return enSuelo; }
     
     // Limpiar geometría y textura
     void limpiarGeometria();
@@ -78,6 +90,12 @@ public:
     // Propiedades de animacion
     unsigned short banderasAnimacion;  // Banderas para control de animación (cada bit representa si esa animacion esta activa, por ejemplo el bit menos signficiativo representa si la primera animacion esta activa)
     unsigned int numeroAnimaciones;    // Numero de animaciones de la entidad
+    
+    // Propiedades físicas - NUEVO
+    glm::vec3 velocidad;               // Velocidad del objeto (incluye velocidad vertical)
+    float gravedad;                    // Fuerza de gravedad aplicada
+    bool fisicaHabilitada;             // Si la física está activa para esta entidad
+    bool enSuelo;                      // Si el objeto está tocando el suelo
     
     // Obtener tipo de geometría
     TipoObjeto getTipoObjeto() const { return TipoObjeto; }
