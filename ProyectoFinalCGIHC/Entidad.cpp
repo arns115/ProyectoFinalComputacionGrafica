@@ -9,7 +9,8 @@ Entidad::Entidad(const std::string& nombreObj,
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
-      texture(nullptr), material(nullptr)
+      texture(nullptr), material(nullptr),
+      banderasAnimacion(0), numeroAnimaciones(0)
 {
     actualizarTransformacion();
 }

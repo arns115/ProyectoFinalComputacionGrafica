@@ -52,6 +52,9 @@ public:
     // Establecer material con nombre y apuntador
     void setMaterial(const std::string& nombreMaterial, Material* mat);
 
+    // Establecer número de animaciones
+    void setNumeroAnimaciones(unsigned int numAnimaciones) { numeroAnimaciones = numAnimaciones; }
+
     
     // Limpiar geometría y textura
     void limpiarGeometria();
@@ -71,6 +74,10 @@ public:
     glm::mat4 transformacionLocal;     // Matriz de transformación local
     
     std::vector<Entidad*> hijos;       // Entidades hijas (jerarquía)
+    
+    // Propiedades de animacion
+    unsigned short banderasAnimacion;  // Banderas para control de animación (cada bit representa si esa animacion esta activa, por ejemplo el bit menos signficiativo representa si la primera animacion esta activa)
+    unsigned int numeroAnimaciones;    // Numero de animaciones de la entidad
     
     // Obtener tipo de geometría
     TipoObjeto getTipoObjeto() const { return TipoObjeto; }

@@ -4,9 +4,10 @@ SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
 {
     // Llamar a las funciones de inicialización separadas
-    inicializarSkybox();
+    inicializarSkybox();  // Inicializar Skybox
+    inicializarLuces();   // Inicializar luces 
     inicializarCamara();  // Inicializar cámara con valores por defecto
-    inicializarEntidades();
+    inicializarEntidades();  // Inicializar Enitdades
 
 }
 
@@ -23,7 +24,7 @@ SceneInformation::~SceneInformation()
     
 }
 
-
+// Function para inicializar la camara
 void SceneInformation::inicializarCamara(glm::vec3 startPosition,
                                         glm::vec3 startUp,
                                         GLfloat startYaw,
@@ -35,14 +36,17 @@ void SceneInformation::inicializarCamara(glm::vec3 startPosition,
     camera = Camera(startPosition, startUp, startYaw, startPitch, startMoveSpeed, startTurnSpeed);
 }
 
+// Funcion para actualizar cada frame con las cosas que no dependen del input del usuario
 void SceneInformation::actualizarFrame(float deltaTime)
 {
     
 }
 
+
+// Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime)
 {
-    // Actualizar cámara con input del usuario
+    // Actualizar cámara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
     
@@ -50,17 +54,74 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
 
 }
 
-
+// Funcion para inicializar la skybox
 void SceneInformation::inicializarSkybox()
 {
     // Establecer el skybox por defecto
     setSkyboxActual(AssetConstants::SkyboxNames::DAY);
 }
 
+// Funcion para inicializar la luz direccional
+void SceneInformation::inicializarLuces()
+{
+    // Obtener la luz del sol desde el LightManager
+    DirectionalLight* sunLight = lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+    
+    if (sunLight != nullptr) {
+        // Establecer la luz del sol como luz direccional principal
+        luzDireccional = *sunLight;
+    } else {
+        // Si no existe, crear una luz direccional por defecto
+        luzDireccional = DirectionalLight(
+            1.0f, 1.0f, 1.0f,      
+            0.3f, 0.5f,           
+            0.0f, -1.0f, 0.0f     
+        );
+    }
+    
+
+}
+
+// Funcion para inicializar todas las entidades
 void SceneInformation::inicializarEntidades()
 {
-       
+    crearPersonajePrincipal();
+    crearPiso();
+    
 
+}
+
+// Funcion para crear a los personjes(ahorita solo esta cuphead)
+void SceneInformation::crearPersonajePrincipal()
+{
+    // Crear entidad prueba del personaje de Cuphead
+    Entidad* testCharacter = new Entidad("testCharacter",
+        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
+        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
+    
+    testCharacter->setTipoObjeto(TipoObjeto::MODELO);
+    testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
+    testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    testCharacter->actualizarTransformacion();
+    agregarEntidad(testCharacter);
+    
+    // Configurar la cámara en tercera persona siguiendo al personaje(esto se va a cambiar mas adelante)
+    camera.setThirdPersonTarget(testCharacter);
+}
+
+void SceneInformation::crearPiso()
+{
+    // Crear el piso
+    Entidad* piso = new Entidad("piso");
+    piso->setTipoObjeto(TipoObjeto::MESH);
+    piso->nombreMesh = AssetConstants::MeshNames::PISO;
+    piso->nombreTextura = AssetConstants::TextureNames::PASTO;
+    piso->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    piso->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
+    piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
+    piso->actualizarTransformacion();
+    agregarEntidad(piso);
 }
     
 

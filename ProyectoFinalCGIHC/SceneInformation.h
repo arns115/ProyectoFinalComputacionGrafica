@@ -121,9 +121,15 @@ private:
     // Inicializar skybox por defecto
     void inicializarSkybox();
     
+    // Inicializar luces de la escena
+    void inicializarLuces();
+    
     // Inicializar entidades de la escena
     void inicializarEntidades();
     
+    // Funciones para crear entidades específicas
+    void crearPersonajePrincipal();
+    void crearPiso();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

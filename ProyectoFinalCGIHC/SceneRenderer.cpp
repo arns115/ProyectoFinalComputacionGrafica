@@ -151,7 +151,6 @@ void SceneRenderer::renderizarEntidad(Entidad* entidad,
 
 void SceneRenderer::renderizarRecursivo(Entidad* entidad, const glm::mat4& transformacionPadre)
 {   
-    std::cout << "Renderizando entidad: " << entidad->nombreObjeto << std::endl;
 
     if (entidad == nullptr) {
         return;
@@ -159,12 +158,6 @@ void SceneRenderer::renderizarRecursivo(Entidad* entidad, const glm::mat4& trans
 	entidad->actualizarTransformacion();
     // Calcular la transformación acumulada
     glm::mat4 transformacionActual = transformacionPadre * entidad->transformacionLocal;
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
-            std::cout << transformacionActual[i][j] << " ";
-        }
-        std::cout << std::endl;
-	}
 
 
     // Se envia el model al shader
@@ -179,7 +172,6 @@ void SceneRenderer::renderizarRecursivo(Entidad* entidad, const glm::mat4& trans
     
     // APLICAR TEXTURA ANTES DE RENDERIZAR
     if (entidad->texture != nullptr) {
-        std::cout << "Usando textura: " << entidad->nombreTextura << std::endl;
         entidad->texture->UseTexture();
     }
     
