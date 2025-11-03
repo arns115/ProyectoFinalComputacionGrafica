@@ -44,13 +44,29 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
 
 // Funcion para actualizar cada frame con el input del usuario
-void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime)
+void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat deltaTime)
 {
     // Actualizar cámara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
     
+	acumuladorTiempoDesdeCambio += deltaTime;
+    if(acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    {
+        esDeDia = !esDeDia; // Cambiar entre dia y noche
+        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
+        if(esDeDia)
+        {
+            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
+			luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+        }
+        else
+        {
+            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
 
+        }
+	}
 
 }
 

@@ -117,6 +117,14 @@ private:
     // Contadores de luces activas
     unsigned int pointLightCountActual;
     unsigned int spotLightCountActual;
+
+    // Booleano para saber si es de dia
+    bool esDeDia = true;
+	// Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
+	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
+
+
+    //Funciones para inicializar componentes de la escena
     
     // Inicializar skybox por defecto
     void inicializarSkybox();

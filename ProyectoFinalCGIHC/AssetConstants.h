@@ -35,22 +35,14 @@ namespace AssetConstants {
 	// Nombres de luces
 	namespace LightNames{
 		// Luces direccionales
-		const std::string SUN_DAY = "sun_day";
-		const std::string MOON_NIGHT = "moon_night";
-		const std::string SOL = "sol";  // Alias para compatibilidad
+		const std::string ESTRELLAS = "estrellas";
+		const std::string SOL = "sol";  
 		
 		// Luces puntuales
-		const std::string LAMP_RED = "lamp_red";
-		const std::string LAMP_GREEN = "lamp_green";
-		const std::string LAMP_BLUE = "lamp_blue";
-		const std::string TORCH = "torch";
-		const std::string PUNTUAL_ROJA = "puntual_roja";  // Alias para compatibilidad
+		const std::string PUNTUAL_ROJA = "puntual_roja"; 
 		
 		// Spotlights
-		const std::string FLASHLIGHT = "flashlight";
-		const std::string SPOTLIGHT_STAGE = "spotlight_stage";
-		const std::string SPOTLIGHT_GREEN = "spotlight_green";
-		const std::string LINTERNA = "linterna";  // Alias para compatibilidad
+		const std::string LINTERNA = "linterna";  
 	}
 
 	// Rutas de texturas
@@ -92,12 +84,12 @@ namespace AssetConstants {
 	namespace SkyboxPaths {
 		const std::string SKYBOX_PATH = "Textures/Skybox/";
 
-		const std::string RIGHT = "right.tga";
-		const std::string LEFT = "left.tga";
-		const std::string TOP =  "top.tga";
-		const std::string BOTTOM = "bottom.tga";
-		const std::string BACK = "back.tga";
-		const std::string FRONT = "front.tga";
+		const std::string RIGHT = "right.png";
+		const std::string LEFT = "left.png";
+		const std::string TOP =  "top.png";
+		const std::string BOTTOM = "bottom.png";
+		const std::string BACK = "back.png";
+		const std::string FRONT = "front.png";
 	}
 
 }
