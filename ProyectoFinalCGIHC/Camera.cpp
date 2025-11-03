@@ -24,6 +24,9 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	// Inicializar detección de tecla Q
 	qKeyPressed = false;
 
+	// NUEVO: Inicializar nivel del suelo
+	groundLevel = 1.0f;
+
 	// Inicializar modo vista aérea
 	aerialViewMode = false;
 	aerialViewHeight = 100.0f;  // Altura más alta para mejor vista del escenario
@@ -162,22 +165,19 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		movement += rightFlat * velocity;
 	}
 
-	// Movimiento vertical (opcional)
+	// NUEVO: Salto con Space (solo si está en el suelo)
 	if (keys[GLFW_KEY_SPACE])
 	{
-		movement.y += velocity;
+		thirdPersonTarget->saltar(8.0f);  // Fuerza de salto ajustable
 	}
 
-	if (keys[GLFW_KEY_LEFT_CONTROL])
-	{
-		movement.y -= velocity;
-	}
-
-	// Aplicar el movimiento al personaje
+	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la física)
 	if (glm::length(movement) > 0.0f) {
-		thirdPersonTarget->posicionLocal += movement;
-		thirdPersonTarget->actualizarTransformacion();
+		// Solo aplicar movimiento horizontal
+		thirdPersonTarget->posicionLocal.x += movement.x;
+		thirdPersonTarget->posicionLocal.z += movement.z;
 
+		// Rotación del personaje basada en dirección de movimiento
 		glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
 		float horizontalLength = glm::length(horizontalMovement);
 		
@@ -189,10 +189,14 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 				targetYaw,
 				thirdPersonTarget->rotacionLocal.z
 			);
-			thirdPersonTarget->actualizarTransformacion();
 		}
-		// Si solo hay movimiento en Y, no rotamos el personaje
 	}
+	
+	// NUEVO: Aplicar física (gravedad) al personaje
+	thirdPersonTarget->aplicarFisica(deltaTime, groundLevel);
+	
+	// Actualizar transformación
+	thirdPersonTarget->actualizarTransformacion();
 }
 
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange)

@@ -63,6 +63,9 @@ private:
 	// Variable para detectar pulsación de tecla Q
 	bool qKeyPressed;
 
+	// NUEVO: Nivel del suelo para física
+	float groundLevel;
+
 	// Variables para vista aérea
 	bool aerialViewMode;
 	float aerialViewHeight;

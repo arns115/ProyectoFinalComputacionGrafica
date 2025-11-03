@@ -101,6 +101,11 @@ void SceneInformation::crearPersonajePrincipal()
     testCharacter->setTipoObjeto(TipoObjeto::MODELO);
     testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
     testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    
+    // NUEVO: Habilitar física para el personaje
+    testCharacter->habilitarFisica(true);
+    testCharacter->gravedad = -0.5f;  // Ajustar gravedad (más negativo = cae más rápido)
+    
     testCharacter->actualizarTransformacion();
     agregarEntidad(testCharacter);
     
