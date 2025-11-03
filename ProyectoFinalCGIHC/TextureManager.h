@@ -10,7 +10,9 @@ public:
 
 	TextureManager();
 
-	void renderTexture(const std::string& textureName);
+	// Método para obtener una textura 
+	Texture* getTexture(const std::string& textureName);
+	
 
 	~TextureManager();
 

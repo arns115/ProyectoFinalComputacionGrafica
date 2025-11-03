@@ -9,15 +9,17 @@ TextureManager::TextureManager()
 	loadTexture(AssetConstants::TextureNames::TIERRA, AssetConstants::TexturePaths::TIERRA_PATH);
 }
 
-// Renderiza una textura por su nombre
-void TextureManager::renderTexture(const std::string& textureName) 
+// Obtiene una textura por su nombre 
+Texture* TextureManager::getTexture(const std::string& textureName)
 {
 	auto it = textures.find(textureName);
 	if (it != textures.end()) {
-		it->second->UseTexture();
+		return it->second;
 	}
+	return nullptr;
 }
 
+// Carga una textura en el manager
 void TextureManager::loadTexture(const std::string& textureName, const std::string& texturePath)
 {
 	Texture* texture = new Texture(texturePath.c_str());

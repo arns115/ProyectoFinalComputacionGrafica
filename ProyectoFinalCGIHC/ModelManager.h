@@ -10,7 +10,9 @@ public:
 
 	ModelManager();
 
-	void renderModel(const std::string& modelName);
+	// Método para obtener un modelo
+	Model* getModel(const std::string& modelName);
+	
 
 	~ModelManager();
 

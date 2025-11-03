@@ -19,6 +19,40 @@ namespace AssetConstants {
 		const std::string CUPHEAD = "cuphead";
 	}
 
+	// Nombres de meshes
+	namespace MeshNames{
+		const std::string PISO = "piso";
+		const std::string PIRAMIDE = "piramide";
+		const std::string VEGETACION = "vegetacion";
+	}
+
+	// Nombres de materiales
+	namespace MaterialNames{
+		const std::string BRILLANTE = "brillante";
+		const std::string OPACO = "opaco";
+	}
+
+	// Nombres de luces
+	namespace LightNames{
+		// Luces direccionales
+		const std::string SUN_DAY = "sun_day";
+		const std::string MOON_NIGHT = "moon_night";
+		const std::string SOL = "sol";  // Alias para compatibilidad
+		
+		// Luces puntuales
+		const std::string LAMP_RED = "lamp_red";
+		const std::string LAMP_GREEN = "lamp_green";
+		const std::string LAMP_BLUE = "lamp_blue";
+		const std::string TORCH = "torch";
+		const std::string PUNTUAL_ROJA = "puntual_roja";  // Alias para compatibilidad
+		
+		// Spotlights
+		const std::string FLASHLIGHT = "flashlight";
+		const std::string SPOTLIGHT_STAGE = "spotlight_stage";
+		const std::string SPOTLIGHT_GREEN = "spotlight_green";
+		const std::string LINTERNA = "linterna";  // Alias para compatibilidad
+	}
+
 	// Rutas de texturas
 	namespace TexturePaths{
 		const std::string TEXTURE_PATH = "Textures/";
@@ -34,6 +68,18 @@ namespace AssetConstants {
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 	}
 
+	// Nombres de shaders
+	namespace ShaderNames {
+		const std::string MAIN_SHADER = "main_shader";
+		const std::string LIGHT_SHADER = "light_shader";
+	}
+
+	// Rutas de shaders
+	namespace ShaderPaths {
+		const std::string SHADER_PATH = "shaders/";
+		const std::string VERTEX_SHADER = SHADER_PATH + "shader_light.vert";
+		const std::string FRAGMENT_SHADER = SHADER_PATH + "shader_light.frag";
+	}
 
 	// Nombres de skybox
 

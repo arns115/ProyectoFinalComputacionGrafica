@@ -10,11 +10,13 @@ class SkyboxManager
 public:
 	SkyboxManager();
 
-	void renderSkybox(const std::string& skyboxName, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
+	// Método para obtener un skybox por nombre 
+	Skybox* getSkybox(const std::string& skyboxName);
 
 	~SkyboxManager();
 
 private:
+	// Mapa para almacenar los skyboxes con su nombre como clave
 	std::map<std::string, Skybox> skyboxes;
 
 	void loadSkybox(const std::string& skyboxName);
