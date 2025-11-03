@@ -164,7 +164,6 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="EjemploUsoEntidad.cpp" />
     <ClCompile Include="Entidad.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
