@@ -18,8 +18,8 @@ Skybox::Skybox(std::vector<std::string> faceLocations)
 	int width, height, bitDepth;
 	for (size_t i = 0; i < 6; i++)
 	{
-
 		unsigned char *texData = stbi_load(faceLocations[i].c_str(), &width, &height, &bitDepth, 0); //el tipo unsigned char es para un array de bytes de la imagen, obtener datos de la imagen 
+		GLint format = (bitDepth == 4) ? GL_RGBA : GL_RGB;
 		if (!texData)
 		{
 			printf("No se encontró : %s", faceLocations[i].c_str());
@@ -27,7 +27,7 @@ Skybox::Skybox(std::vector<std::string> faceLocations)
 		}
 		//para cambiar el origen a la esquina inferior izquierda como necesitamos
 		//stbi_set_flip_vertically_on_load(true);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X +i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texData); //SIN CANAL ALPHA A ENOS QUE QUERAMOS AGREGAR EFECTO DE PARALLAX
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X +i, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, texData); //SIN CANAL ALPHA A ENOS QUE QUERAMOS AGREGAR EFECTO DE PARALLAX
 		stbi_image_free(texData); //para liberar la información de la imagen
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

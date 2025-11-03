@@ -15,8 +15,8 @@ void SkyboxManager::loadSkybox(const std::string& skyboxName)
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::RIGHT);
 	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::LEFT);
-	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::BOTTOM);
 	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::TOP);
+	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::BOTTOM);
 	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::BACK);
 	skyboxFaces.push_back(basePath + AssetConstants::SkyboxPaths::FRONT);
 	skyboxes[skyboxName] = Skybox(skyboxFaces);
