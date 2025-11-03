@@ -10,6 +10,13 @@ LightManager::LightManager()
 		0.0f, -1.0f, 0.0f);
 
 
+	loadDirectionalLight(AssetConstants::LightNames::ESTRELLAS,
+		0.8f, 0.85f, 1.0f,           // Color azulado
+		0.3f, 0.5f,
+		0.0f, -1.0f, 0.0f);
+
+
+
 
 	// Cargar luces puntuales predefinidas
 	loadPointLight(AssetConstants::LightNames::PUNTUAL_ROJA,

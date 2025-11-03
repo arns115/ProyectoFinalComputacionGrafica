@@ -3,10 +3,10 @@
 SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
 {
-    // Llamar a las funciones de inicialización separadas
+    // Llamar a las funciones de inicializaciÃ³n separadas
     inicializarSkybox();  // Inicializar Skybox
     inicializarLuces();   // Inicializar luces 
-    inicializarCamara();  // Inicializar cámara con valores por defecto
+    inicializarCamara();  // Inicializar cÃ¡mara con valores por defecto
     inicializarEntidades();  // Inicializar Enitdades
 
 }
@@ -32,7 +32,7 @@ void SceneInformation::inicializarCamara(glm::vec3 startPosition,
                                         GLfloat startMoveSpeed,
                                         GLfloat startTurnSpeed)
 {
-    // Crear la cámara con los parámetros especificados
+    // Crear la cÃ¡mara con los parÃ¡metros especificados
     camera = Camera(startPosition, startUp, startYaw, startPitch, startMoveSpeed, startTurnSpeed);
 }
 
@@ -46,10 +46,28 @@ void SceneInformation::actualizarFrame(float deltaTime)
 // Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
 {
-    // Actualizar cámara con input del usuario (mouse y teclado)
+    // Actualizar cÃ¡mara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
     camera.mouseScrollControl(scrollChange);  // Agregar control del scroll
+    
+	acumuladorTiempoDesdeCambio += deltaTime;
+    if(acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    {
+        esDeDia = !esDeDia; // Cambiar entre dia y noche
+        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
+        if(esDeDia)
+        {
+            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
+			luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+        }
+        else
+        {
+            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+
+        }
+	}
 }
 
 // Funcion para inicializar la skybox
@@ -94,22 +112,22 @@ void SceneInformation::crearPersonajePrincipal()
 {
     // Crear entidad prueba del personaje de Cuphead
     Entidad* testCharacter = new Entidad("testCharacter",
-        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
-        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(0.0f, 0.0f, 0.0f),      // PosiciÃ³n inicial
+        glm::vec3(-90.0f, 0.0f, 0.0f),     // RotaciÃ³n
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
     testCharacter->setTipoObjeto(TipoObjeto::MODELO);
     testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
     testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     
-    // NUEVO: Habilitar física para el personaje
+    // NUEVO: Habilitar fÃ­sica para el personaje
     testCharacter->habilitarFisica(true);
-    testCharacter->gravedad = -0.5f;  // Ajustar gravedad (más negativo = cae más rápido)
+    testCharacter->gravedad = -0.5f;  // Ajustar gravedad (mÃ¡s negativo = cae mÃ¡s rÃ¡pido)
     
     testCharacter->actualizarTransformacion();
     agregarEntidad(testCharacter);
     
-    // Configurar la cámara en tercera persona siguiendo al personaje(esto se va a cambiar mas adelante)
+    // Configurar la cÃ¡mara en tercera persona siguiendo al personaje(esto se va a cambiar mas adelante)
     camera.setThirdPersonTarget(testCharacter);
 }
 
@@ -177,7 +195,7 @@ void SceneInformation::setLuzDireccional(const DirectionalLight& light)
 bool SceneInformation::agregarLuzPuntualActual(const PointLight& light)
 {
     if (pointLightCountActual >= MAX_POINT_LIGHTS) {
-        return false; // No hay espacio para más luces actuales
+        return false; // No hay espacio para mÃ¡s luces actuales
     }
     
     // Agregar al arreglo de luces actuales
@@ -195,7 +213,7 @@ void SceneInformation::limpiarLucesPuntualesActuales()
 bool SceneInformation::agregarSpotLightActual(const SpotLight& light)
 {
     if (spotLightCountActual >= MAX_SPOT_LIGHTS) {
-        return false; // No hay espacio para más luces actuales
+        return false; // No hay espacio para mÃ¡s luces actuales
     }
     
     // Agregar solo al arreglo de luces actuales
