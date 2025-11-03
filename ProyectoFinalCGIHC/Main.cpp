@@ -51,7 +51,8 @@ int main()
 		// Actualizar la escena con input del usuario (cámara, controles, etc.)
 		scene.actualizarFrameInput(mainWindow.getsKeys(), 
 		                           mainWindow.getXChange(), 
-		                           mainWindow.getYChange(), 
+		                           mainWindow.getYChange(),
+		                           mainWindow.getScrollChange(),  // Agregar scroll
 		                           deltaTime);
 
 		// Actualizar la escena (luces dinámicas, animaciones, etc.)

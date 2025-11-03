@@ -38,7 +38,7 @@ public:
     void actualizarFrame(float deltaTime);
 
     // Actualizar la escena cada frame dependiendo del input del usuario
-    void actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime);
+    void actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime);
 
     // Agregar una entidad a la escena
     void agregarEntidad(Entidad* entidad);
