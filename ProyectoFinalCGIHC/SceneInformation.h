@@ -14,6 +14,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "CommonValues.h"
+#include "Camera.h"
 
 // Clase para gestionar la información de la escena
 // Se enfoca en gestión de recursos, entidades e iluminación
@@ -25,6 +26,20 @@ public:
     // Inicializar la escena creando todos los objetos
     void inicializarEscena();
     
+    // Inicializar la cámara con parámetros personalizados
+    void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),
+                          glm::vec3 startUp = glm::vec3(0.0f, 1.0f, 0.0f),
+                          GLfloat startYaw = -60.0f,
+                          GLfloat startPitch = 0.0f,
+                          GLfloat startMoveSpeed = 0.3f,
+                          GLfloat startTurnSpeed = 0.5f);
+    
+    // Actualizar la escena cada frame (luces dinámicas, animaciones, etc.)
+    void actualizarFrame(float deltaTime);
+
+    // Actualizar la escena cada frame dependiendo del input del usuario
+    void actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime);
+
     // Agregar una entidad a la escena
     void agregarEntidad(Entidad* entidad);
     
@@ -32,6 +47,9 @@ public:
     void removerEntidad(Entidad* entidad);
     
     
+    // Acceso a la cámara
+    Camera& getCamara() { return camera; }
+    const Camera& getCamara() const { return camera; }
     
     // Acceso a las entidades
     std::vector<Entidad*>& getEntidades() { return entidades; }
@@ -47,7 +65,6 @@ public:
     // Buscar una entidad por nombre 
     Entidad* buscarEntidad(const std::string& nombre);
 
-    
     // Establecer la luz direccional
     void setLuzDireccional(const DirectionalLight& light);
     DirectionalLight* getLuzDireccional() { return &luzDireccional; }
@@ -76,6 +93,9 @@ private:
     // Vector con todas las entidades de la escena
     std::vector<Entidad*> entidades;
     
+    // Cámara de la escena
+    Camera camera;
+    
     // Managers de recursos
     ModelManager modelManager;
     TextureManager textureManager;
@@ -86,7 +106,6 @@ private:
     
     // Skybox actual de la escena
     Skybox* skyboxActual;
-    
     
     // Luz direccional
     DirectionalLight luzDireccional;

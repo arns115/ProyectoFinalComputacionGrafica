@@ -8,7 +8,7 @@ Entidad::Entidad(const std::string& nombreObj,
     : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
-      tipoGeometria(TipoGeometria::MODELO), modelo(nullptr), mesh(nullptr), 
+      TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
       texture(nullptr), material(nullptr)
 {
     actualizarTransformacion();
@@ -52,7 +52,7 @@ void Entidad::setModelo(const std::string& nombreModelo, Model* modelo)
 {
     this->nombreModelo = nombreModelo;
     this->modelo = modelo;
-    this->tipoGeometria = TipoGeometria::MODELO;
+    this->TipoObjeto = TipoObjeto::MODELO;
     this->mesh = nullptr;
     this->nombreMesh = "";
 }
@@ -61,7 +61,7 @@ void Entidad::setMesh(const std::string& nombreMesh, Mesh* mesh)
 {
     this->nombreMesh = nombreMesh;
     this->mesh = mesh;
-    this->tipoGeometria = TipoGeometria::MESH;
+    this->TipoObjeto = TipoObjeto::MESH;
     this->modelo = nullptr;
     this->nombreModelo = "";
 }

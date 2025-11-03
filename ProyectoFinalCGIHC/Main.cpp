@@ -12,20 +12,16 @@
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
-//para probar el importer
-//#include<assimp/Importer.hpp>
 
 #include "Window.h"
 #include "Mesh.h"
-#include "Shader_light.h"
 #include "Camera.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
-#include "SkyboxManager.h"
 #include "Sphere.h"
-#include"Model.h"
+#include "Model.h"
 #include "Entidad.h"
 #include "AssetConstants.h"
+#include "SceneInformation.h"
+#include "SceneRenderer.h"
 
 // Iluminación
 #include "CommonValues.h"
@@ -37,7 +33,6 @@ const float toRadians = 3.14159265f / 180.0f;
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
-std::vector<Shader> shaderList;
 
 Camera camera;
 
@@ -55,12 +50,8 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-// Vertex Shader
-static const char* vShader = "shaders/shader_light.vert";
-
-// Fragment Shader
-static const char* fShader = "shaders/shader_light.frag";
-
+// Scene renderer
+SceneRenderer sceneRenderer;
 
 //función de calculo de normales por promedio de vértices 
 void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
@@ -137,9 +128,7 @@ void CreateObjects()
 		0.0f, -0.5f, -0.5f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 		0.0f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 		0.0f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-
-
+		0.0f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f
 	};
 	
 	Mesh *obj1 = new Mesh();
@@ -165,80 +154,53 @@ void CreateObjects()
 }
 
 
-void CreateShaders()
-{
-	Shader *shader1 = new Shader();
-	shader1->CreateFromFiles(vShader, fShader);
-	shaderList.push_back(*shader1);
-}
-
-
-
 int main()
 {
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
 	mainWindow.Initialise();
 
-	// se crean los manejadores de texturas, modelos y skybox
-	TextureManager textureManager;
-	ModelManager modelManager;
-	SkyboxManager skyboxManager;
-
-	CreateObjects();
-	CreateShaders();
-
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
-	// Crear entidad de prueba con una raíz
-	EntidadParte* raizTest = new EntidadParte("cuphead");
+	// Crear SceneInformation (gestiona recursos y estado de la escena)
+	SceneInformation scene;
 	
-	Entidad *testCharacter = new Entidad(glm::vec3(0.0f, 0.0f, 0.0f), // Posición
-									glm::vec3(-90.0f, 0.0f, 0.0f), // Rotación
-									glm::vec3(1.5f, 1.5f, 1.5f), // Escala
-									raizTest);
+	// Inicializar el SceneRenderer
+	if (!sceneRenderer.inicializar()) {
+		return 1;
+	}
 
-	Material_brillante = Material(4.0f, 256);
-	Material_opaco = Material(0.3f, 4);
-
-	camera.setThirdPersonTarget(testCharacter);
-
-	//luz direccional, sólo 1 y siempre debe de existir
-	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.3f, 0.3f,
-		0.0f, 0.0f, -1.0f);
-	//contador de luces puntuales
-	unsigned int pointLightCount = 0;
-	//Declaración de primer luz puntual
-	pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f,
-		-6.0f, 1.5f, 1.5f,
-		0.3f, 0.2f, 0.1f);
-	pointLightCount++;
-
-	unsigned int spotLightCount = 0;
-	//linterna
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		0.0f, 2.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		5.0f);
-	spotLightCount++;
-
-	//luz fija
-	spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
-		1.0f, 2.0f,
-		5.0f, 10.0f, 0.0f,
-		0.0f, -5.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		15.0f);
-	spotLightCount++;
+	// INICIALIZAR LUZ DIRECCIONAL
+	DirectionalLight mainLight(1.0f, 1.0f, 1.0f,  // Color blanco
+	                           0.3f, 0.5f,         // Intensidades ambient y diffuse
+	                           0.0f, -1.0f, 0.0f); // Dirección hacia abajo
+	scene.setLuzDireccional(mainLight);
 	
-	//se crean mas luces puntuales y spotlight 
+	// Crear entidad de prueba
+	Entidad* testCharacter = new Entidad("testCharacter",
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(-90.0f, 0.0f, 0.0f),
+		glm::vec3(1.5f, 1.5f, 1.5f));
+	testCharacter->setTipoObjeto(TipoObjeto::MODELO);
+	testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
+	testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	testCharacter->actualizarTransformacion();
+	scene.agregarEntidad(testCharacter);
+	
+	// Crear piso
+	Entidad* floor = new Entidad("floor");
+	floor->setTipoObjeto(TipoObjeto::MESH);  // ESTABLECER TIPO ANTES DE AGREGAR
+	floor->nombreMesh = AssetConstants::MeshNames::PISO;
+	floor->nombreTextura = AssetConstants::TextureNames::PASTO;
+	floor->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+	floor->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
+	floor->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
+	floor->actualizarTransformacion();
+	scene.agregarEntidad(floor);
 
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
-		uniformSpecularIntensity = 0, uniformShininess = 0;
-	GLuint uniformColor = 0;
+
+	// Configurar cámara en tercera persona
+	scene.getCamara().setThirdPersonTarget(testCharacter);
+
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
+	
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -247,59 +209,30 @@ int main()
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
-		//Recibir eventos del usuario
+		// Recibir eventos del usuario
 		glfwPollEvents();
-		camera.keyControl(mainWindow.getsKeys(), deltaTime);
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
-
-		// Clear the window
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skyboxManager.renderSkybox(AssetConstants::SkyboxNames::DAY, camera.calculateViewMatrix(), projection);
-		shaderList[0].UseShader();
-		uniformModel = shaderList[0].GetModelLocation();
-		uniformProjection = shaderList[0].GetProjectionLocation();
-		uniformView = shaderList[0].GetViewLocation();
-		uniformEyePosition = shaderList[0].GetEyePositionLocation();
-		uniformColor = shaderList[0].getColorLocation();
 		
-		//información en el shader de intensidad especular y brillo
-		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-		uniformShininess = shaderList[0].GetShininessLocation();
+		// Actualizar la escena con input del usuario (cámara, controles, etc.)
+		scene.actualizarFrameInput(mainWindow.getsKeys(), 
+		                           mainWindow.getXChange(), 
+		                           mainWindow.getYChange(), 
+		                           deltaTime);
 
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		// Actualizar la escena (luces dinámicas, animaciones, etc.)
+		scene.actualizarFrame(deltaTime);
 
-		// luz ligada a la cámara de tipo flash
-		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
-			glm::vec3 lowerLight = camera.getCameraPosition();
-		lowerLight.y -= 0.3f;
-		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-
-		//información al shader de fuentes de iluminación
-		shaderList[0].SetDirectionalLight(&mainLight);
-		shaderList[0].SetPointLights(pointLights, pointLightCount);
-		shaderList[0].SetSpotLights(spotLights, spotLightCount);
-
-
-		glm::mat4 model(1.0);
-		glm::mat4 modelaux(1.0);
-		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		textureManager.renderTexture(AssetConstants::TextureNames::PASTO);
-		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[2]->RenderMesh();
-
-		//testCharacter.setRotacion(glm::vec3(toRadians * -90, 0.0f, 0.0f));
-		testCharacter->renderizar(modelManager, uniformModel);
-
-		glUseProgram(0);
+		// Renderizar frame completo
+		sceneRenderer.renderizarFrame(
+			scene.getSkyboxActual(),
+			scene.getCamara(),
+			projection,
+			scene.getEntidades(),
+			scene.getLuzDireccional(),
+			scene.getPointLightsActuales(),
+			scene.getPointLightCountActual(),
+			scene.getSpotLightsActuales(),
+			scene.getSpotLightCountActual()
+		);
 
 		mainWindow.swapBuffers();
 	}

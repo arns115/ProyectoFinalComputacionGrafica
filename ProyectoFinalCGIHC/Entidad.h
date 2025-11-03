@@ -14,7 +14,7 @@
 class SceneRenderer;
 
 // Enum para el tipo de geometría de la entidad
-enum class TipoGeometria {
+enum class TipoObjeto {
     MODELO,     // Usa un modelo 3D
     MESH        // Usa un mesh
 };
@@ -37,6 +37,9 @@ public:
     // Agregar una entidad hija
     void agregarHijo(Entidad* hijo);
     
+    // Establecer tipo de objeto
+    void setTipoObjeto(TipoObjeto tipo) { TipoObjeto = tipo; }
+
     // Establecer modelo con nombre y apuntador
     void setModelo(const std::string& nombreModelo, Model* modelo);
 
@@ -48,6 +51,7 @@ public:
     
     // Establecer material con nombre y apuntador
     void setMaterial(const std::string& nombreMaterial, Material* mat);
+
     
     // Limpiar geometría y textura
     void limpiarGeometria();
@@ -69,14 +73,14 @@ public:
     std::vector<Entidad*> hijos;       // Entidades hijas (jerarquía)
     
     // Obtener tipo de geometría
-    TipoGeometria getTipoGeometria() const { return tipoGeometria; }
+    TipoObjeto getTipoObjeto() const { return TipoObjeto; }
     
     // SceneRenderer necesita acceso a los miembros privados
     friend class SceneRenderer;
     
 private:
     // Tipo de geometría que usa esta entidad
-    TipoGeometria tipoGeometria;
+    TipoObjeto TipoObjeto;
     
     // Punteros directos a recursos
     Model* modelo;

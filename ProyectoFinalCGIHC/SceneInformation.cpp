@@ -5,6 +5,7 @@ SceneInformation::SceneInformation()
 {
     // Llamar a las funciones de inicialización separadas
     inicializarSkybox();
+    inicializarCamara();  // Inicializar cámara con valores por defecto
     inicializarEntidades();
 
 }
@@ -23,6 +24,32 @@ SceneInformation::~SceneInformation()
 }
 
 
+void SceneInformation::inicializarCamara(glm::vec3 startPosition,
+                                        glm::vec3 startUp,
+                                        GLfloat startYaw,
+                                        GLfloat startPitch,
+                                        GLfloat startMoveSpeed,
+                                        GLfloat startTurnSpeed)
+{
+    // Crear la cámara con los parámetros especificados
+    camera = Camera(startPosition, startUp, startYaw, startPitch, startMoveSpeed, startTurnSpeed);
+}
+
+void SceneInformation::actualizarFrame(float deltaTime)
+{
+    
+}
+
+void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, float deltaTime)
+{
+    // Actualizar cámara con input del usuario
+    camera.keyControl(keys, deltaTime);
+    camera.mouseControl(mouseXChange, mouseYChange);
+    
+
+
+}
+
 
 void SceneInformation::inicializarSkybox()
 {
@@ -32,10 +59,10 @@ void SceneInformation::inicializarSkybox()
 
 void SceneInformation::inicializarEntidades()
 {
-    // Aquí se pueden crear entidades iniciales de la escena
+       
 
 }
-
+    
 
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {
@@ -124,7 +151,7 @@ void SceneInformation::vincularRecursos(Entidad* entidad)
     if (entidad == nullptr) return;
     
     // Vincular modelo si la entidad usa un modelo
-    if (entidad->getTipoGeometria() == TipoGeometria::MODELO) {
+    if (entidad->getTipoObjeto() == TipoObjeto::MODELO) {
         std::string modelName = entidad->nombreModelo;
         if (!modelName.empty()) {
             Model* modelo = modelManager.getModel(modelName);
@@ -135,7 +162,7 @@ void SceneInformation::vincularRecursos(Entidad* entidad)
     }
     
     // Vincular mesh si la entidad usa un mesh
-    if (entidad->getTipoGeometria() == TipoGeometria::MESH) {
+    if (entidad->getTipoObjeto() == TipoObjeto::MESH) {
         std::string meshName = entidad->nombreMesh;
         if (!meshName.empty()) {
             Mesh* mesh = meshManager.getMesh(meshName);

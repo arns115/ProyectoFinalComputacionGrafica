@@ -35,13 +35,22 @@ namespace AssetConstants {
 	// Nombres de luces
 	namespace LightNames{
 		// Luces direccionales
-		const std::string SOL = "sol";
+		const std::string SUN_DAY = "sun_day";
+		const std::string MOON_NIGHT = "moon_night";
+		const std::string SOL = "sol";  // Alias para compatibilidad
 		
 		// Luces puntuales
-		const std::string PUNTUAL_ROJA = "puntual_roja";
+		const std::string LAMP_RED = "lamp_red";
+		const std::string LAMP_GREEN = "lamp_green";
+		const std::string LAMP_BLUE = "lamp_blue";
+		const std::string TORCH = "torch";
+		const std::string PUNTUAL_ROJA = "puntual_roja";  // Alias para compatibilidad
 		
 		// Spotlights
-		const std::string LINTERNA = "linterna";
+		const std::string FLASHLIGHT = "flashlight";
+		const std::string SPOTLIGHT_STAGE = "spotlight_stage";
+		const std::string SPOTLIGHT_GREEN = "spotlight_green";
+		const std::string LINTERNA = "linterna";  // Alias para compatibilidad
 	}
 
 	// Rutas de texturas

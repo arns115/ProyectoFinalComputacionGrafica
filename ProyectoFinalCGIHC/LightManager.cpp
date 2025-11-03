@@ -1,33 +1,34 @@
 #include "LightManager.h"
 
 // Carga todas las luces predefinidas al inicializar el LightManager
-LightManager::LightManager() 
+LightManager::LightManager()
 {
 	// Cargar luces direccionales predefinidas
-	loadDirectionalLight(AssetConstants::LightNames::SOL, 
-	                    1.0f, 1.0f, 1.0f,           // Color blanco
-	                    0.3f, 0.5f,                 
-	                    0.0f, -1.0f, 0.0f);         
-	
+	loadDirectionalLight(AssetConstants::LightNames::SOL,
+		1.0f, 1.0f, 1.0f,           // Color blanco
+		0.3f, 0.5f,
+		0.0f, -1.0f, 0.0f);
 
-	
+
+
 	// Cargar luces puntuales predefinidas
-	loadPointLight(AssetConstants::LightNames::PUNTUAL_ROJA, 
-	              1.0f, 0.0f, 0.0f,                 // Rojo
-	              0.3f, 1.0f,                       
-	              -5.0f, 2.0f, 0.0f,                
-	              0.3f, 0.2f, 0.1f);             
-	
-	
+	loadPointLight(AssetConstants::LightNames::PUNTUAL_ROJA,
+		1.0f, 0.0f, 0.0f,                 // Rojo
+		0.3f, 1.0f,
+		-5.0f, 2.0f, 0.0f,
+		0.3f, 0.2f, 0.1f);
+
+
 	// Cargar spotlights predefinidos
 	loadSpotLight(AssetConstants::LightNames::LINTERNA,
-				1.0f, 1.0f, 1.0f,
-				0.0f, 2.0f,
-				0.0f, 0.0f, 0.0f,
-				0.0f, -1.0f, 0.0f,
-				1.0f, 0.0f, 0.0f,
-				5.0f);
-	
+		1.0f, 1.0f, 1.0f,
+		0.0f, 2.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		5.0f);
+
+}
 
 
 // Obtiene una luz direccional por su nombre
