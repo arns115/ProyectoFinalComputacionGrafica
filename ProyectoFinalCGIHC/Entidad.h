@@ -85,6 +85,11 @@ public:
     glm::vec3 escalaLocal;             // Escala local
     glm::mat4 transformacionLocal;     // Matriz de transformación local
     
+    // Transformaciones iniciales (para poder regresar objetos a sus estados iniciales)
+    glm::vec3 posicionInicial;         // Posición inicial configurada en el constructor
+    glm::vec3 rotacionInicial;         // Rotación inicial configurada en el constructor
+    glm::vec3 escalaInicial;           // Escala inicial configurada en el constructor
+    
     std::vector<Entidad*> hijos;       // Entidades hijas (jerarquía)
     
     // Propiedades de animacion

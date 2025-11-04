@@ -8,6 +8,7 @@ Entidad::Entidad(const std::string& nombreObj,
     : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
+      posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),  // Guardar valores iniciales (estado inicial del objeto)
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
       texture(nullptr), material(nullptr),
       banderasAnimacion(0), numeroAnimaciones(0),
@@ -67,8 +68,8 @@ void Entidad::aplicarFisica(float deltaTime, float nivelSuelo)
     posicionLocal += velocidad * deltaTime;
     
     // Colisión con el suelo
-    if (posicionLocal.y <= nivelSuelo) {
-        posicionLocal.y = nivelSuelo;
+    if (posicionLocal.y <= nivelSuelo + posicionInicial.y) {
+        posicionLocal.y = nivelSuelo + posicionInicial.y;
         velocidad.y = 0.0f;
         enSuelo = true;
     } else {

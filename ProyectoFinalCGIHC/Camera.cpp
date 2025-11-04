@@ -25,7 +25,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	qKeyPressed = false;
 
 	// NUEVO: Inicializar nivel del suelo
-	groundLevel = 1.0f;
+	groundLevel = 0.0f;
 
 	// Inicializar modo vista aérea
 	aerialViewMode = false;
@@ -186,7 +186,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
 			thirdPersonTarget->rotacionLocal = glm::vec3(
 				thirdPersonTarget->rotacionLocal.x,
-				targetYaw,
+				thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
 				thirdPersonTarget->rotacionLocal.z
 			);
 		}
