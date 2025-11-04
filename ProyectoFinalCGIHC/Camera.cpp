@@ -1,7 +1,9 @@
 #include "Camera.h"
 #include "Entidad.h"
+#include "ComponenteFisico.h"
+#include "ComponenteAnimacion.h"
 
-// TODO: Hacer una clases para la c·mara aÈrea y la c·mara en tercera persona que hereden de Camera
+// TODO: Hacer una clases para la c√°mara a√©rea y la c√°mara en tercera persona que hereden de Camera
 
 Camera::Camera() {}
 
@@ -23,36 +25,36 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	thirdPersonHeight = 2.0f;
 	thirdPersonMoveSpeed = 1.0f;  // Velocidad por defecto para el personaje
 	
-	// Inicializar detecciÛn de tecla Q
+	// Inicializar detecci√≥n de tecla Q
 	qKeyPressed = false;
 
 	// NUEVO: Inicializar nivel del suelo
 	groundLevel = 1.2f;
 	
-	// Inicializar detecciÛn de teclas de modo de c·mara
+	// Inicializar detecci√≥n de teclas de modo de c√°mara
 	key8Pressed = false;
 	key9Pressed = false;
 	key0Pressed = false;
 
-	// Inicializar modo vista aÈrea
+	// Inicializar modo vista a√©rea
 	aerialViewMode = false;
-	aerialViewHeight = 100.0f;  // Altura m·s alta para mejor vista del escenario
+	aerialViewHeight = 100.0f;  // Altura m√°s alta para mejor vista del escenario
 	aerialViewCenter = glm::vec3(0.0f, 0.0f, 0.0f);  // Centro de la escena
 	//zeroKeyPressed = false;
 	
-	// Inicializar movimiento de c·mara aÈrea
+	// Inicializar movimiento de c√°mara a√©rea
 	aerialYaw = 0.0f;
 	aerialPitch = -90.0f;  // Mirando directamente hacia abajo
-	aerialMoveSpeed = 1.0f;  // Velocidad muy reducida de movimiento en vista aÈrea
+	aerialMoveSpeed = 1.0f;  // Velocidad muy reducida de movimiento en vista a√©rea
 
 	update();
 }
 
 void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
-	// Alternar entre modos de c·mara con teclas 8, 9 y 0
+	// Alternar entre modos de c√°mara con teclas 8, 9 y 0
 	
-	// Tecla 8: C·mara Libre
+	// Tecla 8: C√°mara Libre
 	if (keys[GLFW_KEY_8]) {
 		if (!key8Pressed) {
 			setFreeCameraMode(true);
@@ -72,7 +74,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		key9Pressed = false;
 	}
 	
-	// Tecla 0: Vista AÈrea
+	// Tecla 0: Vista A√©rea
 	if (keys[GLFW_KEY_0]) {
 		if (!key0Pressed) {
 			setAerialViewMode(true);
@@ -82,7 +84,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		key0Pressed = false;
 	}
 
-	// Si est· en vista aÈrea, permitir movimiento limitado
+	// Si est√° en vista a√©rea, permitir movimiento limitado
 	if (aerialViewMode) {
 		GLfloat velocity = aerialMoveSpeed * deltaTime;
 		
@@ -94,7 +96,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 
 		if (keys[GLFW_KEY_S])
 		{
-			aerialViewCenter.z += velocity;  // Mover hacia atr·s (sur)
+			aerialViewCenter.z += velocity;  // Mover hacia atr√°s (sur)
 		}
 
 		if (keys[GLFW_KEY_A])
@@ -120,13 +122,13 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		qKeyPressed = false;
 	}
 
-	// Si est· en tercera persona, mover el personaje en lugar de la c·mara
+	// Si est√° en tercera persona, mover el personaje en lugar de la c√°mara
 	if (thirdPersonMode && thirdPersonTarget != nullptr) {
 		moveThirdPersonTarget(keys, deltaTime);
 		return;
 	}
 
-	// Modo c·mara libre: mover la c·mara normalmente
+	// Modo c√°mara libre: mover la c√°mara normalmente
 	GLfloat velocity = moveSpeed * deltaTime;
 
 	if (keys[GLFW_KEY_W])
@@ -167,12 +169,12 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	GLfloat velocity = thirdPersonMoveSpeed * deltaTime;
 	glm::vec3 movement(0.0f);
 
-	// Calcular direcciÛn de movimiento basada en la orientaciÛn de la c·mara
+	// Calcular direcci√≥n de movimiento basada en la orientaci√≥n de la c√°mara
 	// Proyectar el vector front en el plano XZ (ignorar componente Y)
 	glm::vec3 forwardFlat = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
 	glm::vec3 rightFlat = glm::normalize(glm::vec3(right.x, 0.0f, right.z));
 
-	// Movimiento adelante/atr·s
+	// Movimiento adelante/atr√°s
 	if (keys[GLFW_KEY_W])
 	{
 		movement += forwardFlat * velocity;
@@ -181,7 +183,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	if (keys[GLFW_KEY_S])
 	{
 		movement -= forwardFlat * velocity;
-	}
+		}
 
 	// Movimiento lateral
 	if (keys[GLFW_KEY_A])
@@ -194,45 +196,56 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		movement += rightFlat * velocity;
 	}
 
-	// NUEVO: Salto con Space (solo si est· en el suelo)
+	// NUEVO: Salto con Space (solo si est√° en el suelo)
 	if (keys[GLFW_KEY_SPACE])
 	{
-		thirdPersonTarget->saltar(4.0f);  // Fuerza de salto ajustable
+		thirdPersonTarget->fisica->saltar(8.0f);  // Fuerza de salto ajustable
 	}
 
-	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la fÌsica)
+	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la f√≠sica)
 	if (glm::length(movement) > 0.0f) {
 		// Solo aplicar movimiento horizontal
 		thirdPersonTarget->posicionLocal.x += movement.x;
 		thirdPersonTarget->posicionLocal.z += movement.z;
 
-		// RotaciÛn del personaje basada en direcciÛn de movimiento
+		// Rotaci√≥n del personaje basada en direcci√≥n de movimiento
 		glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
 		float horizontalLength = glm::length(horizontalMovement);
 		
-		if (horizontalLength > 0.001f) {  // Umbral pequeÒo para evitar divisiones por cero
+		if (horizontalLength > 0.001f) {  // Umbral peque√±o para evitar divisiones por cero
 			glm::vec3 moveDir = glm::normalize(horizontalMovement);
 			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
 			thirdPersonTarget->rotacionLocal = glm::vec3(
 				thirdPersonTarget->rotacionLocal.x,
-				targetYaw,
+				thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
 				thirdPersonTarget->rotacionLocal.z
 			);
 		}
 	}
 	
-	// NUEVO: Aplicar fÌsica (gravedad) al personaje
-	thirdPersonTarget->aplicarFisica(deltaTime, groundLevel);
+	// Calcular velocidad de movimiento para animaci√≥n
+	float velocidadMovimiento = glm::length(movement);
 	
-	// Actualizar transformaciÛn
+	// Actualizar animacion del personaje activo
+	if (thirdPersonTarget->animacion != nullptr) {
+		thirdPersonTarget->animacion->actualizarAnimacion(0, deltaTime, velocidadMovimiento);
+	}
+	
+	// Aplicar la fisica al personaje(basicamente gravedad)
+	if (thirdPersonTarget->fisica != nullptr) {
+		thirdPersonTarget->fisica->aplicarFisica(deltaTime, groundLevel, 
+			thirdPersonTarget->posicionLocal, thirdPersonTarget->posicionInicial);
+	}
+	
+	// Actualizar transformaci√≥n
 	thirdPersonTarget->actualizarTransformacion();
 }
 
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 {
-	// En vista aÈrea, permitir rotaciÛn limitada
+	// En vista a√©rea, permitir rotaci√≥n limitada
 	if (aerialViewMode) {
-		xChange *= turnSpeed * 0.5f;  // Reducir sensibilidad en vista aÈrea
+		xChange *= turnSpeed * 0.5f;  // Reducir sensibilidad en vista a√©rea
 		yChange *= turnSpeed * 0.5f;
 		
 		aerialYaw += xChange;
@@ -276,7 +289,7 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 
 void Camera::mouseScrollControl(GLfloat yOffset)
 {
-	// Solo aplicar zoom en vista aÈrea
+	// Solo aplicar zoom en vista a√©rea
 	if (aerialViewMode) {
 		// Ajustar altura con la rueda del mouse
 		// yOffset positivo = scroll hacia arriba = alejar (aumentar altura)
@@ -284,7 +297,7 @@ void Camera::mouseScrollControl(GLfloat yOffset)
 		GLfloat zoomSpeed = 5.0f;
 		aerialViewHeight -= yOffset * zoomSpeed;
 		
-		// Limitar altura mÌnima y m·xima
+		// Limitar altura m√≠nima y m√°xima
 		if (aerialViewHeight < 10.0f) {
 			aerialViewHeight = 10.0f;
 		}
@@ -296,11 +309,11 @@ void Camera::mouseScrollControl(GLfloat yOffset)
 
 glm::mat4 Camera::calculateViewMatrix()
 {
-	// Si est· en modo vista aÈrea, actualizar la posiciÛn de la c·mara
+	// Si est√° en modo vista a√©rea, actualizar la posici√≥n de la c√°mara
 	if (aerialViewMode) {
 		updateAerialView();
 	}
-	// Si est· en modo tercera persona, actualizar la posiciÛn de la c·mara
+	// Si est√° en modo tercera persona, actualizar la posici√≥n de la c√°mara
 	else if (thirdPersonMode && thirdPersonTarget != nullptr) {
 		updateThirdPerson();
 	}
@@ -407,17 +420,17 @@ bool Camera::isAerialViewMode() const
 
 void Camera::updateAerialView()
 {
-	// Calcular direcciÛn de la c·mara basada en aerialYaw y aerialPitch
+	// Calcular direcci√≥n de la c√°mara basada en aerialYaw y aerialPitch
 	glm::vec3 direction;
 	direction.x = cos(glm::radians(aerialYaw)) * cos(glm::radians(aerialPitch));
 	direction.y = sin(glm::radians(aerialPitch));
 	direction.z = sin(glm::radians(aerialYaw)) * cos(glm::radians(aerialPitch));
 	direction = glm::normalize(direction);
 	
-	// Posicionar la c·mara encima del centro
+	// Posicionar la c√°mara encima del centro
 	position = aerialViewCenter + glm::vec3(0.0f, aerialViewHeight, 0.0f);
 	
-	// La c·mara mira en la direcciÛn calculada
+	// La c√°mara mira en la direcci√≥n calculada
 	front = direction;
 	
 	// Calcular vectores right y up
@@ -435,7 +448,7 @@ void Camera::saveCurrentState()
 	savedPitch = pitch;
 	savedThirdPersonMode = thirdPersonMode;
 	
-	// Resetear ·ngulos de vista aÈrea al entrar
+	// Resetear √°ngulos de vista a√©rea al entrar
 	aerialYaw = 0.0f;
 	aerialPitch = -90.0f;  // Mirando hacia abajo por defecto
 }
@@ -461,25 +474,25 @@ void Camera::updateThirdPerson()
 		return;
 	}
 
-	// Obtener la posiciÛn del objetivo
+	// Obtener la posici√≥n del objetivo
 	glm::vec3 targetPos = thirdPersonTarget->posicionLocal;
 	glm::vec3 targetRot = thirdPersonTarget->rotacionLocal;
 
-	// Calcular la direcciÛn de la c·mara basada en yaw y pitch
+	// Calcular la direcci√≥n de la c√°mara basada en yaw y pitch
 	glm::vec3 direction;
 	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	direction.y = sin(glm::radians(pitch));
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	direction = glm::normalize(direction);
 
-	// Posicionar la c·mara detr·s del objetivo
+	// Posicionar la c√°mara detr√°s del objetivo
 	position = targetPos - direction * thirdPersonDistance;
 	
-	// MODIFICADO: La altura de la c·mara sigue la altura del personaje
-	// Esto hace que la c·mara se mantenga relativa al personaje durante el salto
+	// MODIFICADO: La altura de la c√°mara sigue la altura del personaje
+	// Esto hace que la c√°mara se mantenga relativa al personaje durante el salto
 	position.y += thirdPersonHeight;
 
-	// Hacer que la c·mara mire hacia el objetivo
+	// Hacer que la c√°mara mire hacia el objetivo
 	// MODIFICADO: Apuntar al centro del personaje (siguiendo su altura actual)
 	front = glm::normalize(targetPos + glm::vec3(0.0f, thirdPersonHeight * 0.5f, 0.0f) - position);
 	

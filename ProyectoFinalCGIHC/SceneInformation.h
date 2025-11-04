@@ -16,8 +16,8 @@
 #include "CommonValues.h"
 #include "Camera.h"
 
-// Clase para gestionar la información de la escena
-// Se enfoca en gestión de recursos, entidades e iluminación
+// Clase para gestionar la informaciÃ³n de la escena
+// Se enfoca en gestiÃ³n de recursos, entidades e iluminaciÃ³n
 class SceneInformation {
 public:
     SceneInformation();
@@ -26,7 +26,7 @@ public:
     // Inicializar la escena creando todos los objetos
     void inicializarEscena();
     
-    // Inicializar la cámara con parámetros personalizados
+    // Inicializar la cÃ¡mara con parÃ¡metros personalizados
     void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),
                           glm::vec3 startUp = glm::vec3(0.0f, 1.0f, 0.0f),
                           GLfloat startYaw = -60.0f,
@@ -34,7 +34,7 @@ public:
                           GLfloat startMoveSpeed = 0.3f,
                           GLfloat startTurnSpeed = 0.5f);
     
-    // Actualizar la escena cada frame (luces dinámicas, animaciones, etc.)
+    // Actualizar la escena cada frame (luces dinÃ¡micas, animaciones, etc.)
     void actualizarFrame(float deltaTime);
 
     // Actualizar la escena cada frame dependiendo del input del usuario
@@ -47,7 +47,7 @@ public:
     void removerEntidad(Entidad* entidad);
     
     
-    // Acceso a la cámara
+    // Acceso a la cÃ¡mara
     Camera& getCamara() { return camera; }
     const Camera& getCamara() const { return camera; }
     
@@ -93,7 +93,7 @@ private:
     // Vector con todas las entidades de la escena
     std::vector<Entidad*> entidades;
     
-    // Cámara de la escena
+    // CÃ¡mara de la escena
     Camera camera;
     
     // Managers de recursos
@@ -123,9 +123,13 @@ private:
 	// Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
 	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
+    // Entero para saber que personaje es actualmente
+	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
+
 
     //Funciones para inicializar componentes de la escena
     
+
     // Inicializar skybox por defecto
     void inicializarSkybox();
     
@@ -135,11 +139,12 @@ private:
     // Inicializar entidades de la escena
     void inicializarEntidades();
     
-    // Funciones para crear entidades específicas
+    // Funciones para crear entidades especÃ­ficas
     void crearPersonajePrincipal();
     void crearPiso();
     void crearObjetosGeometricos();  // NUEVO
+    void crearIsaac();
     
-    // Función auxiliar para vincular texturas y modelos a las entidades
+    // FunciÃ³n auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
 };

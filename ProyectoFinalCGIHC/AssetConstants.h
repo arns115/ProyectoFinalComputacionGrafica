@@ -17,6 +17,12 @@ namespace AssetConstants {
 	// Nombres de modelos
 	namespace ModelNames{
 		const std::string CUPHEAD = "cuphead";
+		const std::string ISAAC_CUERPO = "isaac_cuerpo";
+		const std::string ISAAC_CABEZA = "isaac_cabeza";
+		const std::string ISAAC_BRAZO_IZQUIERDO = "isaac_brazo_izquierdo";
+		const std::string ISAAC_BRAZO_DERECHO = "isaac_brazo_derecho";
+		const std::string ISAAC_PIERNA_IZQUIERDA = "isaac_pierna_izquierda";
+		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
 	}
 
 	// Nombres de meshes
@@ -59,6 +65,13 @@ namespace AssetConstants {
 	namespace ModelPaths {
 		const std::string MODEL_PATH = "Models/";
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
+
+		const std::string ISAAC_CUERPO = MODEL_PATH + "isaac_cuerpo.obj";
+		const std::string ISAAC_CABEZA = MODEL_PATH + "isaac_cabeza.obj";
+		const std::string ISAAC_BRAZO_IZQUIERDO = MODEL_PATH + "isaac_brazo_izquierdo.obj";
+		const std::string ISAAC_BRAZO_DERECHO = MODEL_PATH + "isaac_brazo_derecho.obj";
+		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
+		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
 	}
 
 	// Nombres de shaders
