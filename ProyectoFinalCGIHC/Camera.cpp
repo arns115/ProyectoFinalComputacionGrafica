@@ -59,6 +59,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		if (!key8Pressed) {
 			setFreeCameraMode(true);
 			key8Pressed = true;
+			printf("Cámara Libre activada\n");
 		}
 	} else {
 		key8Pressed = false;
