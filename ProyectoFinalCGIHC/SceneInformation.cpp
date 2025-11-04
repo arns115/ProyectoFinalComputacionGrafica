@@ -137,8 +137,7 @@ void SceneInformation::inicializarEntidades()
     // Tercero Gojo
     crearPersonajePrincipal();
 	  crearIsaac();
-    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
-
+    crearGojo(); // Crear Gojo en lugar de crear Isaac nuevamente
 
 }
 
@@ -246,6 +245,72 @@ void SceneInformation::crearIsaac()
 
 
 	agregarEntidad(isaac_cuerpo);
+}
+
+// Nuevo: Crear jerarquía Gojo (pruebagojo y sus partes)
+void SceneInformation::crearGojo()
+{
+    Entidad* gojo_cuerpo = new Entidad("pruebagojo",
+        glm::vec3(3.0f, -1.0f, 10.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(20.0f, 20.0f, 20.0f));
+
+    Entidad* gojo_pierna_izq = new Entidad("gojopiernaizq",
+        glm::vec3(-0.5f, 0.5f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+
+    Entidad* gojo_pierna_der = new Entidad("gojopiernader",
+        glm::vec3(0.5f, 0.5f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+
+    Entidad* gojo_rodilla_izq = new Entidad("gojorodillaizq",
+        glm::vec3(0.0f, -0.6f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+
+    Entidad* gojo_rodilla_der = new Entidad("gojorodillader",
+        glm::vec3(0.0f, -0.6f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // Configurar tipos y recursos
+    gojo_cuerpo->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_cuerpo->setModelo(AssetConstants::ModelNames::PRUEBAGOJO, modelManager.getModel(AssetConstants::ModelNames::PRUEBAGOJO));
+    gojo_cuerpo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    gojo_cuerpo->actualizarTransformacion();
+    /*
+    gojo_pierna_izq->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_pierna_izq->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ));
+    gojo_pierna_izq->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+    gojo_pierna_der->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_pierna_der->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_DER, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_DER));
+    gojo_pierna_der->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+    gojo_rodilla_izq->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_rodilla_izq->setModelo(AssetConstants::ModelNames::GOJO_RODILLA_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_RODILLA_IZQ));
+    gojo_rodilla_izq->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+    gojo_rodilla_der->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_rodilla_der->setModelo(AssetConstants::ModelNames::GOJO_RODILLA_DER, modelManager.getModel(AssetConstants::ModelNames::GOJO_RODILLA_DER));
+    gojo_rodilla_der->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+    // Armar jerarquía
+    gojo_pierna_izq->agregarHijo(gojo_rodilla_izq);
+    gojo_pierna_der->agregarHijo(gojo_rodilla_der);
+    gojo_cuerpo->agregarHijo(gojo_pierna_izq);
+    gojo_cuerpo->agregarHijo(gojo_pierna_der);
+
+    */
+    // Agregar componentes de física
+    gojo_cuerpo->fisica = new ComponenteFisico();
+    gojo_cuerpo->fisica->habilitar(true);
+    gojo_cuerpo->fisica->gravedad = -0.5f;
+
+    // Agregar a la escena
+    agregarEntidad(gojo_cuerpo);
 }
 
 void SceneInformation::crearPiso()

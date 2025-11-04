@@ -144,6 +144,7 @@ private:
     void crearPiso();
     void crearObjetosGeometricos();  // NUEVO
     void crearIsaac();
+    void crearGojo(); // Nueva función para crear Gojo jerárquico
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

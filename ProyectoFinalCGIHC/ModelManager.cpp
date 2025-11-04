@@ -10,6 +10,13 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO, AssetConstants::ModelPaths::ISAAC_BRAZO_DERECHO);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
+
+	// Cargar modelos de Gojo (jerarquía)
+	loadModel(AssetConstants::ModelNames::PRUEBAGOJO, AssetConstants::ModelPaths::PRUEBAGOJO);
+	loadModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, AssetConstants::ModelPaths::GOJOPIERNAIZQ);
+	loadModel(AssetConstants::ModelNames::GOJO_PIERNA_DER, AssetConstants::ModelPaths::GOJOPIERNADER);
+	loadModel(AssetConstants::ModelNames::GOJO_RODILLA_IZQ, AssetConstants::ModelPaths::GOJORODILLAIZQ);
+	loadModel(AssetConstants::ModelNames::GOJO_RODILLA_DER, AssetConstants::ModelPaths::GOJORODILLADER);
 }
 
 

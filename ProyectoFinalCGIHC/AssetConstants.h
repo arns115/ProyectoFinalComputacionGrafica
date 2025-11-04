@@ -23,6 +23,13 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = "isaac_brazo_derecho";
 		const std::string ISAAC_PIERNA_IZQUIERDA = "isaac_pierna_izquierda";
 		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
+
+		// Modelos para Gojo (jerarquia)
+		const std::string PRUEBAGOJO = "pruebagojo";
+		const std::string GOJO_PIERNA_IZQ = "gojopiernaizq";
+		const std::string GOJO_PIERNA_DER = "gojopiernader";
+		const std::string GOJO_RODILLA_IZQ = "gojorodillaizq";
+		const std::string GOJO_RODILLA_DER = "gojorodillader";
 	}
 
 	// Nombres de meshes
@@ -72,6 +79,13 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = MODEL_PATH + "isaac_brazo_derecho.obj";
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
+
+		// Rutas para modelos de Gojo (jerarquia)
+		const std::string PRUEBAGOJO = MODEL_PATH + "pruebagojo.obj";
+		const std::string GOJOPIERNAIZQ = MODEL_PATH + "gojopiernaizq.obj";
+		const std::string GOJOPIERNADER = MODEL_PATH + "gojopiernader.obj";
+		const std::string GOJORODILLAIZQ = MODEL_PATH + "gojorodillaizq.obj";
+		const std::string GOJORODILLADER = MODEL_PATH + "gojorodillader.obj";
 	}
 
 	// Nombres de shaders
