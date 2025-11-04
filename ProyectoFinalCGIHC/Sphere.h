@@ -22,11 +22,25 @@ public:
 	void init();
 	void load();
 	void render();
+	
+	// NUEVO: Métodos para obtener datos de la esfera
+	std::vector<GLfloat> getVertices() const;
+	std::vector<GLuint> getIndices() const { return index; }
+	int getVertexCount() const { return vertices.size(); }
+	int getIndexCount() const { return index.size(); }
+	
 	virtual ~Sphere();
 private:
-	std::vector<VertexColor> vertexC;
-	/*std::vector<VertexLightColor> vertexLC;
-	std::vector<VertexLightTexture> vertexLT;*/
+	// Estructura de vértice con posición, normal y coordenadas de textura
+	struct VertexData {
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec2 texCoords;
+		
+		VertexData() : position(0.0f), normal(0.0f), texCoords(0.0f) {}
+	};
+	
+	std::vector<VertexData> vertices;  // Vector de vértices con toda la información
 	std::vector<GLuint> index;
 	float ratio;
 	int slices;

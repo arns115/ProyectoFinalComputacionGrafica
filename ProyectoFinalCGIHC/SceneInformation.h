@@ -138,6 +138,7 @@ private:
     // Funciones para crear entidades específicas
     void crearPersonajePrincipal();
     void crearPiso();
+    void crearObjetosGeometricos();  // NUEVO
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

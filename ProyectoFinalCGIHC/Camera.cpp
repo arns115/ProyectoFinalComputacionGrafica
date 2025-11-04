@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Entidad.h"
 
+// TODO: Hacer una clases para la cámara aérea y la cámara en tercera persona que hereden de Camera
+
 Camera::Camera() {}
 
 Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed)
@@ -25,13 +27,18 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	qKeyPressed = false;
 
 	// NUEVO: Inicializar nivel del suelo
-	groundLevel = 1.0f;
+	groundLevel = 1.2f;
+	
+	// Inicializar detección de teclas de modo de cámara
+	key8Pressed = false;
+	key9Pressed = false;
+	key0Pressed = false;
 
 	// Inicializar modo vista aérea
 	aerialViewMode = false;
 	aerialViewHeight = 100.0f;  // Altura más alta para mejor vista del escenario
 	aerialViewCenter = glm::vec3(0.0f, 0.0f, 0.0f);  // Centro de la escena
-	zeroKeyPressed = false;
+	//zeroKeyPressed = false;
 	
 	// Inicializar movimiento de cámara aérea
 	aerialYaw = 0.0f;
@@ -43,14 +50,36 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 
 void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
-	// Alternar vista aérea con la tecla 0
-	if (keys[GLFW_KEY_0]) {
-		if (!zeroKeyPressed) {
-			setAerialViewMode(!aerialViewMode);
-			zeroKeyPressed = true;
+	// Alternar entre modos de cámara con teclas 8, 9 y 0
+	
+	// Tecla 8: Cámara Libre
+	if (keys[GLFW_KEY_8]) {
+		if (!key8Pressed) {
+			setFreeCameraMode(true);
+			key8Pressed = true;
 		}
 	} else {
-		zeroKeyPressed = false;
+		key8Pressed = false;
+	}
+	
+	// Tecla 9: Tercera Persona
+	if (keys[GLFW_KEY_9]) {
+		if (!key9Pressed) {
+			setThirdPersonMode(true);
+			key9Pressed = true;
+		}
+	} else {
+		key9Pressed = false;
+	}
+	
+	// Tecla 0: Vista Aérea
+	if (keys[GLFW_KEY_0]) {
+		if (!key0Pressed) {
+			setAerialViewMode(true);
+			key0Pressed = true;
+		}
+	} else {
+		key0Pressed = false;
 	}
 
 	// Si está en vista aérea, permitir movimiento limitado
@@ -81,7 +110,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		return;
 	}
 
-	// Alternar entre cámara libre y tercera persona con la tecla Q
+	// Mantener compatibilidad con tecla Q (deprecated)
 	if (keys[GLFW_KEY_Q]) {
 		if (!qKeyPressed) {
 			setThirdPersonMode(!thirdPersonMode);
@@ -168,7 +197,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	// NUEVO: Salto con Space (solo si está en el suelo)
 	if (keys[GLFW_KEY_SPACE])
 	{
-		thirdPersonTarget->saltar(8.0f);  // Fuerza de salto ajustable
+		thirdPersonTarget->saltar(4.0f);  // Fuerza de salto ajustable
 	}
 
 	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la física)
@@ -291,6 +320,10 @@ glm::vec3 Camera::getCameraDirection()
 
 void Camera::setThirdPersonMode(bool enable)
 {
+	if (enable) {
+		// Desactivar otros modos
+		aerialViewMode = false;
+	}
 	thirdPersonMode = enable;
 }
 
@@ -319,10 +352,27 @@ bool Camera::isThirdPersonMode() const
 	return thirdPersonMode;
 }
 
+void Camera::setFreeCameraMode(bool enable)
+{
+	if (enable) {
+		// Desactivar otros modos
+		thirdPersonMode = false;
+		aerialViewMode = false;
+	}
+}
+
+bool Camera::isFreeCameraMode() const
+{
+	return !thirdPersonMode && !aerialViewMode;
+}
+
 void Camera::setAerialViewMode(bool enable)
 {
 	if (enable && !aerialViewMode) {
-		// Guardar el estado actual antes de cambiar a vista aérea
+		// Desactivar otros modos
+		thirdPersonMode = false;
+		
+		// Guardar el estado actual antes de cambiar a vista aerial
 		saveCurrentState();
 		aerialViewMode = true;
 		updateAerialView();
@@ -424,9 +474,13 @@ void Camera::updateThirdPerson()
 
 	// Posicionar la cámara detrás del objetivo
 	position = targetPos - direction * thirdPersonDistance;
+	
+	// MODIFICADO: La altura de la cámara sigue la altura del personaje
+	// Esto hace que la cámara se mantenga relativa al personaje durante el salto
 	position.y += thirdPersonHeight;
 
 	// Hacer que la cámara mire hacia el objetivo
+	// MODIFICADO: Apuntar al centro del personaje (siguiendo su altura actual)
 	front = glm::normalize(targetPos + glm::vec3(0.0f, thirdPersonHeight * 0.5f, 0.0f) - position);
 	
 	// Actualizar los vectores right y up

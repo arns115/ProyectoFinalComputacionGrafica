@@ -1,4 +1,3 @@
-
 /*
 * Sphere.cpp
 *Basado en el código creado por
@@ -32,8 +31,9 @@ Sphere::~Sphere() {
 
 
 void Sphere::init() {
-		vertexC.resize(((slices + 1) * (stacks + 1)));
+	vertices.resize(((slices + 1) * (stacks + 1)));
 	index.resize((slices * stacks + slices) * 6);
+	
 	for (int i = 0; i <= stacks; ++i) {
 		float V = i / (float)stacks;
 		float phi = V * M_PI;
@@ -42,15 +42,25 @@ void Sphere::init() {
 			float U = j / (float)slices;
 			float theta = U * M_PI * 2.0;
 
+			// Calcular coordenadas esféricas
 			float X = cos(theta) * sin(phi);
 			float Y = cos(phi);
 			float Z = sin(theta) * sin(phi);
-				vertexC[i * (slices + 1) + j].position = ratio
-					* glm::vec3(X, Y, Z);
-				vertexC[i * (slices + 1) + j].color = glm::sphericalRand(1.0);
+			
+			int index = i * (slices + 1) + j;
+			
+			// Posición del vértice
+			vertices[index].position = ratio * glm::vec3(X, Y, Z);
+			
+			// Normal (para una esfera, la normal es el vector normalizado desde el centro)
+			vertices[index].normal = glm::normalize(glm::vec3(X, Y, Z));
+			
+			// Coordenadas de textura (mapeo esférico)
+			vertices[index].texCoords = glm::vec2(U, V);
 		}
 	}
 
+	// Generar índices para los triángulos
 	for (int i = 0; i < slices * stacks + slices; ++i) {
 		index[i * 6] = i;
 		index[i * 6 + 1] = i + slices + 1;
@@ -71,31 +81,29 @@ void Sphere::load() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	size_t stride;
-
-	size_t offset1 = 0;
-	size_t offset2 = 0;
-	size_t offset3 = 0;
-
-		glBufferData(GL_ARRAY_BUFFER, vertexC.size() * sizeof(glm::vec3) * 2,
-			vertexC.data(),
-			GL_STATIC_DRAW);
-		stride = sizeof(vertexC[0]);
-		offset1 = 0;
+	// Tamaño total del buffer: cada vértice tiene posición (3), normal (3) y texCoords (2) = 8 floats
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexData),
+		vertices.data(),
+		GL_STATIC_DRAW);
+	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(GLuint),
 		index.data(),
 		GL_STATIC_DRAW);
 
-	// First attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset1);
+	// Stride: tamaño de un vértice completo
+	GLsizei stride = sizeof(VertexData);
+
+	// Atributo 0: Posición (3 floats)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData, position));
 	glEnableVertexAttribArray(0);
-	// Second attribute
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
-		(GLvoid*)offset2);
+	
+	// Atributo 1: Normal (3 floats)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData, normal));
 	glEnableVertexAttribArray(1);
-	// Thrid attribute
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offset3);
+	
+	// Atributo 2: Coordenadas de textura (2 floats)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData, texCoords));
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0); // Unbind VAO
@@ -109,5 +117,30 @@ void Sphere::render() {
 			(GLvoid*) (sizeof(GLuint) * 0));
 	glBindVertexArray(0);
 
+}
+
+// NUEVO: Convertir los vértices a un array de floats compatible con Mesh
+std::vector<GLfloat> Sphere::getVertices() const
+{
+	std::vector<GLfloat> floatArray;
+	floatArray.reserve(vertices.size() * 8); // 3 pos + 2 tex + 3 normal = 8 floats por vértice
+	
+	for (const auto& vertex : vertices) {
+		// Posición (3 floats)
+		floatArray.push_back(vertex.position.x);
+		floatArray.push_back(vertex.position.y);
+		floatArray.push_back(vertex.position.z);
+		
+		// Coordenadas de textura (2 floats)
+		floatArray.push_back(vertex.texCoords.x);
+		floatArray.push_back(vertex.texCoords.y);
+		
+		// Normal (3 floats)
+		floatArray.push_back(vertex.normal.x);
+		floatArray.push_back(vertex.normal.y);
+		floatArray.push_back(vertex.normal.z);
+	}
+	
+	return floatArray;
 }
 

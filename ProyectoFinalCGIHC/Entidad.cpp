@@ -12,7 +12,7 @@ Entidad::Entidad(const std::string& nombreObj,
       texture(nullptr), material(nullptr),
       banderasAnimacion(0), numeroAnimaciones(0),
       velocidad(0.0f, 0.0f, 0.0f),        // NUEVO: Inicializar velocidad
-      gravedad(-15.0f),                    // NUEVO: Gravedad estándar
+      gravedad(-18.0f),                    // NUEVO: Gravedad estándar
       fisicaHabilitada(false),            // NUEVO: Física deshabilitada por defecto
       enSuelo(false)                       // NUEVO: No está en el suelo inicialmente
 {
