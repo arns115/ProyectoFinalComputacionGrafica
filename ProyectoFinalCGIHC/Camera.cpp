@@ -25,7 +25,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	qKeyPressed = false;
 
 	// NUEVO: Inicializar nivel del suelo
-	groundLevel = 0.0f;
+	groundLevel = -1.0f;
 
 	// Inicializar modo vista aérea
 	aerialViewMode = false;

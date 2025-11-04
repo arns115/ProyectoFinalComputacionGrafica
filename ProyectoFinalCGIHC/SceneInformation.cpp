@@ -144,7 +144,7 @@ void SceneInformation::crearPersonajePrincipal()
 {
     // Crear entidad prueba del personaje de Cuphead
     Entidad* testCharacter = new Entidad("testCharacter",
-        glm::vec3(0.0f, 1.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
         glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
@@ -168,7 +168,7 @@ void SceneInformation::crearIsaac()
 {
     // Crear entidad de Isaac ya con Jerarquia
     Entidad* isaac_cuerpo = new Entidad("isaac_cuerpo",
-        glm::vec3(0.0f, 0.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, -1.0f, 10.0f),      // Posición inicial
         glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
         glm::vec3(0.8f, 0.8f, 0.8f));      // Escala
 
@@ -247,7 +247,7 @@ void SceneInformation::crearPiso()
     piso->nombreMesh = AssetConstants::MeshNames::PISO;
     piso->nombreTextura = AssetConstants::TextureNames::PASTO;
     piso->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-    piso->posicionLocal = glm::vec3(0.0f, 0.0f, 0.0f);
+    piso->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
     piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
     piso->actualizarTransformacion();
     agregarEntidad(piso);

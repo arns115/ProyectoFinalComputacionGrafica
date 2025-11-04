@@ -68,8 +68,8 @@ void Entidad::aplicarFisica(float deltaTime, float nivelSuelo)
     posicionLocal += velocidad * deltaTime;
     
     // Colisión con el suelo
-    if (posicionLocal.y <= nivelSuelo + posicionInicial.y) {
-        posicionLocal.y = nivelSuelo + posicionInicial.y;
+    if (posicionLocal.y <= posicionInicial.y) {
+        posicionLocal.y = posicionInicial.y;
         velocidad.y = 0.0f;
         enSuelo = true;
     } else {
