@@ -8,6 +8,7 @@ MeshManager::MeshManager()
 	createPiramideMesh();
 	createPisoMesh();
 	createVegetacionMesh();
+	createSphereMesh();
 }
 
 // Carga un mesh en el manager
@@ -135,6 +136,27 @@ void MeshManager::calcAverageNormals(unsigned int* indices, unsigned int indiceC
 		vec = glm::normalize(vec);
 		vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
 	}
+}
+
+void MeshManager::createSphereMesh()
+{
+	// Crear una esfera con radio 1.0, 32 slices y 16 stacks para mejor calidad
+	Sphere sphere(1.0f, 32, 16);
+	sphere.init(); // Generar vértices e índices
+	
+	// Obtener los datos de la esfera en formato compatible con Mesh
+	std::vector<GLfloat> vertexData = sphere.getVertices();
+	std::vector<GLuint> indexData = sphere.getIndices();
+	
+	// Crear el mesh usando los datos extraídos
+	Mesh* sphereMesh = new Mesh();
+	sphereMesh->CreateMesh(vertexData.data(), 
+	                       const_cast<unsigned int*>(indexData.data()), 
+	                       vertexData.size(), 
+	                       indexData.size());
+	
+	// Guardar el mesh en el manager
+	loadMesh(AssetConstants::MeshNames::ESFERA, sphereMesh);
 }
 
 MeshManager::~MeshManager() 

@@ -128,6 +128,7 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
+    crearObjetosGeometricos();  // NUEVO
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -135,7 +136,7 @@ void SceneInformation::inicializarEntidades()
 	// Segundo Isaac
     // Tercero Gojo
     crearPersonajePrincipal();
-	crearIsaac();
+	  crearIsaac();
     crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
 
 
@@ -260,7 +261,49 @@ void SceneInformation::crearPiso()
     piso->actualizarTransformacion();
     agregarEntidad(piso);
 }
+
+// NUEVO: Función para crear objetos geométricos de prueba
+void SceneInformation::crearObjetosGeometricos()
+{
+    // Crear esfera de prueba 1 - Flotando en el aire
+    Entidad* esfera1 = new Entidad("esfera1",
+        glm::vec3(5.0f, 3.0f, 0.0f),      // Posición: a la derecha y elevada
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
+        glm::vec3(2.0f, 2.0f, 2.0f));      // Escala 2x
     
+    esfera1->setTipoObjeto(TipoObjeto::MESH);
+    esfera1->nombreMesh = AssetConstants::MeshNames::ESFERA;
+    esfera1->nombreTextura = AssetConstants::TextureNames::TIERRA;
+    esfera1->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    esfera1->actualizarTransformacion();
+    agregarEntidad(esfera1);
+    
+    // Crear esfera de prueba 2 - En el suelo
+    Entidad* esfera2 = new Entidad("esfera2",
+        glm::vec3(-5.0f, 1.0f, 5.0f),     // Posición: a la izquierda
+        glm::vec3(0.0f, 45.0f, 0.0f),      // Rotación de 45 grados
+        glm::vec3(1.5f, 1.5f, 1.5f));      // Escala 1.5x
+    
+    esfera2->setTipoObjeto(TipoObjeto::MESH);
+    esfera2->nombreMesh = AssetConstants::MeshNames::ESFERA;
+    esfera2->nombreTextura = AssetConstants::TextureNames::LADRILLO;
+    esfera2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    esfera2->actualizarTransformacion();
+    agregarEntidad(esfera2);
+    
+    // Crear esfera de prueba 3 - Pequeña y cercana
+    Entidad* esfera3 = new Entidad("esfera3",
+        glm::vec3(0.0f, 2.0f, -8.0f),      // Posición: al frente
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+    
+    esfera3->setTipoObjeto(TipoObjeto::MESH);
+    esfera3->nombreMesh = AssetConstants::MeshNames::ESFERA;
+    esfera3->nombreTextura = AssetConstants::TextureNames::PASTO;
+    esfera3->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    esfera3->actualizarTransformacion();
+    agregarEntidad(esfera3);
+}
 
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {
@@ -338,6 +381,7 @@ bool SceneInformation::agregarSpotLightActual(const SpotLight& light)
     
     return true;
 }
+
 
 void SceneInformation::limpiarSpotLightsActuales()
 {

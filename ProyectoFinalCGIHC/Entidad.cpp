@@ -24,7 +24,7 @@ void Entidad::actualizarTransformacion()
 {
     transformacionLocal = glm::mat4(1.0f);
     
-    // Aplicar traslación
+    // Aplicar traslaciÃ³n
     transformacionLocal = glm::translate(transformacionLocal, posicionLocal);
     
     // Aplicar rotaciones (en orden Z, Y, X)

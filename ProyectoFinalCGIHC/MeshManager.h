@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetConstants.h"
 #include "Mesh.h"
+#include "Sphere.h"
 #include <map>
 #include <glew.h>
 #include <glm.hpp>
@@ -29,6 +30,7 @@ private:
 	void createPiramideMesh();
 	void createPisoMesh();
 	void createVegetacionMesh();
+	void createSphereMesh();
 	
 	// Función auxiliar para calcular normales por promedio de vértices
 	void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, 

@@ -37,6 +37,10 @@ public:
 	void setAerialViewHeight(float height);
 	void setAerialViewCenter(glm::vec3 center);
 	bool isAerialViewMode() const;
+	
+	// Método para establecer modo de cámara libre
+	void setFreeCameraMode(bool enable);
+	bool isFreeCameraMode() const;
 
 	~Camera();
 
@@ -65,13 +69,17 @@ private:
 
 	// NUEVO: Nivel del suelo para física
 	float groundLevel;
+	
+	// Variables para detección de teclas de cambio de modo
+	bool key8Pressed;  // Tecla 8 para cámara libre
+	bool key9Pressed;  // Tecla 9 para tercera persona
+	bool key0Pressed;  // Tecla 0 para vista aérea (renombrado)
 
 	// Variables para vista aérea
 	bool aerialViewMode;
 	float aerialViewHeight;
 	glm::vec3 aerialViewCenter;
-	bool zeroKeyPressed;
-	
+
 	// Variables para movimiento de cámara aérea
 	GLfloat aerialYaw;
 	GLfloat aerialPitch;

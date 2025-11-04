@@ -30,6 +30,7 @@ namespace AssetConstants {
 		const std::string PISO = "piso";
 		const std::string PIRAMIDE = "piramide";
 		const std::string VEGETACION = "vegetacion";
+		const std::string ESFERA = "esfera";  // NUEVO
 	}
 
 	// Nombres de materiales
