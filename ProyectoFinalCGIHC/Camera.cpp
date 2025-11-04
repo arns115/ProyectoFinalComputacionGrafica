@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include "Entidad.h"
+#include "ComponenteFisico.h"
+#include "ComponenteAnimacion.h"
 
 Camera::Camera() {}
 
@@ -25,7 +27,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	qKeyPressed = false;
 
 	// NUEVO: Inicializar nivel del suelo
-	groundLevel = 1.0f;
+	groundLevel = -1.0f;
 
 	// Inicializar modo vista aérea
 	aerialViewMode = false;
@@ -152,7 +154,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	if (keys[GLFW_KEY_S])
 	{
 		movement -= forwardFlat * velocity;
-	}
+		}
 
 	// Movimiento lateral
 	if (keys[GLFW_KEY_A])
@@ -168,7 +170,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	// NUEVO: Salto con Space (solo si está en el suelo)
 	if (keys[GLFW_KEY_SPACE])
 	{
-		thirdPersonTarget->saltar(8.0f);  // Fuerza de salto ajustable
+		thirdPersonTarget->fisica->saltar(8.0f);  // Fuerza de salto ajustable
 	}
 
 	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la física)
@@ -186,14 +188,25 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
 			thirdPersonTarget->rotacionLocal = glm::vec3(
 				thirdPersonTarget->rotacionLocal.x,
-				targetYaw,
+				thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
 				thirdPersonTarget->rotacionLocal.z
 			);
 		}
 	}
 	
-	// NUEVO: Aplicar física (gravedad) al personaje
-	thirdPersonTarget->aplicarFisica(deltaTime, groundLevel);
+	// Calcular velocidad de movimiento para animación
+	float velocidadMovimiento = glm::length(movement);
+	
+	// Actualizar animacion del personaje activo
+	if (thirdPersonTarget->animacion != nullptr) {
+		thirdPersonTarget->animacion->actualizarAnimacion(0, deltaTime, velocidadMovimiento);
+	}
+	
+	// Aplicar la fisica al personaje(basicamente gravedad)
+	if (thirdPersonTarget->fisica != nullptr) {
+		thirdPersonTarget->fisica->aplicarFisica(deltaTime, groundLevel, 
+			thirdPersonTarget->posicionLocal, thirdPersonTarget->posicionInicial);
+	}
 	
 	// Actualizar transformación
 	thirdPersonTarget->actualizarTransformacion();

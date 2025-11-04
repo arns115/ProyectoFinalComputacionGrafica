@@ -123,9 +123,13 @@ private:
 	// Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
 	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
+    // Entero para saber que personaje es actualmente
+	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
+
 
     //Funciones para inicializar componentes de la escena
     
+
     // Inicializar skybox por defecto
     void inicializarSkybox();
     
@@ -138,6 +142,7 @@ private:
     // Funciones para crear entidades específicas
     void crearPersonajePrincipal();
     void crearPiso();
+    void crearIsaac();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

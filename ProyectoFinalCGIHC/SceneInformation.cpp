@@ -1,4 +1,6 @@
 #include "SceneInformation.h"
+#include "ComponenteFisico.h"
+#include "ComponenteAnimacion.h"
 
 SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
@@ -39,7 +41,26 @@ void SceneInformation::inicializarCamara(glm::vec3 startPosition,
 // Funcion para actualizar cada frame con las cosas que no dependen del input del usuario
 void SceneInformation::actualizarFrame(float deltaTime)
 {
-    
+    // Actualizar el ciclo dia/noche
+    acumuladorTiempoDesdeCambio += deltaTime;
+    if (acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    {
+        esDeDia = !esDeDia; // Cambiar entre dia y noche
+        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
+        if (esDeDia)
+        {
+            // Se pone la skyboxAdecuada y la luz direccional del sol
+            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+        }
+        else
+        {
+            // Se pone la skyboxAdecuada y la luz direccional de las estrellas
+            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+
+        }
+    }
 }
 
 
@@ -51,23 +72,28 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     camera.mouseControl(mouseXChange, mouseYChange);
     camera.mouseScrollControl(scrollChange);  // Agregar control del scroll
     
-	acumuladorTiempoDesdeCambio += deltaTime;
-    if(acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
-    {
-        esDeDia = !esDeDia; // Cambiar entre dia y noche
-        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
-        if(esDeDia)
-        {
-            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
-			luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
-        }
-        else
-        {
-            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
-            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+    
 
-        }
+    // Se maneja todo lo del teclado que no tenga que ver con la camara
+	// 1: Cambia el modo tercera persona a cuphead
+    if(keys[GLFW_KEY_1]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 3]);
+        personajeActual = 1;
 	}
+	// 2: Cambia el modo tercera persona a Isaac
+    if (keys[GLFW_KEY_2]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 2]);
+        personajeActual = 2;
+
+    }
+	// 3: Cambia el modo tercera persona a Gojo
+    if (keys[GLFW_KEY_3]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 1]);
+        personajeActual = 3;
+
+    }
+
+
 }
 
 // Funcion para inicializar la skybox
@@ -101,9 +127,17 @@ void SceneInformation::inicializarLuces()
 // Funcion para inicializar todas las entidades
 void SceneInformation::inicializarEntidades()
 {
-    crearPersonajePrincipal();
     crearPiso();
-    
+
+
+	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
+    // Primero Cuphead
+	// Segundo Isaac
+    // Tercero Gojo
+    crearPersonajePrincipal();
+	crearIsaac();
+    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
+
 
 }
 
@@ -120,15 +154,97 @@ void SceneInformation::crearPersonajePrincipal()
     testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
     testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     
-    // NUEVO: Habilitar física para el personaje
-    testCharacter->habilitarFisica(true);
-    testCharacter->gravedad = -0.5f;  // Ajustar gravedad (más negativo = cae más rápido)
+    // Crear y configurar componente de física
+    testCharacter->fisica = new ComponenteFisico();
+    testCharacter->fisica->habilitar(true);
+    testCharacter->fisica->gravedad = -0.5f;
     
     testCharacter->actualizarTransformacion();
     agregarEntidad(testCharacter);
     
-    // Configurar la cámara en tercera persona siguiendo al personaje(esto se va a cambiar mas adelante)
+    // Configurar la cámara en tercera persona siguiendo al personaje
     camera.setThirdPersonTarget(testCharacter);
+}
+
+// Crea al personaje de Isaac
+void SceneInformation::crearIsaac()
+{
+    // Crear entidad de Isaac ya con Jerarquia
+    Entidad* isaac_cuerpo = new Entidad("isaac_cuerpo",
+        glm::vec3(0.0f, -1.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
+        glm::vec3(0.8f, 0.8f, 0.8f));      // Escala
+
+    Entidad* isaac_cabeza = new Entidad("isaac_cabeza",
+        glm::vec3(0.0f, 1.5f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    Entidad* isaac_brazo_izquierdo = new Entidad("isaac_brazo_izquierdo",
+        glm::vec3(-0.586f, 1.31f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    Entidad* isaac_brazo_derecho = new Entidad("isaac_brazo_derecho",
+        glm::vec3(0.61f, 1.33f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierda",
+        glm::vec3(-0.48f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    Entidad* isaac_pierna_derecha = new Entidad("isaac_pierna_derecha",
+        glm::vec3(0.455f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    isaac_cuerpo->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_cuerpo->setModelo(AssetConstants::ModelNames::ISAAC_CUERPO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_CUERPO));
+    if(isaac_cuerpo->nombreModelo.empty())
+    {
+        std::cout << "Error al cargar el modelo de Isaac Cuerpo" << std::endl;
+	}
+	isaac_cuerpo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+	
+	// Crear y configurar componente de física
+	isaac_cuerpo->fisica = new ComponenteFisico();
+	isaac_cuerpo->fisica->habilitar(true);
+	isaac_cuerpo->fisica->gravedad = -0.5f;
+	
+	// Crear y configurar componente de animación
+	isaac_cuerpo->animacion = new ComponenteAnimacion(isaac_cuerpo);
+
+	isaac_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+	isaac_brazo_derecho->setModelo(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO));
+	isaac_brazo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+	isaac_brazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+	isaac_brazo_izquierdo->setModelo(AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO));
+	isaac_brazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+	isaac_cabeza->setTipoObjeto(TipoObjeto::MODELO);
+	isaac_cabeza->setModelo(AssetConstants::ModelNames::ISAAC_CABEZA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_CABEZA));
+	isaac_cabeza->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+	isaac_pierna_derecha->setTipoObjeto(TipoObjeto::MODELO);
+	isaac_pierna_derecha->setModelo(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA));
+	isaac_pierna_derecha->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+	isaac_pierna_izquierda->setTipoObjeto(TipoObjeto::MODELO);
+	isaac_pierna_izquierda->setModelo(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA));
+	isaac_pierna_izquierda->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+
+    isaac_cuerpo->agregarHijo(isaac_cabeza);
+	isaac_cuerpo->agregarHijo(isaac_brazo_izquierdo);
+	isaac_cuerpo->agregarHijo(isaac_brazo_derecho);
+	isaac_cuerpo->agregarHijo(isaac_pierna_izquierda);
+	isaac_cuerpo->agregarHijo(isaac_pierna_derecha);
+
+
+	agregarEntidad(isaac_cuerpo);
 }
 
 void SceneInformation::crearPiso()
