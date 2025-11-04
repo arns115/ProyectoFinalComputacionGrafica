@@ -39,7 +39,26 @@ void SceneInformation::inicializarCamara(glm::vec3 startPosition,
 // Funcion para actualizar cada frame con las cosas que no dependen del input del usuario
 void SceneInformation::actualizarFrame(float deltaTime)
 {
-    
+    // Actualizar el ciclo dia/noche
+    acumuladorTiempoDesdeCambio += deltaTime;
+    if (acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    {
+        esDeDia = !esDeDia; // Cambiar entre dia y noche
+        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
+        if (esDeDia)
+        {
+            // Se pone la skyboxAdecuada y la luz direccional del sol
+            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+        }
+        else
+        {
+            // Se pone la skyboxAdecuada y la luz direccional de las estrellas
+            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
+            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+
+        }
+    }
 }
 
 
@@ -51,23 +70,28 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     camera.mouseControl(mouseXChange, mouseYChange);
     camera.mouseScrollControl(scrollChange);  // Agregar control del scroll
     
-	acumuladorTiempoDesdeCambio += deltaTime;
-    if(acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
-    {
-        esDeDia = !esDeDia; // Cambiar entre dia y noche
-        acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
-        if(esDeDia)
-        {
-            setSkyboxActual(AssetConstants::SkyboxNames::DAY);
-			luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
-        }
-        else
-        {
-            setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
-            luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+    
 
-        }
+    // Se maneja todo lo del teclado que no tenga que ver con la camara
+	// 1: Cambia el modo tercera persona a cuphead
+    if(keys[GLFW_KEY_1]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 3]);
+        personajeActual = 1;
 	}
+	// 2: Cambia el modo tercera persona a Isaac
+    if (keys[GLFW_KEY_2]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 2]);
+        personajeActual = 2;
+
+    }
+	// 3: Cambia el modo tercera persona a Gojo
+    if (keys[GLFW_KEY_3]) {
+        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 1]);
+        personajeActual = 3;
+
+    }
+
+
 }
 
 // Funcion para inicializar la skybox
@@ -101,9 +125,17 @@ void SceneInformation::inicializarLuces()
 // Funcion para inicializar todas las entidades
 void SceneInformation::inicializarEntidades()
 {
-    crearPersonajePrincipal();
     crearPiso();
+
+
+	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
+    // Primero Cuphead
+	// Segundo Isaac
+    // Tercero Gojo
+    crearPersonajePrincipal();
 	crearIsaac();
+    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
+
 
 }
 
@@ -112,7 +144,7 @@ void SceneInformation::crearPersonajePrincipal()
 {
     // Crear entidad prueba del personaje de Cuphead
     Entidad* testCharacter = new Entidad("testCharacter",
-        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 1.0f, 0.0f),      // Posición inicial
         glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
@@ -136,7 +168,7 @@ void SceneInformation::crearIsaac()
 {
     // Crear entidad de Isaac ya con Jerarquia
     Entidad* isaac_cuerpo = new Entidad("isaac_cuerpo",
-        glm::vec3(0.0f, -1.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 10.0f),      // Posición inicial
         glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
         glm::vec3(0.8f, 0.8f, 0.8f));      // Escala
 
@@ -215,7 +247,7 @@ void SceneInformation::crearPiso()
     piso->nombreMesh = AssetConstants::MeshNames::PISO;
     piso->nombreTextura = AssetConstants::TextureNames::PASTO;
     piso->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-    piso->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
+    piso->posicionLocal = glm::vec3(0.0f, 0.0f, 0.0f);
     piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
     piso->actualizarTransformacion();
     agregarEntidad(piso);
