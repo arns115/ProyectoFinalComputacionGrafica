@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ComponenteAnimacion.h" />
     <ClInclude Include="AssetConstants.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommonValues.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="MeshManager.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="ComponenteFisico.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="SceneInformation.h" />
     <ClInclude Include="SceneRenderer.h" />
@@ -167,6 +169,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ComponenteAnimacion.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Entidad.cpp" />
@@ -178,6 +181,7 @@
     <ClCompile Include="Mesh_tn.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="ComponenteFisico.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SceneInformation.cpp" />

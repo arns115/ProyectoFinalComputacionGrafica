@@ -10,12 +10,7 @@ Entidad::Entidad(const std::string& nombreObj,
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
       posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),  // Guardar valores iniciales (estado inicial del objeto)
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
-      texture(nullptr), material(nullptr),
-      banderasAnimacion(0), numeroAnimaciones(0),
-      velocidad(0.0f, 0.0f, 0.0f),        // NUEVO: Inicializar velocidad
-      gravedad(-15.0f),                    // NUEVO: Gravedad estándar
-      fisicaHabilitada(false),            // NUEVO: Física deshabilitada por defecto
-      enSuelo(false)                       // NUEVO: No está en el suelo inicialmente
+      texture(nullptr), material(nullptr)
 {
     actualizarTransformacion();
 }
@@ -51,46 +46,6 @@ void Entidad::agregarHijo(Entidad* hijo)
 {
     if (hijo != nullptr) {
         hijos.push_back(hijo);
-    }
-}
-
-// NUEVO: Aplicar física (gravedad y colisión con suelo)
-void Entidad::aplicarFisica(float deltaTime, float nivelSuelo)
-{
-    if (!fisicaHabilitada) {
-        return;
-    }
-    
-    // Aplicar gravedad a la velocidad vertical
-    velocidad.y += gravedad * deltaTime;
-    
-    // Aplicar velocidad a la posición
-    posicionLocal += velocidad * deltaTime;
-    
-    // Colisión con el suelo
-    if (posicionLocal.y <= posicionInicial.y) {
-        posicionLocal.y = posicionInicial.y;
-        velocidad.y = 0.0f;
-        enSuelo = true;
-    } else {
-        enSuelo = false;
-    }
-    
-    // Actualizar transformación después de aplicar física
-    actualizarTransformacion();
-}
-
-// NUEVO: Aplicar salto
-void Entidad::saltar(float fuerzaSalto)
-{
-    if (!fisicaHabilitada) {
-        return;
-    }
-    
-    // Solo permitir saltar si está en el suelo
-    if (enSuelo) {
-        velocidad.y = fuerzaSalto;
-        enSuelo = false;
     }
 }
 
@@ -137,3 +92,6 @@ void Entidad::limpiarTextura()
     this->nombreTextura = "";
     this->texture = nullptr;
 }
+
+
+

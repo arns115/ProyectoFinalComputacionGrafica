@@ -1,4 +1,6 @@
 #include "SceneInformation.h"
+#include "ComponenteFisico.h"
+#include "ComponenteAnimacion.h"
 
 SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
@@ -152,14 +154,15 @@ void SceneInformation::crearPersonajePrincipal()
     testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
     testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     
-    // NUEVO: Habilitar física para el personaje
-    testCharacter->habilitarFisica(true);
-    testCharacter->gravedad = -0.5f;  // Ajustar gravedad (más negativo = cae más rápido)
+    // Crear y configurar componente de física
+    testCharacter->fisica = new ComponenteFisico();
+    testCharacter->fisica->habilitar(true);
+    testCharacter->fisica->gravedad = -0.5f;
     
     testCharacter->actualizarTransformacion();
     agregarEntidad(testCharacter);
     
-    // Configurar la cámara en tercera persona siguiendo al personaje(esto se va a cambiar mas adelante)
+    // Configurar la cámara en tercera persona siguiendo al personaje
     camera.setThirdPersonTarget(testCharacter);
 }
 
@@ -204,9 +207,14 @@ void SceneInformation::crearIsaac()
         std::cout << "Error al cargar el modelo de Isaac Cuerpo" << std::endl;
 	}
 	isaac_cuerpo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-	isaac_cuerpo->habilitarFisica(true);
-    isaac_cuerpo->gravedad = -0.5f;
-
+	
+	// Crear y configurar componente de física
+	isaac_cuerpo->fisica = new ComponenteFisico();
+	isaac_cuerpo->fisica->habilitar(true);
+	isaac_cuerpo->fisica->gravedad = -0.5f;
+	
+	// Crear y configurar componente de animación
+	isaac_cuerpo->animacion = new ComponenteAnimacion(isaac_cuerpo);
 
 	isaac_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
 	isaac_brazo_derecho->setModelo(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO));
