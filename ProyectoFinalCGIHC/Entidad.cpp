@@ -8,10 +8,12 @@ Entidad::Entidad(const std::string& nombreObj,
     : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
       posicionLocal(pos), rotacionLocal(rot), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
-      posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),  // Guardar valores iniciales (estado inicial del objeto)
+      posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
-      texture(nullptr), material(nullptr)
+      texture(nullptr), material(nullptr), fisica(nullptr), animacion(nullptr)
 {
+    sincronizarRotacion();
+    rotacionInicialQuat = rotacionLocalQuat;
     actualizarTransformacion();
 }
 
@@ -22,24 +24,24 @@ Entidad::~Entidad()
 
 void Entidad::actualizarTransformacion() 
 {
+    // Se actualiza la informacion del aquaternion
+    sincronizarRotacion();
+    
     transformacionLocal = glm::mat4(1.0f);
-    
-    // Aplicar traslación
+    // Se posiciona adecuadamente
     transformacionLocal = glm::translate(transformacionLocal, posicionLocal);
-    
-    // Aplicar rotaciones (en orden Z, Y, X)
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.z), 
-                                     glm::vec3(0.0f, 0.0f, 1.0f));
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.y), 
-                                     glm::vec3(0.0f, 1.0f, 0.0f));
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.x), 
-                                     glm::vec3(1.0f, 0.0f, 0.0f));
-    
-    // Aplicar escala
+	// Se rota adecuadamente
+    transformacionLocal *= glm::mat4_cast(rotacionLocalQuat);
+	// Se escala adecuadamente
     transformacionLocal = glm::scale(transformacionLocal, escalaLocal);
+}
+
+// Sincronizar la rotacion del vector con el quaternion para tener bien los ejes
+void Entidad::sincronizarRotacion()
+{
+    rotacionLocalQuat = glm::angleAxis(glm::radians(rotacionLocal.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
+                        glm::angleAxis(glm::radians(rotacionLocal.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
+                        glm::angleAxis(glm::radians(rotacionLocal.x), glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void Entidad::agregarHijo(Entidad* hijo) 
@@ -92,6 +94,12 @@ void Entidad::limpiarTextura()
     this->nombreTextura = "";
     this->texture = nullptr;
 }
+
+
+
+
+
+
 
 
 

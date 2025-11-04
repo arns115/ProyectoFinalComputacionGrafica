@@ -20,6 +20,11 @@ namespace AssetConstants {
 
 		const std::string CUPHEAD = "cuphead";
 
+		const std::string CABEZA_HOLLOW = "cabeza_hollow";
+		const std::string CUERPO1_HOLLOW = "cuerpo1_hollow";
+		const std::string CUERPO2_HOLLOW = "cuerpo2_hollow";
+		const std::string CUERPO3_HOLLOW = "cuerpo3_hollow";
+
 		const std::string ISAAC_CUERPO = "isaac_cuerpo";
 		const std::string ISAAC_CABEZA = "isaac_cabeza";
 		const std::string ISAAC_BRAZO_IZQUIERDO = "isaac_brazo_izquierdo";
@@ -71,6 +76,12 @@ namespace AssetConstants {
 		const std::string CABEZA_OLMECA = MODEL_PATH + "cabeza_olmeca.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
+
+		const std::string CABEZA_HOLLOW = MODEL_PATH + "cabeza_hollow.obj";
+		const std::string CUERPO1_HOLLOW = MODEL_PATH + "cuerpo1_hollow.obj";
+		const std::string CUERPO2_HOLLOW = MODEL_PATH + "cuerpo2_hollow.obj";
+		const std::string CUERPO3_HOLLOW = MODEL_PATH + "cuerpo3_hollow.obj";
+
 
 		const std::string ISAAC_CUERPO = MODEL_PATH + "isaac_cuerpo.obj";
 		const std::string ISAAC_CABEZA = MODEL_PATH + "isaac_cabeza.obj";

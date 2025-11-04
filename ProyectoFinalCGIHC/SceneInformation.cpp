@@ -130,6 +130,7 @@ void SceneInformation::inicializarEntidades()
     crearPiso();
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
+    crearHollow();
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
@@ -268,6 +269,70 @@ void SceneInformation::crearCabezaOlmeca()
     cabezaOlmeca->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     cabezaOlmeca->actualizarTransformacion();
     agregarEntidad(cabezaOlmeca);
+}
+
+void SceneInformation::crearHollow() {
+    Entidad* cabeza_hollow = new Entidad("hollow",
+        glm::vec3(10.0f, 4.0f, 50.0f),      // Posición inicial
+        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
+
+    cabeza_hollow->setTipoObjeto(TipoObjeto::MODELO);
+    cabeza_hollow->nombreModelo = AssetConstants::ModelNames::CABEZA_HOLLOW;
+    cabeza_hollow->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cabeza_hollow->actualizarTransformacion();
+
+
+
+    Entidad* cuerpo_hollow1 = new Entidad("cuerpo_hollow1",
+        glm::vec3(0.0f, -18.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow1->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow1->nombreModelo = AssetConstants::ModelNames::CUERPO2_HOLLOW;
+    cuerpo_hollow1->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	cuerpo_hollow1->actualizarTransformacion();
+
+    Entidad* cuerpo_hollow2 = new Entidad("cuerpo_hollow2",
+        glm::vec3(3.0f, -14.0f, -1.0f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+	cuerpo_hollow2->setTipoObjeto(TipoObjeto::MODELO);
+	cuerpo_hollow2->nombreModelo = AssetConstants::ModelNames::CUERPO1_HOLLOW;
+	cuerpo_hollow2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	cuerpo_hollow2->actualizarTransformacion();
+
+
+
+    Entidad* cuerpo_hollow3 = new Entidad("cuerpo_hollow3",
+        glm::vec3(3.0f, -14.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow3->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow3->nombreModelo = AssetConstants::ModelNames::CUERPO1_HOLLOW;
+    cuerpo_hollow3->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cuerpo_hollow3->actualizarTransformacion();
+
+
+    Entidad* cuerpo_hollow4 = new Entidad("cuerpo_hollow4",
+        glm::vec3(7.0f, -10.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 40.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow4->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow4->nombreModelo = AssetConstants::ModelNames::CUERPO3_HOLLOW;
+    cuerpo_hollow4->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cuerpo_hollow4->actualizarTransformacion();
+
+	cabeza_hollow->agregarHijo(cuerpo_hollow1);
+	cuerpo_hollow1->agregarHijo(cuerpo_hollow2);
+	cuerpo_hollow2->agregarHijo(cuerpo_hollow3);
+	cuerpo_hollow3->agregarHijo(cuerpo_hollow4);
+
+    agregarEntidad(cabeza_hollow);
 }
 
 void SceneInformation::crearPiso()
