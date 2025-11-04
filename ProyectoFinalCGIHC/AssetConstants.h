@@ -16,7 +16,10 @@ namespace AssetConstants {
 
 	// Nombres de modelos
 	namespace ModelNames{
+		const std::string CABEZA_OLMECA = "cabeza_olmeca";
+
 		const std::string CUPHEAD = "cuphead";
+
 		const std::string ISAAC_CUERPO = "isaac_cuerpo";
 		const std::string ISAAC_CABEZA = "isaac_cabeza";
 		const std::string ISAAC_BRAZO_IZQUIERDO = "isaac_brazo_izquierdo";
@@ -64,6 +67,9 @@ namespace AssetConstants {
 	// Rutas de modelos
 	namespace ModelPaths {
 		const std::string MODEL_PATH = "Models/";
+
+		const std::string CABEZA_OLMECA = MODEL_PATH + "cabeza_olmeca.obj";
+
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 
 		const std::string ISAAC_CUERPO = MODEL_PATH + "isaac_cuerpo.obj";
