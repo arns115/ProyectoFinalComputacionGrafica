@@ -146,6 +146,8 @@ private:
     void crearIsaac();
     void crearCabezaOlmeca();
     void crearHollow();
+    void crearPiramide();
+    void crearCamino();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

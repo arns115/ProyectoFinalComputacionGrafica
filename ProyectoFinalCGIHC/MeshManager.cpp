@@ -9,6 +9,7 @@ MeshManager::MeshManager()
 	createPisoMesh();
 	createVegetacionMesh();
 	createSphereMesh();
+	createCaminoMesh();
 }
 
 // Carga un mesh en el manager
@@ -157,6 +158,78 @@ void MeshManager::createSphereMesh()
 	
 	// Guardar el mesh en el manager
 	loadMesh(AssetConstants::MeshNames::ESFERA, sphereMesh);
+}
+
+// Crear mesh de camino empedrado (prisma rectangular)
+void MeshManager::createCaminoMesh()
+{
+	// El camino va desde las cabezas olmecas (z=200) hasta la pirámide (z=-150)
+	// Ancho del camino: 5 unidades (de -2.5 a 2.5 en x)
+	// Altura muy pequeña: 0.1 unidades
+	unsigned int caminoIndices[] = {
+		// Cara superior
+		0, 1, 2,
+		0, 2, 3,
+		// Cara inferior
+		4, 6, 5,
+		4, 7, 6,
+		// Cara frontal (hacia la pirámide)
+		8, 9, 10,
+		8, 10, 11,
+		// Cara trasera (hacia las cabezas olmecas)
+		12, 14, 13,
+		12, 15, 14,
+		// Cara lateral izquierda
+		16, 17, 18,
+		16, 18, 19,
+		// Cara lateral derecha
+		20, 22, 21,
+		20, 23, 22
+	};
+
+	GLfloat caminoVertices[] = {
+		// Cara superior (y = 0.05) - Normales invertidas
+		//    x      y      z          u     v        nx    ny    nz
+		-2.5f,  0.05f, -150.0f,   0.0f, 0.0f,    0.0f, -1.0f, 0.0f,  // 0
+		 2.5f,  0.05f, -150.0f,   1.0f, 0.0f,    0.0f, -1.0f, 0.0f,  // 1
+		 2.5f,  0.05f,  200.0f,   1.0f, 70.0f,   0.0f, -1.0f, 0.0f,  // 2
+		-2.5f,  0.05f,  200.0f,   0.0f, 70.0f,   0.0f, -1.0f, 0.0f,  // 3
+		
+		// Cara inferior (y = -0.05) - Normales invertidas
+		-2.5f, -0.05f, -150.0f,   0.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 4
+		 2.5f, -0.05f, -150.0f,   1.0f, 0.0f,    0.0f, 1.0f, 0.0f, // 5
+		 2.5f, -0.05f,  200.0f,   1.0f, 70.0f,   0.0f, 1.0f, 0.0f, // 6
+		-2.5f, -0.05f,  200.0f,   0.0f, 70.0f,   0.0f, 1.0f, 0.0f, // 7
+		
+		// Cara frontal (z = -150, hacia la pirámide) - Normales invertidas
+		-2.5f, -0.05f, -150.0f,   0.0f, 0.0f,    0.0f, 0.0f, 1.0f, // 8
+		 2.5f, -0.05f, -150.0f,   1.0f, 0.0f,    0.0f, 0.0f, 1.0f, // 9
+		 2.5f,  0.05f, -150.0f,   1.0f, 1.0f,    0.0f, 0.0f, 1.0f, // 10
+		-2.5f,  0.05f, -150.0f,   0.0f, 1.0f,    0.0f, 0.0f, 1.0f, // 11
+		
+		// Cara trasera (z = 200, hacia las cabezas olmecas) - Normales invertidas
+		-2.5f, -0.05f,  200.0f,   0.0f, 0.0f,    0.0f, 0.0f, -1.0f,  // 12
+		 2.5f, -0.05f,  200.0f,   1.0f, 0.0f,    0.0f, 0.0f, -1.0f,  // 13
+		 2.5f,  0.05f,  200.0f,   1.0f, 1.0f,    0.0f, 0.0f, -1.0f,  // 14
+		-2.5f,  0.05f,  200.0f,   0.0f, 1.0f,    0.0f, 0.0f, -1.0f,  // 15
+		
+		// Cara lateral izquierda (x = -2.5) - Normales invertidas
+		-2.5f, -0.05f, -150.0f,   0.0f, 0.0f,   1.0f, 0.0f, 0.0f,  // 16
+		-2.5f, -0.05f,  200.0f,   70.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 17
+		-2.5f,  0.05f,  200.0f,   70.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 18
+		-2.5f,  0.05f, -150.0f,   0.0f, 1.0f,   1.0f, 0.0f, 0.0f,  // 19
+		
+		// Cara lateral derecha (x = 2.5) - Normales invertidas
+		 2.5f, -0.05f, -150.0f,   0.0f, 0.0f,    -1.0f, 0.0f, 0.0f,  // 20
+		 2.5f, -0.05f,  200.0f,   70.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 21
+		 2.5f,  0.05f,  200.0f,   70.0f, 1.0f,   -1.0f, 0.0f, 0.0f,  // 22
+		 2.5f,  0.05f, -150.0f,   0.0f, 1.0f,    -1.0f, 0.0f, 0.0f   // 23
+	};
+
+	// Crear el mesh
+	Mesh* caminoMesh = new Mesh();
+	caminoMesh->CreateMesh(caminoVertices, caminoIndices, 192, 36);
+	loadMesh(AssetConstants::MeshNames::CAMINO, caminoMesh);
 }
 
 MeshManager::~MeshManager() 

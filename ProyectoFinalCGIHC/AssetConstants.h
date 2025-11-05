@@ -11,6 +11,7 @@ namespace AssetConstants {
 		const std::string PASTO = "pasto";
 		const std::string LADRILLO = "brick";
 		const std::string TIERRA = "dirt";
+		const std::string EMPEDRADO = "empedrado";
 		// Texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
 		const std::string POPOTE_ROJO = "popote_rojo";
@@ -20,6 +21,7 @@ namespace AssetConstants {
 	// Nombres de modelos
 	namespace ModelNames{
 		const std::string CABEZA_OLMECA = "cabeza_olmeca";
+		const std::string PIRAMIDE = "piramide";
 
 		const std::string CUPHEAD = "cuphead";
 
@@ -57,6 +59,7 @@ namespace AssetConstants {
 		const std::string PIRAMIDE = "piramide";
 		const std::string VEGETACION = "vegetacion";
 		const std::string ESFERA = "esfera";  
+		const std::string CAMINO = "camino";
 	}
 
 	// Nombres de materiales
@@ -85,6 +88,7 @@ namespace AssetConstants {
 		const std::string PASTO_PATH = TEXTURE_PATH + "textura_pasto.png";
 		const std::string LADRILLO_PATH = TEXTURE_PATH + "brick.png";
 		const std::string TIERRA_PATH = TEXTURE_PATH + "dirt.png";
+		const std::string EMPEDRADO_PATH = TEXTURE_PATH + "empedrado.png";
 		// Rutas de texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
 		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
@@ -95,6 +99,7 @@ namespace AssetConstants {
 		const std::string MODEL_PATH = "Models/";
 
 		const std::string CABEZA_OLMECA = MODEL_PATH + "cabeza_olmeca.obj";
+		const std::string PIRAMIDE = MODEL_PATH + "piramide.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 

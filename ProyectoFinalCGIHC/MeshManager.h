@@ -31,6 +31,7 @@ private:
 	void createPisoMesh();
 	void createVegetacionMesh();
 	void createSphereMesh();
+	void createCaminoMesh();
 	
 	// Función auxiliar para calcular normales por promedio de vértices
 	void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, 

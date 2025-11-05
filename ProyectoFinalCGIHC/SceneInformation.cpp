@@ -138,8 +138,10 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
+    crearCamino();
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
+    crearPiramide();
     crearHollow();
     crearObjetosGeometricos(); 
 
@@ -429,6 +431,39 @@ void SceneInformation::crearCabezaOlmeca()
     cabezaOlmeca->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     cabezaOlmeca->actualizarTransformacion();
     agregarEntidad(cabezaOlmeca);
+}
+
+// Crear entidad de la pirámide
+void SceneInformation::crearPiramide()
+{
+    // Pirámide 1
+    Entidad* piramide = new Entidad("piramide1",
+        glm::vec3(0.0f, -4.0f, -150.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),         // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));        // Escala
+    
+    piramide->setTipoObjeto(TipoObjeto::MODELO);
+    piramide->nombreModelo = AssetConstants::ModelNames::PIRAMIDE;
+    piramide->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    piramide->actualizarTransformacion();
+    agregarEntidad(piramide);
+}
+
+// Crear entidad del camino empedrado
+void SceneInformation::crearCamino()
+{
+    // Crear el camino empedrado que une las cabezas olmecas con la pirámide
+    Entidad* camino = new Entidad("camino_empedrado",
+        glm::vec3(2.0f, -1.0f, 25.0f),      // Posición centrada entre olmecas y pirámide
+        glm::vec3(0.0f, 0.0f, 0.0f),        // Sin rotación
+        glm::vec3(1.8f, 1.0f, 1.0f));       // Escala normal (el mesh ya tiene el tamaño correcto)
+    
+    camino->setTipoObjeto(TipoObjeto::MESH);
+    camino->nombreMesh = AssetConstants::MeshNames::CAMINO;
+    camino->nombreTextura = AssetConstants::TextureNames::EMPEDRADO;
+    camino->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    camino->actualizarTransformacion();
+    agregarEntidad(camino);
 }
 
 void SceneInformation::crearHollow() {
