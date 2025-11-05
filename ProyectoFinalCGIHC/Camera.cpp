@@ -213,22 +213,25 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		thirdPersonTarget->posicionLocal.z += movement.z;
 
 		// Rotación del personaje basada en dirección de movimiento
-		if (!enSalto) {
-			glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
-			float horizontalLength = glm::length(horizontalMovement);
-			
-			if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
-				glm::vec3 moveDir = glm::normalize(horizontalMovement);
-				float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
-				thirdPersonTarget->rotacionLocal = glm::vec3(
-					thirdPersonTarget->rotacionLocal.x,
-					thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
-					thirdPersonTarget->rotacionLocal.z
-				);
-			}
+		glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
+		float horizontalLength = glm::length(horizontalMovement);
+		
+		if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
+			glm::vec3 moveDir = glm::normalize(horizontalMovement);
+			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
+			// Actualizar rotación Y del personaje para que mire en la dirección de movimiento
+			thirdPersonTarget->rotacionLocalQuat = glm::quat(1, 0, 0, 0);
+			thirdPersonTarget->rotacionLocal = glm::vec3(
+				thirdPersonTarget->rotacionInicial.x,
+				thirdPersonTarget->rotacionInicial.y + targetYaw, 
+				thirdPersonTarget->rotacionInicial.z
+			);
 		}
 	}
 	
+	// Actualizar transformación
+	thirdPersonTarget->actualizarTransformacion();
+
 	// Calcular velocidad de movimiento para animación
 	float velocidadMovimiento = glm::length(movement);
 	
