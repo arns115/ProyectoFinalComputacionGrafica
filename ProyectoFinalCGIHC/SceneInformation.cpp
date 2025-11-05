@@ -340,7 +340,7 @@ void SceneInformation::crearIsaac()
 {
     // Crear entidad de Isaac ya con Jerarquia
     Entidad* isaac_cuerpo = new Entidad("isaac_cuerpo",
-        glm::vec3(0.0f, -1.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, -1.15f, 10.0f),      // Posición inicial
         glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
         glm::vec3(0.8f, 0.8f, 0.8f));      // Escala
 
@@ -360,12 +360,12 @@ void SceneInformation::crearIsaac()
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierda",
-        glm::vec3(-0.48f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(-0.48f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     Entidad* isaac_pierna_derecha = new Entidad("isaac_pierna_derecha",
-        glm::vec3(0.455f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(0.455f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -415,9 +415,9 @@ void SceneInformation::crearBossRoom()
 {
     // Crear entidad de la boss room
     Entidad* room = new Entidad("boss_room",
-        glm::vec3(0.0f, 0.0f, 150.0f),      // Posición inicial
-        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
-        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+        glm::vec3(125.0f, 17.45f, -125.0f),      // Posición inicial
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
+        glm::vec3(10.0f, 10.0f, 10.0f));      // Escala
 
     room->setTipoObjeto(TipoObjeto::MODELO);
     room->nombreModelo = AssetConstants::ModelNames::BOSS_ROOM;
@@ -457,7 +457,7 @@ void SceneInformation::crearCabezaOlmeca()
 
 void SceneInformation::crearHollow() {
     Entidad* cabeza_hollow = new Entidad("hollow",
-        glm::vec3(10.0f, 4.0f, 50.0f),      // Posición inicial
+        glm::vec3(125.0f, 4.0f, -125.0f),      // Posición inicial
         glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
 
