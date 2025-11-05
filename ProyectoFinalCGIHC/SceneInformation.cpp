@@ -128,7 +128,7 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
-    crearObjetosGeometricos();  // NUEVO
+    crearObjetosGeometricos(); 
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -142,29 +142,173 @@ void SceneInformation::inicializarEntidades()
 
 }
 
-// Funcion para crear a los personjes(ahorita solo esta cuphead)
+// Funcion para crear a los personjes
 void SceneInformation::crearPersonajePrincipal()
 {
-    // Crear entidad prueba del personaje de Cuphead
-    Entidad* testCharacter = new Entidad("testCharacter",
-        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
+    // Crear el modelo jerárquico de Cuphead siguiendo la estructura especificada
+    // Padre: cuphead_torso
+    
+    // 1. Crear el torso (padre raíz)
+    Entidad* cuphead_torso = new Entidad("cuphead_torso",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición inicial en el mundo
         glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
-    testCharacter->setTipoObjeto(TipoObjeto::MODELO);
-    testCharacter->nombreModelo = AssetConstants::ModelNames::CUPHEAD;
-    testCharacter->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cuphead_torso->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_torso->setModelo(AssetConstants::ModelNames::CUPHEAD_TORSO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_TORSO));
+    cuphead_torso->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     
-    // Crear y configurar componente de física
-    testCharacter->fisica = new ComponenteFisico();
-    testCharacter->fisica->habilitar(true);
-    testCharacter->fisica->gravedad = -0.5f;
+    // Crear y configurar componente de física para el torso
+    cuphead_torso->fisica = new ComponenteFisico();
+    cuphead_torso->fisica->habilitar(true);
+    cuphead_torso->fisica->gravedad = -0.5f;
     
-    testCharacter->actualizarTransformacion();
-    agregarEntidad(testCharacter);
+    // Crear y configurar componente de animación
+    cuphead_torso->animacion = new ComponenteAnimacion(cuphead_torso);
+
+    // 2. Crear la cabeza (hijo del torso)
+    Entidad* cuphead_cabeza = new Entidad("cuphead_cabeza",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación adicional
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+    
+    cuphead_cabeza->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_cabeza->setModelo(AssetConstants::ModelNames::CUPHEAD_CABEZA, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_CABEZA));
+    cuphead_cabeza->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 3. Crear la leche (hijo de la cabeza)
+    Entidad* cuphead_leche = new Entidad("cuphead_leche",
+        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_leche->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_leche->setModelo(AssetConstants::ModelNames::CUPHEAD_LECHE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_LECHE));
+    cuphead_leche->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 4. Crear el popote (hijo de la leche)
+    Entidad* cuphead_popote = new Entidad("cuphead_popote",
+        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_popote->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_popote->setModelo(AssetConstants::ModelNames::CUPHEAD_POPOTE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_POPOTE));
+    cuphead_popote->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 5. Crear brazo derecho (hijo del torso)
+    Entidad* cuphead_brazo_derecho = new Entidad("cuphead_brazo_derecho",
+        glm::vec3(-0.15f, 0.0f, 0.2f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, -35.0f, 0.0f),        // Rotación para bajar el brazo naturalmente
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_brazo_derecho->setModelo(AssetConstants::ModelNames::CUPHEAD_BRAZO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_BRAZO_DERECHO));
+    cuphead_brazo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 6. Crear antebrazo derecho (hijo del brazo derecho)
+    Entidad* cuphead_antebrazo_derecho = new Entidad("cuphead_antebrazo_derecho",
+        glm::vec3(-0.2f, 0.0f, -0.005f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, -15.0f, 0.0f),          // Rotación adicional para el antebrazo
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_antebrazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_antebrazo_derecho->setModelo(AssetConstants::ModelNames::CUPHEAD_ANTEBRAZO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_ANTEBRAZO_DERECHO));
+    cuphead_antebrazo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 7. Crear brazo izquierdo (hijo del torso)
+    Entidad* cuphead_brazo_izquierdo = new Entidad("cuphead_brazo_izquierdo",
+        glm::vec3(0.15f, 0.0f, 0.2f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 35.0f, 0.0f),      // Rotación para bajar el brazo naturalmente (opuesto al derecho)
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_brazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_brazo_izquierdo->setModelo(AssetConstants::ModelNames::CUPHEAD_BRAZO_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_BRAZO_IZQUIERDO));
+    cuphead_brazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 8. Crear antebrazo izquierdo (hijo del brazo izquierdo)
+    Entidad* cuphead_antebrazo_izquierdo = new Entidad("cuphead_antebrazo_izquierdo",
+        glm::vec3(0.2f, 0.0f, -0.015f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 15.0f, 0.0f),        // Rotación adicional para el antebrazo (opuesto al derecho)
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_antebrazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_antebrazo_izquierdo->setModelo(AssetConstants::ModelNames::CUPHEAD_ANTEBRAZO_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_ANTEBRAZO_IZQUIERDO));
+    cuphead_antebrazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 9. Crear muslo derecho (hijo del torso)
+    Entidad* cuphead_muslo_derecho = new Entidad("cuphead_muslo_derecho",
+        glm::vec3(-0.13f, 0.0f, -0.25f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_muslo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_muslo_derecho->setModelo(AssetConstants::ModelNames::CUPHEAD_MUSLO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_MUSLO_DERECHO));
+    cuphead_muslo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 10. Crear pie derecho (hijo del muslo derecho)
+    Entidad* cuphead_pie_derecho = new Entidad("cuphead_pie_derecho",
+        glm::vec3(0.0f, 0.0f, -0.1f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_pie_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_pie_derecho->setModelo(AssetConstants::ModelNames::CUPHEAD_PIE_DERECHO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_PIE_DERECHO));
+    cuphead_pie_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 11. Crear muslo izquierdo (hijo del torso)
+    Entidad* cuphead_muslo_izquierdo = new Entidad("cuphead_muslo_izquierdo",
+        glm::vec3(0.1f, 0.0f, -0.25f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_muslo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_muslo_izquierdo->setModelo(AssetConstants::ModelNames::CUPHEAD_MUSLO_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_MUSLO_IZQUIERDO));
+    cuphead_muslo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 12. Crear pie izquierdo (hijo del muslo izquierdo)
+    Entidad* cuphead_pie_izquierdo = new Entidad("cuphead_pie_izquierdo",
+        glm::vec3(0.0f, 0.0f, -0.1f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    cuphead_pie_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    cuphead_pie_izquierdo->setModelo(AssetConstants::ModelNames::CUPHEAD_PIE_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_PIE_IZQUIERDO));
+    cuphead_pie_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Construir la jerarquía según el árbol especificado
+    
+    // Cabeza -> Leche -> Popote
+    cuphead_leche->agregarHijo(cuphead_popote);
+    cuphead_cabeza->agregarHijo(cuphead_leche);
+    
+    // Brazo derecho -> Antebrazo derecho
+    cuphead_brazo_derecho->agregarHijo(cuphead_antebrazo_derecho);
+    
+    // Brazo izquierdo -> Antebrazo izquierdo
+    cuphead_brazo_izquierdo->agregarHijo(cuphead_antebrazo_izquierdo);
+    
+    // Muslo derecho -> Pie derecho
+    cuphead_muslo_derecho->agregarHijo(cuphead_pie_derecho);
+    
+    // Muslo izquierdo -> Pie izquierdo
+    cuphead_muslo_izquierdo->agregarHijo(cuphead_pie_izquierdo);
+    
+    // Torso como padre de todo
+    cuphead_torso->agregarHijo(cuphead_cabeza);
+    cuphead_torso->agregarHijo(cuphead_brazo_derecho);
+    cuphead_torso->agregarHijo(cuphead_brazo_izquierdo);
+    cuphead_torso->agregarHijo(cuphead_muslo_derecho);
+    cuphead_torso->agregarHijo(cuphead_muslo_izquierdo);
+    
+    // Actualizar transformaciones
+    cuphead_torso->actualizarTransformacion();
+    
+    // Agregar a la escena (solo el padre, los hijos se renderizarán automáticamente)
+    agregarEntidad(cuphead_torso);
     
     // Configurar la cámara en tercera persona siguiendo al personaje
-    camera.setThirdPersonTarget(testCharacter);
+    camera.setThirdPersonTarget(cuphead_torso);
 }
 
 // Crea al personaje de Isaac
@@ -262,7 +406,6 @@ void SceneInformation::crearPiso()
     agregarEntidad(piso);
 }
 
-// NUEVO: Función para crear objetos geométricos de prueba
 void SceneInformation::crearObjetosGeometricos()
 {
     // Crear esfera de prueba 1 - Flotando en el aire

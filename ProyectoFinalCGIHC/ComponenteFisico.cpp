@@ -2,7 +2,7 @@
 
 ComponenteFisico::ComponenteFisico()
     : velocidad(0.0f, 0.0f, 0.0f),
-      gravedad(-15.0f),
+      gravedad(-0.5f),
       habilitada(false),
       enSuelo(false)
 {
