@@ -16,7 +16,16 @@ namespace AssetConstants {
 
 	// Nombres de modelos
 	namespace ModelNames{
-		// Cuphead - modelo jerárquico
+		const std::string CABEZA_OLMECA = "cabeza_olmeca";
+
+		const std::string CUPHEAD = "cuphead";
+
+		const std::string CABEZA_HOLLOW = "cabeza_hollow";
+		const std::string CUERPO1_HOLLOW = "cuerpo1_hollow";
+		const std::string CUERPO2_HOLLOW = "cuerpo2_hollow";
+		const std::string CUERPO3_HOLLOW = "cuerpo3_hollow";
+
+		// Cuphead - modelo jerÃ¡rquico
 		const std::string CUPHEAD_TORSO = "cuphead_torso";
 		const std::string CUPHEAD_CABEZA = "cuphead_cabeza";
 		const std::string CUPHEAD_LECHE = "cuphead_leche";
@@ -30,7 +39,7 @@ namespace AssetConstants {
 		const std::string CUPHEAD_PIE_IZQUIERDO = "cuphead_pie_izquierdo";
 		const std::string CUPHEAD_PIE_DERECHO = "cuphead_pie_derecho";
 		
-		// Isaac - modelo jerárquico
+		// Isaac - modelo jerÃ¡rquico
 		const std::string ISAAC_CUERPO = "isaac_cuerpo";
 		const std::string ISAAC_CABEZA = "isaac_cabeza";
 		const std::string ISAAC_BRAZO_IZQUIERDO = "isaac_brazo_izquierdo";
@@ -78,8 +87,19 @@ namespace AssetConstants {
 	// Rutas de modelos
 	namespace ModelPaths {
 		const std::string MODEL_PATH = "Models/";
+
+		const std::string CABEZA_OLMECA = MODEL_PATH + "cabeza_olmeca.obj";
+
+		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
+
+		const std::string CABEZA_HOLLOW = MODEL_PATH + "cabeza_hollow.obj";
+		const std::string CUERPO1_HOLLOW = MODEL_PATH + "cuerpo1_hollow.obj";
+		const std::string CUERPO2_HOLLOW = MODEL_PATH + "cuerpo2_hollow.obj";
+		const std::string CUERPO3_HOLLOW = MODEL_PATH + "cuerpo3_hollow.obj";
+
+
 		
-		// Cuphead - modelo jerárquico en formato .dae
+		// Cuphead - modelo jerÃ¡rquico en formato .dae
 		const std::string CUPHEAD_TORSO = MODEL_PATH + "cuphead_torso.dae";
 		const std::string CUPHEAD_CABEZA = MODEL_PATH + "cuphead_cabeza.dae";
 		const std::string CUPHEAD_LECHE = MODEL_PATH + "cuphead_leche.dae";
@@ -93,7 +113,7 @@ namespace AssetConstants {
 		const std::string CUPHEAD_PIE_IZQUIERDO = MODEL_PATH + "cuphead_pie_izquierdo.dae";
 		const std::string CUPHEAD_PIE_DERECHO = MODEL_PATH + "cuphead_pie_derecho.dae";
 
-		// Isaac - modelo jerárquico
+		// Isaac - modelo jerÃ¡rquico
 		const std::string ISAAC_CUERPO = MODEL_PATH + "isaac_cuerpo.obj";
 		const std::string ISAAC_CABEZA = MODEL_PATH + "isaac_cabeza.obj";
 		const std::string ISAAC_BRAZO_IZQUIERDO = MODEL_PATH + "isaac_brazo_izquierdo.obj";

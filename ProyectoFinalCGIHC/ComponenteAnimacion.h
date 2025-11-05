@@ -14,25 +14,26 @@ public:
     // Actualizar animacion numero 1
     void actualizarAnimacion(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
     
-    // Control de banderas de animaci髇
+    // Control de banderas de animaci贸n
     void activarAnimacion(int indiceAnimacion);
     void desactivarAnimacion(int indiceAnimacion);
     bool estaActiva(int indiceAnimacion) const;
     
     // Propiedades de las animacion
 	unsigned short banderasAnimacion;  // Short para banderas de animacion (cada bit representa una animacion) (si bit x esta prendido, la animacion x esta activa)
-    unsigned int numeroAnimaciones;    // N鷐ero de animaciones disponibles
-    float tiemposAnimacion[16];        // Tiempo por cada animaci髇
-    float velocidadesAnimacion[16];    // Velocidad por cada animaci髇
+    unsigned int numeroAnimaciones;    // N煤mero de animaciones disponibles
+    float tiemposAnimacion[16];        // Tiempo por cada animaci贸n
+    float velocidadesAnimacion[16];    // Velocidad por cada animaci贸n
     
 private:
 	Entidad* entidad;  // Referencia a la entidad que tiene esta informacion de animacion
     
-    // Variables para guardar el estado antes de la animaci髇 de salto
-    glm::vec3 rotacionPreSalto;  // Guardar rotaci髇 antes del salto
+    // Variables para guardar el estado antes de la animaci贸n de salto
+    glm::vec3 rotacionPreSalto;  // Guardar rotaci贸n antes del salto
     
-    // Funciones de animaci髇 espec韋icas por entidad
+    // Funciones de animaci贸n espec铆ficas por entidad
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+    void animarHollow(int indiceAnimacion, float deltaTime);
     void animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
-    void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animaci髇 de salto
+    void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animaci贸n de salto
 };

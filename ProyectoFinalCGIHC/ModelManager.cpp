@@ -3,7 +3,18 @@
 // Carga todos los modelos al inicializar el ModelManager
 ModelManager::ModelManager()
 {
-	// Cargar modelos de Cuphead (jer·rquico)
+	
+	loadModel(AssetConstants::ModelNames::CABEZA_OLMECA, AssetConstants::ModelPaths::CABEZA_OLMECA);
+
+	loadModel(AssetConstants::ModelNames::CABEZA_HOLLOW, AssetConstants::ModelPaths::CABEZA_HOLLOW);
+	loadModel(AssetConstants::ModelNames::CUERPO1_HOLLOW, AssetConstants::ModelPaths::CUERPO1_HOLLOW);
+	loadModel(AssetConstants::ModelNames::CUERPO2_HOLLOW, AssetConstants::ModelPaths::CUERPO2_HOLLOW);
+	loadModel(AssetConstants::ModelNames::CUERPO3_HOLLOW, AssetConstants::ModelPaths::CUERPO3_HOLLOW);
+
+	loadModel("cuphead", AssetConstants::ModelPaths::CUPHEAD);
+
+
+	// Cargar modelos de Cuphead (jer√°rquico)
 	loadModel(AssetConstants::ModelNames::CUPHEAD_TORSO, AssetConstants::ModelPaths::CUPHEAD_TORSO);
 	loadModel(AssetConstants::ModelNames::CUPHEAD_CABEZA, AssetConstants::ModelPaths::CUPHEAD_CABEZA);
 	loadModel(AssetConstants::ModelNames::CUPHEAD_LECHE, AssetConstants::ModelPaths::CUPHEAD_LECHE);
@@ -17,7 +28,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::CUPHEAD_PIE_IZQUIERDO, AssetConstants::ModelPaths::CUPHEAD_PIE_IZQUIERDO);
 	loadModel(AssetConstants::ModelNames::CUPHEAD_PIE_DERECHO, AssetConstants::ModelPaths::CUPHEAD_PIE_DERECHO);
 	
-	// Cargar modelos de Isaac (jer·rquico)
+	// Cargar modelos de Isaac (jer√°rquico)
 	loadModel(AssetConstants::ModelNames::ISAAC_CUERPO, AssetConstants::ModelPaths::ISAAC_CUERPO);
 	loadModel(AssetConstants::ModelNames::ISAAC_CABEZA, AssetConstants::ModelPaths::ISAAC_CABEZA);
 	loadModel(AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO, AssetConstants::ModelPaths::ISAAC_BRAZO_IZQUIERDO);

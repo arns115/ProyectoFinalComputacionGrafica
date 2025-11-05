@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <gtc/quaternion.hpp>
 #include "Model.h"
 #include "Texture.h"
 #include "Mesh.h"
@@ -71,12 +72,14 @@ public:
     // Transformaciones locales
     glm::vec3 posicionLocal;           // Posición relativa al padre
     glm::vec3 rotacionLocal;           // Rotación en grados (X, Y, Z)
+    glm::quat rotacionLocalQuat;       // Rotación como quaternion
     glm::vec3 escalaLocal;             // Escala local
     glm::mat4 transformacionLocal;     // Matriz de transformación local
     
     // Transformaciones iniciales
     glm::vec3 posicionInicial;         // Posición inicial
     glm::vec3 rotacionInicial;         // Rotación inicial
+    glm::quat rotacionInicialQuat;     // Rotación inicial como quaternion
     glm::vec3 escalaInicial;           // Escala inicial
     
     // Jerarquía
@@ -98,4 +101,7 @@ private:
     Mesh* mesh;
     Texture* texture;
     Material* material;
+    
+    // Sincronizar rotacion con el quaternion
+    void sincronizarRotacion();
 };

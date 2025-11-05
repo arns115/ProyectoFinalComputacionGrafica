@@ -4,6 +4,7 @@
 #include <glm.hpp>
 #include <gtc/constants.hpp>
 #include <cmath>
+#include <random>
 
 // Parametros de las diferentes animaciones
 namespace {
@@ -13,6 +14,7 @@ namespace {
     const float ISAAC_AMPLITUD_CABEZA = 5.0f;
     const float ISAAC_BOBBING = 0.08f;
     
+    // Variables globales para los calculos de animaciones
     // Cuphead - Caminata
     const float CUPHEAD_AMPLITUD_BRAZOS = 25.0f;         // Amplitud del swing de brazos
     const float CUPHEAD_AMPLITUD_ANTEBRAZOS = 8.0f;      // Movimiento leve de antebrazos
@@ -87,10 +89,12 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
     }
     
     // Dependiendo de entidad llamar a su funcion de animacion
-    if (entidad->nombreObjeto.find("isaac_cuerpo") != std::string::npos) {
+    if (entidad->nombreObjeto == "isaac_cuerpo") {
         animarIsaac(indiceAnimacion, deltaTime, velocidadMovimiento);
     }
-    else if (entidad->nombreObjeto.find("cuphead_torso") != std::string::npos) {
+    else if (entidad->nombreObjeto == "hollow") {
+		animarHollow(indiceAnimacion, deltaTime);
+    else if (entidad->nombreObjeto == "cuphead_torso") {
         // Índice 0: Animación de caminata
         // Índice 1: Animación de salto
         if (indiceAnimacion == 0) {
@@ -141,7 +145,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     tiempo = tiemposAnimacion[indiceAnimacion];
     anguloBase = sin(tiempo);
     anguloOpuesto = sin(tiempo + glm::pi<float>());
-    
+
     for (auto* hijo : entidad->hijos) {
         if (hijo == nullptr) continue;
         
@@ -149,25 +153,23 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
         
         // Piernas
         if (nombre.find("pierna_derecha") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_PIERNAS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_PIERNAS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         else if (nombre.find("pierna_izquierda") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_PIERNAS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_PIERNAS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
-        
         // Brazos
         else if (nombre.find("brazo_derecho") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_BRAZOS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_BRAZOS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         else if (nombre.find("brazo_izquierdo") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_BRAZOS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_BRAZOS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         
         // Cabeza
         else if (nombre.find("cabeza") != std::string::npos) {
-            hijo->rotacionLocal.z = hijo->rotacionInicial.z + (anguloBase * ISAAC_AMPLITUD_CABEZA);
-            hijo->posicionLocal.y = hijo->posicionInicial.y + 
-                                   abs(sin(tiempo * 2.0f)) * ISAAC_BOBBING;
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.z + (anguloBase * ISAAC_AMPLITUD_CABEZA)), glm::vec3(0.0f, 0.0f, 1.0f));
+            hijo->posicionLocal.y = hijo->posicionInicial.y + abs(sin(tiempo * 2.0f)) * ISAAC_BOBBING;
         }
         
         hijo->actualizarTransformacion();
@@ -180,6 +182,9 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     }
 }
 
+void ComponenteAnimacion::animarHollow(int indiceAnimacion, float deltaTime) {
+
+}
 // Animación de caminata para Cuphead
 void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento)
 {

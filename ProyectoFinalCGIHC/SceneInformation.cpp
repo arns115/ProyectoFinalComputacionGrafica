@@ -61,6 +61,16 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
         }
     }
+    
+	// Actualizar animaciones de las entidades que tengan componente de animacion
+    for (auto* entidad : entidades) {
+        if (entidad != nullptr && entidad->animacion != nullptr) {
+            if (entidad->nombreObjeto == "hollow") {
+                std::cout << 1 << std::endl;
+                entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
+            }
+        }
+    }
 }
 
 
@@ -128,6 +138,9 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
+    crearObjetosGeometricos();
+	crearCabezaOlmeca();
+    crearHollow();
     crearObjetosGeometricos(); 
 
 
@@ -346,50 +359,137 @@ void SceneInformation::crearIsaac()
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     isaac_cuerpo->setTipoObjeto(TipoObjeto::MODELO);
-    isaac_cuerpo->setModelo(AssetConstants::ModelNames::ISAAC_CUERPO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_CUERPO));
-    if(isaac_cuerpo->nombreModelo.empty())
-    {
-        std::cout << "Error al cargar el modelo de Isaac Cuerpo" << std::endl;
-	}
-	isaac_cuerpo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-	
-	// Crear y configurar componente de física
-	isaac_cuerpo->fisica = new ComponenteFisico();
-	isaac_cuerpo->fisica->habilitar(true);
-	isaac_cuerpo->fisica->gravedad = -0.5f;
-	
-	// Crear y configurar componente de animación
-	isaac_cuerpo->animacion = new ComponenteAnimacion(isaac_cuerpo);
+    isaac_cuerpo->nombreModelo = AssetConstants::ModelNames::ISAAC_CUERPO;
+    isaac_cuerpo->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    
+    // Crear y configurar componente de física
+    isaac_cuerpo->fisica = new ComponenteFisico();
+    isaac_cuerpo->fisica->habilitar(true);
+    isaac_cuerpo->fisica->gravedad = -0.5f;
+    
+    // Crear y configurar componente de animación
+    isaac_cuerpo->animacion = new ComponenteAnimacion(isaac_cuerpo);
 
-	isaac_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
-	isaac_brazo_derecho->setModelo(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO));
-	isaac_brazo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    isaac_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_brazo_derecho->nombreModelo = AssetConstants::ModelNames::ISAAC_BRAZO_DERECHO;
+    isaac_brazo_derecho->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 
-	isaac_brazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
-	isaac_brazo_izquierdo->setModelo(AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO, modelManager.getModel(AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO));
-	isaac_brazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    isaac_brazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_brazo_izquierdo->nombreModelo = AssetConstants::ModelNames::ISAAC_BRAZO_IZQUIERDO;
+    isaac_brazo_izquierdo->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 
-	isaac_cabeza->setTipoObjeto(TipoObjeto::MODELO);
-	isaac_cabeza->setModelo(AssetConstants::ModelNames::ISAAC_CABEZA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_CABEZA));
-	isaac_cabeza->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    isaac_cabeza->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_cabeza->nombreModelo = AssetConstants::ModelNames::ISAAC_CABEZA;
+    isaac_cabeza->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 
-	isaac_pierna_derecha->setTipoObjeto(TipoObjeto::MODELO);
-	isaac_pierna_derecha->setModelo(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA));
-	isaac_pierna_derecha->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    isaac_pierna_derecha->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_pierna_derecha->nombreModelo = AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA;
+    isaac_pierna_derecha->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 
-	isaac_pierna_izquierda->setTipoObjeto(TipoObjeto::MODELO);
-	isaac_pierna_izquierda->setModelo(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, modelManager.getModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA));
-	isaac_pierna_izquierda->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-
+    isaac_pierna_izquierda->setTipoObjeto(TipoObjeto::MODELO);
+    isaac_pierna_izquierda->nombreModelo = AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA;
+    isaac_pierna_izquierda->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 
     isaac_cuerpo->agregarHijo(isaac_cabeza);
-	isaac_cuerpo->agregarHijo(isaac_brazo_izquierdo);
-	isaac_cuerpo->agregarHijo(isaac_brazo_derecho);
-	isaac_cuerpo->agregarHijo(isaac_pierna_izquierda);
-	isaac_cuerpo->agregarHijo(isaac_pierna_derecha);
+    isaac_cuerpo->agregarHijo(isaac_brazo_izquierdo);
+    isaac_cuerpo->agregarHijo(isaac_brazo_derecho);
+    isaac_cuerpo->agregarHijo(isaac_pierna_izquierda);
+    isaac_cuerpo->agregarHijo(isaac_pierna_derecha);
+
+    agregarEntidad(isaac_cuerpo);
+}
+
+// Crear entidad de la cabeza olmeca
+void SceneInformation::crearCabezaOlmeca()
+{
+    // Cabeza olmeca 1
+    Entidad* cabezaOlmeca = new Entidad("cabezaOlmeca1",
+        glm::vec3(20.0f, -1.0f, 200.0f),      // Posición inicial
+        glm::vec3(0.0f, 45.0f, 0.0f),     // Rotación
+        glm::vec3(3.0f, 3.0f, 3.0f));      // Escala
+    
+    cabezaOlmeca->setTipoObjeto(TipoObjeto::MODELO);
+    cabezaOlmeca->nombreModelo = AssetConstants::ModelNames::CABEZA_OLMECA;
+    cabezaOlmeca->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    cabezaOlmeca->actualizarTransformacion();
+	agregarEntidad(cabezaOlmeca);
+
+    // Cabeza olmeca 2
+    cabezaOlmeca = new Entidad("cabezaOlmeca2",
+        glm::vec3(-20.0f, -1.0f, 200.0f),      // Posición inicial
+        glm::vec3(0.0f, 115.0f, 0.0f),     // Rotación
+        glm::vec3(3.0f, 3.0f, 3.0f));      // Escala
+
+    cabezaOlmeca->setTipoObjeto(TipoObjeto::MODELO);
+    cabezaOlmeca->nombreModelo = AssetConstants::ModelNames::CABEZA_OLMECA;
+    cabezaOlmeca->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    cabezaOlmeca->actualizarTransformacion();
+    agregarEntidad(cabezaOlmeca);
+}
+
+void SceneInformation::crearHollow() {
+    Entidad* cabeza_hollow = new Entidad("hollow",
+        glm::vec3(10.0f, 4.0f, 50.0f),      // Posición inicial
+        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
+
+    cabeza_hollow->setTipoObjeto(TipoObjeto::MODELO);
+    cabeza_hollow->nombreModelo = AssetConstants::ModelNames::CABEZA_HOLLOW;
+    cabeza_hollow->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cabeza_hollow->actualizarTransformacion();
+    
+    // Crear y configurar componente de animación
+    cabeza_hollow->animacion = new ComponenteAnimacion(cabeza_hollow);
 
 
-	agregarEntidad(isaac_cuerpo);
+    Entidad* cuerpo_hollow1 = new Entidad("cuerpo_hollow1",
+        glm::vec3(0.0f, -18.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow1->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow1->nombreModelo = AssetConstants::ModelNames::CUERPO2_HOLLOW;
+    cuerpo_hollow1->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	cuerpo_hollow1->actualizarTransformacion();
+
+    Entidad* cuerpo_hollow2 = new Entidad("cuerpo_hollow2",
+        glm::vec3(3.0f, -14.0f, -1.0f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+	cuerpo_hollow2->setTipoObjeto(TipoObjeto::MODELO);
+	cuerpo_hollow2->nombreModelo = AssetConstants::ModelNames::CUERPO1_HOLLOW;
+	cuerpo_hollow2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	cuerpo_hollow2->actualizarTransformacion();
+
+
+    Entidad* cuerpo_hollow3 = new Entidad("cuerpo_hollow3",
+        glm::vec3(3.0f, -14.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow3->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow3->nombreModelo = AssetConstants::ModelNames::CUERPO1_HOLLOW;
+    cuerpo_hollow3->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cuerpo_hollow3->actualizarTransformacion();
+
+
+    Entidad* cuerpo_hollow4 = new Entidad("cuerpo_hollow4",
+        glm::vec3(7.0f, -10.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 40.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    cuerpo_hollow4->setTipoObjeto(TipoObjeto::MODELO);
+    cuerpo_hollow4->nombreModelo = AssetConstants::ModelNames::CUERPO3_HOLLOW;
+    cuerpo_hollow4->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    cuerpo_hollow4->actualizarTransformacion();
+
+	cabeza_hollow->agregarHijo(cuerpo_hollow1);
+	cuerpo_hollow1->agregarHijo(cuerpo_hollow2);
+	cuerpo_hollow2->agregarHijo(cuerpo_hollow3);
+	cuerpo_hollow3->agregarHijo(cuerpo_hollow4);
+
+    agregarEntidad(cabeza_hollow);
 }
 
 void SceneInformation::crearPiso()
