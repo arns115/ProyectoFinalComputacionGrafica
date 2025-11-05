@@ -62,6 +62,13 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
     
+	// Se posiciona linterna en la posicion y direccion de la camara
+    spotLightActual = *lightManager.getSpotLight(AssetConstants::LightNames::LINTERNA);
+	posicionLuzActual = camera.getCameraPosition();
+	direccionLuzActual = camera.getCameraDirection();
+    spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
+	agregarSpotLightActual(spotLightActual);
+
 	// Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
         if (entidad != nullptr && entidad->animacion != nullptr) {
@@ -77,6 +84,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
 // Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
 {
+	limpiarSpotLightsActuales(); // Limpiar los spotlights actuales para actualizarlos cada frame
+	limpiarLucesPuntualesActuales(); // Limpiar las luces puntuales actuales para actualizarlas cada frame
+
     // Actualizar cámara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
@@ -142,6 +152,7 @@ void SceneInformation::inicializarEntidades()
 	crearCabezaOlmeca();
     crearHollow();
     crearObjetosGeometricos(); 
+    crearBossRoom();
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -397,6 +408,23 @@ void SceneInformation::crearIsaac()
     isaac_cuerpo->agregarHijo(isaac_pierna_derecha);
 
     agregarEntidad(isaac_cuerpo);
+}
+
+// Crear la boss room
+void SceneInformation::crearBossRoom()
+{
+    // Crear entidad de la boss room
+    Entidad* room = new Entidad("boss_room",
+        glm::vec3(0.0f, 0.0f, 150.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    room->setTipoObjeto(TipoObjeto::MODELO);
+    room->nombreModelo = AssetConstants::ModelNames::BOSS_ROOM;
+    room->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+	room->actualizarTransformacion();
+
+    agregarEntidad(room);
 }
 
 // Crear entidad de la cabeza olmeca

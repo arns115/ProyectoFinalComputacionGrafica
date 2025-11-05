@@ -23,9 +23,15 @@ public:
     SceneInformation();
     ~SceneInformation();
     
-    // Inicializar la escena creando todos los objetos
-    void inicializarEscena();
+	// Variables para luces actuales (para tomar la luz y meterla al arreglo)
+    SpotLight spotLightActual;
+    PointLight pointLightActual;
     
+    // Variables para manejar posicion y direccion de luz que se agregara a luces actuales 
+	glm::vec3 posicionLuzActual;
+	glm::vec3 direccionLuzActual;
+
+
     // Inicializar la cámara con parámetros personalizados
     void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),
                           glm::vec3 startUp = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -146,6 +152,7 @@ private:
     void crearIsaac();
     void crearCabezaOlmeca();
     void crearHollow();
+	void crearBossRoom();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
