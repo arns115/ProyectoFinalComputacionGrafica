@@ -136,9 +136,9 @@ std::vector<GLfloat> Sphere::getVertices() const
 		floatArray.push_back(vertex.texCoords.y);
 		
 		// Normal (3 floats)
-		floatArray.push_back(vertex.normal.x);
-		floatArray.push_back(vertex.normal.y);
-		floatArray.push_back(vertex.normal.z);
+		floatArray.push_back(-vertex.normal.x);
+		floatArray.push_back(-vertex.normal.y);
+		floatArray.push_back(-vertex.normal.z);
 	}
 	
 	return floatArray;
