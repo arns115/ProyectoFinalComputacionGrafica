@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <glm.hpp>
 
 class Entidad;
 
@@ -27,7 +28,11 @@ public:
 private:
 	Entidad* entidad;  // Referencia a la entidad que tiene esta informacion de animacion
     
+    // Variables para guardar el estado antes de la animación de salto
+    glm::vec3 rotacionPreSalto;  // Guardar rotación antes del salto
+    
     // Funciones de animación específicas por entidad
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
-    void animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento);  // NUEVO
+    void animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+    void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animación de salto
 };

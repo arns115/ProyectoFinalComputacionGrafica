@@ -128,7 +128,7 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
-    crearObjetosGeometricos();  // NUEVO
+    crearObjetosGeometricos(); 
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -142,7 +142,7 @@ void SceneInformation::inicializarEntidades()
 
 }
 
-// Funcion para crear a los personjes(ahorita solo esta cuphead)
+// Funcion para crear a los personjes
 void SceneInformation::crearPersonajePrincipal()
 {
     // Crear el modelo jerárquico de Cuphead siguiendo la estructura especificada
@@ -406,7 +406,6 @@ void SceneInformation::crearPiso()
     agregarEntidad(piso);
 }
 
-// NUEVO: Función para crear objetos geométricos de prueba
 void SceneInformation::crearObjetosGeometricos()
 {
     // Crear esfera de prueba 1 - Flotando en el aire

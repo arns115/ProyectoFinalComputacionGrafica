@@ -28,7 +28,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	// Inicializar detección de tecla Q
 	qKeyPressed = false;
 
-	// NUEVO: Inicializar nivel del suelo
+	// Inicializar nivel del suelo
 	groundLevel = 1.2f;
 	
 	// Inicializar detección de teclas de modo de cámara
@@ -101,25 +101,15 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 
 		if (keys[GLFW_KEY_A])
 		{
-			aerialViewCenter.x -= velocity;  // Mover a la izquierda (oeste)
+			aerialViewCenter.x -= velocity;  // Mover a la izquierda 
 		}
 
 		if (keys[GLFW_KEY_D])
 		{
-			aerialViewCenter.x += velocity;  // Mover a la derecha (este)
+			aerialViewCenter.x += velocity;  // Mover a la derecha
 		}
 		
 		return;
-	}
-
-	// Mantener compatibilidad con tecla Q (deprecated)
-	if (keys[GLFW_KEY_Q]) {
-		if (!qKeyPressed) {
-			setThirdPersonMode(!thirdPersonMode);
-			qKeyPressed = true;
-		}
-	} else {
-		qKeyPressed = false;
 	}
 
 	// Si está en tercera persona, mover el personaje en lugar de la cámara
@@ -183,7 +173,7 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	if (keys[GLFW_KEY_S])
 	{
 		movement -= forwardFlat * velocity;
-		}
+	}
 
 	// Movimiento lateral
 	if (keys[GLFW_KEY_A])
@@ -196,10 +186,24 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		movement += rightFlat * velocity;
 	}
 
-	// NUEVO: Salto con Space (solo si está en el suelo)
+	// Salto con Space
 	if (keys[GLFW_KEY_SPACE])
 	{
-		thirdPersonTarget->fisica->saltar(8.0f);  // Fuerza de salto ajustable
+		if (thirdPersonTarget->fisica->estaEnSuelo()) {
+			// Activar física de salto
+			thirdPersonTarget->fisica->saltar(8.0f);
+			
+			// Activar animación de salto automáticamente
+			if (thirdPersonTarget->animacion != nullptr) {
+				thirdPersonTarget->animacion->activarAnimacion(1); // Índice 1 = salto
+			}
+		}
+	}
+
+	// Verificar si hay animación de salto activa
+	bool enSalto = false;
+	if (thirdPersonTarget->animacion != nullptr) {
+		enSalto = thirdPersonTarget->animacion->estaActiva(1); // Índice 1 = animación de salto
 	}
 
 	// Aplicar el movimiento horizontal al personaje (NO vertical, eso lo maneja la física)
@@ -209,32 +213,41 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		thirdPersonTarget->posicionLocal.z += movement.z;
 
 		// Rotación del personaje basada en dirección de movimiento
-		glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
-		float horizontalLength = glm::length(horizontalMovement);
-		
-		if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
-			glm::vec3 moveDir = glm::normalize(horizontalMovement);
-			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
-			thirdPersonTarget->rotacionLocal = glm::vec3(
-				thirdPersonTarget->rotacionLocal.x,
-				thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
-				thirdPersonTarget->rotacionLocal.z
-			);
+		if (!enSalto) {
+			glm::vec3 horizontalMovement(movement.x, 0.0f, movement.z);
+			float horizontalLength = glm::length(horizontalMovement);
+			
+			if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
+				glm::vec3 moveDir = glm::normalize(horizontalMovement);
+				float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
+				thirdPersonTarget->rotacionLocal = glm::vec3(
+					thirdPersonTarget->rotacionLocal.x,
+					thirdPersonTarget->rotacionInicial.y + targetYaw, // Se toma en cuenta rotacion inicial para que vaya en la direccion correcta
+					thirdPersonTarget->rotacionLocal.z
+				);
+			}
 		}
 	}
 	
 	// Calcular velocidad de movimiento para animación
 	float velocidadMovimiento = glm::length(movement);
 	
-	// Actualizar animacion del personaje activo
-	if (thirdPersonTarget->animacion != nullptr) {
-		thirdPersonTarget->animacion->actualizarAnimacion(0, deltaTime, velocidadMovimiento);
-	}
-	
 	// Aplicar la fisica al personaje(basicamente gravedad)
 	if (thirdPersonTarget->fisica != nullptr) {
 		thirdPersonTarget->fisica->aplicarFisica(deltaTime, groundLevel, 
 			thirdPersonTarget->posicionLocal, thirdPersonTarget->posicionInicial);
+	}
+	
+	// Actualizar animación del personaje activo
+	if (thirdPersonTarget->animacion != nullptr) {
+		// Animación de caminata (índice 0)
+		if (!enSalto) {
+			thirdPersonTarget->animacion->actualizarAnimacion(0, deltaTime, velocidadMovimiento);
+		}
+		// Animación de salto (índice 1)
+		if (enSalto) {
+			thirdPersonTarget->animacion->actualizarAnimacion(1, deltaTime, 0.0f);
+		}
 	}
 	
 	// Actualizar transformación
@@ -488,12 +501,11 @@ void Camera::updateThirdPerson()
 	// Posicionar la cámara detrás del objetivo
 	position = targetPos - direction * thirdPersonDistance;
 	
-	// MODIFICADO: La altura de la cámara sigue la altura del personaje
+
 	// Esto hace que la cámara se mantenga relativa al personaje durante el salto
 	position.y += thirdPersonHeight;
 
 	// Hacer que la cámara mire hacia el objetivo
-	// MODIFICADO: Apuntar al centro del personaje (siguiendo su altura actual)
 	front = glm::normalize(targetPos + glm::vec3(0.0f, thirdPersonHeight * 0.5f, 0.0f) - position);
 	
 	// Actualizar los vectores right y up

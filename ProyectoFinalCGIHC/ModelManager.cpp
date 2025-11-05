@@ -35,7 +35,7 @@ void ModelManager::loadModel(const std::string& modelName, const std::string& mo
 	models[modelName] = model;
 }
 
-// Obtiene un modelo por su nombre (retorna puntero)
+// Obtiene un modelo por su nombre (retorna apuntador)
 Model* ModelManager::getModel(const std::string& modelName)
 {
 	auto it = models.find(modelName);
