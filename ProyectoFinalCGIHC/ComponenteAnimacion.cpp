@@ -3,6 +3,7 @@
 #include <glm.hpp>
 #include <gtc/constants.hpp>
 #include <cmath>
+#include <random>
 
 // Parametros de las diferentes animaciones (ahora solo esta implementado caminar de isaac)
 namespace {
@@ -11,7 +12,7 @@ namespace {
     const float ISAAC_AMPLITUD_CABEZA = 5.0f;
     const float ISAAC_BOBBING = 0.08f;
     
-    // Variables globales para los calculos de animacion
+    // Variables globales para los calculos de animaciones
     bool animacionActiva = false;
     float tiempo = 0.0f;
     float anguloBase = 0.0f;
@@ -64,8 +65,11 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
     }
     
     // Dependiendo de entidad llamar a su funcion de animacion
-    if (entidad->nombreObjeto.find("isaac_cuerpo") != std::string::npos) {
+    if (entidad->nombreObjeto == "isaac_cuerpo") {
         animarIsaac(indiceAnimacion, deltaTime, velocidadMovimiento);
+    }
+    else if (entidad->nombreObjeto == "hollow") {
+		animarHollow(indiceAnimacion, deltaTime);
     }
 }
 
@@ -108,7 +112,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     tiempo = tiemposAnimacion[indiceAnimacion];
     anguloBase = sin(tiempo);
     anguloOpuesto = sin(tiempo + glm::pi<float>());
-    
+
     for (auto* hijo : entidad->hijos) {
         if (hijo == nullptr) continue;
         
@@ -116,25 +120,23 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
         
         // Piernas
         if (nombre.find("pierna_derecha") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_PIERNAS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_PIERNAS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         else if (nombre.find("pierna_izquierda") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_PIERNAS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_PIERNAS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
-        
         // Brazos
         else if (nombre.find("brazo_derecho") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_BRAZOS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloOpuesto * ISAAC_AMPLITUD_BRAZOS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         else if (nombre.find("brazo_izquierdo") != std::string::npos) {
-            hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_BRAZOS);
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.x + (anguloBase * ISAAC_AMPLITUD_BRAZOS)), glm::vec3(1.0f, 0.0f, 0.0f));
         }
         
         // Cabeza
         else if (nombre.find("cabeza") != std::string::npos) {
-            hijo->rotacionLocal.z = hijo->rotacionInicial.z + (anguloBase * ISAAC_AMPLITUD_CABEZA);
-            hijo->posicionLocal.y = hijo->posicionInicial.y + 
-                                   abs(sin(tiempo * 2.0f)) * ISAAC_BOBBING;
+            hijo->rotacionLocalQuat = glm::angleAxis(glm::radians(hijo->rotacionInicial.z + (anguloBase * ISAAC_AMPLITUD_CABEZA)), glm::vec3(0.0f, 0.0f, 1.0f));
+            hijo->posicionLocal.y = hijo->posicionInicial.y + abs(sin(tiempo * 2.0f)) * ISAAC_BOBBING;
         }
         
         hijo->actualizarTransformacion();
@@ -147,3 +149,6 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     }
 }
 
+void ComponenteAnimacion::animarHollow(int indiceAnimacion, float deltaTime) {
+
+}

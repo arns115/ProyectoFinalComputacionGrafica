@@ -29,4 +29,5 @@ private:
     
     // Funciones de animación específicas por entidad (se van a agregar mas)
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+    void animarHollow(int indiceAnimacion, float deltaTime);
 };

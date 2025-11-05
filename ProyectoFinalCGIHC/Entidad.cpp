@@ -6,13 +6,15 @@ Entidad::Entidad(const std::string& nombreObj,
                  glm::vec3 rot, 
                  glm::vec3 escala)
     : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
-      posicionLocal(pos), rotacionLocal(rot), 
+      posicionLocal(pos), rotacionLocal(glm::vec3(0.0f)), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
       posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
       texture(nullptr), material(nullptr), fisica(nullptr), animacion(nullptr)
 {
-    sincronizarRotacion();
+    rotacionLocalQuat = glm::angleAxis(glm::radians(rot.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
+                        glm::angleAxis(glm::radians(rot.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
+                        glm::angleAxis(glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
     rotacionInicialQuat = rotacionLocalQuat;
     actualizarTransformacion();
 }
@@ -28,7 +30,7 @@ void Entidad::actualizarTransformacion()
     sincronizarRotacion();
     
     transformacionLocal = glm::mat4(1.0f);
-    // Se posiciona adecuadamente
+	// Se traslada adecuadamente
     transformacionLocal = glm::translate(transformacionLocal, posicionLocal);
 	// Se rota adecuadamente
     transformacionLocal *= glm::mat4_cast(rotacionLocalQuat);
@@ -36,12 +38,12 @@ void Entidad::actualizarTransformacion()
     transformacionLocal = glm::scale(transformacionLocal, escalaLocal);
 }
 
-// Sincronizar la rotacion del vector con el quaternion para tener bien los ejes
-void Entidad::sincronizarRotacion()
-{
-    rotacionLocalQuat = glm::angleAxis(glm::radians(rotacionLocal.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
-                        glm::angleAxis(glm::radians(rotacionLocal.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
-                        glm::angleAxis(glm::radians(rotacionLocal.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+// Sincroniza la rotacion con el quaternion
+void Entidad::sincronizarRotacion() {
+    rotacionLocalQuat = rotacionLocalQuat * glm::quat(glm::radians(rotacionLocal));
+	rotacionLocalQuat = glm::normalize(rotacionLocalQuat);
+    rotacionLocal = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 void Entidad::agregarHijo(Entidad* hijo) 

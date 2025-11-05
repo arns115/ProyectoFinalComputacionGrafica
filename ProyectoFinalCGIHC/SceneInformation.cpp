@@ -61,6 +61,16 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
         }
     }
+    
+	// Actualizar animaciones de las entidades que tengan componente de animacion
+    for (auto* entidad : entidades) {
+        if (entidad != nullptr && entidad->animacion != nullptr) {
+            if (entidad->nombreObjeto == "hollow") {
+                std::cout << 1 << std::endl;
+                entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
+            }
+        }
+    }
 }
 
 
@@ -281,7 +291,9 @@ void SceneInformation::crearHollow() {
     cabeza_hollow->nombreModelo = AssetConstants::ModelNames::CABEZA_HOLLOW;
     cabeza_hollow->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     cabeza_hollow->actualizarTransformacion();
-
+    
+    // Crear y configurar componente de animación
+    cabeza_hollow->animacion = new ComponenteAnimacion(cabeza_hollow);
 
 
     Entidad* cuerpo_hollow1 = new Entidad("cuerpo_hollow1",
@@ -303,7 +315,6 @@ void SceneInformation::crearHollow() {
 	cuerpo_hollow2->nombreModelo = AssetConstants::ModelNames::CUERPO1_HOLLOW;
 	cuerpo_hollow2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
 	cuerpo_hollow2->actualizarTransformacion();
-
 
 
     Entidad* cuerpo_hollow3 = new Entidad("cuerpo_hollow3",
