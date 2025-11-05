@@ -178,23 +178,27 @@ void SceneInformation::crearPersonajePrincipal()
     
     // 3. Crear la leche (hijo de la cabeza)
     Entidad* cuphead_leche = new Entidad("cuphead_leche",
-        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.6f),       // Posición relativa (ya está en el modelo)
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
     
     cuphead_leche->setTipoObjeto(TipoObjeto::MODELO);
     cuphead_leche->setModelo(AssetConstants::ModelNames::CUPHEAD_LECHE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_LECHE));
     cuphead_leche->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    // Forzar la textura
+    cuphead_leche->setTextura(AssetConstants::TextureNames::CUPHEAD_TEXTURE, textureManager.getTexture(AssetConstants::TextureNames::CUPHEAD_TEXTURE));
     
     // 4. Crear el popote (hijo de la leche)
     Entidad* cuphead_popote = new Entidad("cuphead_popote",
-        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(-0.3f, 0.0f, 0.3f),       // Posición relativa (ya está en el modelo)
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::vec3(0.2f, 0.2f, 0.2f));
     
     cuphead_popote->setTipoObjeto(TipoObjeto::MODELO);
     cuphead_popote->setModelo(AssetConstants::ModelNames::CUPHEAD_POPOTE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_POPOTE));
     cuphead_popote->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    // Forzar la textura
+    cuphead_popote->setTextura(AssetConstants::TextureNames::POPOTE_ROJO, textureManager.getTexture(AssetConstants::TextureNames::POPOTE_ROJO));
     
     // 5. Crear brazo derecho (hijo del torso)
     Entidad* cuphead_brazo_derecho = new Entidad("cuphead_brazo_derecho",

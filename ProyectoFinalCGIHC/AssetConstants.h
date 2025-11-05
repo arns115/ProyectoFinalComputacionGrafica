@@ -11,6 +11,9 @@ namespace AssetConstants {
 		const std::string PASTO = "pasto";
 		const std::string LADRILLO = "brick";
 		const std::string TIERRA = "dirt";
+		// Texturas de Cuphead
+		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
+		const std::string POPOTE_ROJO = "popote_rojo";
 	}
 
 
@@ -73,6 +76,9 @@ namespace AssetConstants {
 		const std::string PASTO_PATH = TEXTURE_PATH + "textura_pasto.png";
 		const std::string LADRILLO_PATH = TEXTURE_PATH + "brick.png";
 		const std::string TIERRA_PATH = TEXTURE_PATH + "dirt.png";
+		// Rutas de texturas de Cuphead
+		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
+		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
 	}
 
 	// Rutas de modelos
