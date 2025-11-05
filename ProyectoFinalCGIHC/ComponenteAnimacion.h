@@ -27,6 +27,7 @@ public:
 private:
 	Entidad* entidad;  // Referencia a la entidad que tiene esta informacion de animacion
     
-    // Funciones de animación específicas por entidad (se van a agregar mas)
+    // Funciones de animación específicas por entidad
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+    void animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento);  // NUEVO
 };
