@@ -522,7 +522,6 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
                 float anguloMuslo = sin(factorMortal * glm::pi<float>()) * -CUPHEAD_SALTO_ANGULO_MUSLOS;
                 hijo->rotacionLocal.x = hijo->rotacionInicial.x + anguloMuslo;
                 
-                // Crear quaternion compuesto: Z * Y * X
                 hijo->rotacionLocalQuat = 
                     glm::angleAxis(glm::radians(hijo->rotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
                     glm::angleAxis(glm::radians(hijo->rotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
@@ -534,7 +533,6 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
                         float anguloPie = (1.0f - factorMortal) * CUPHEAD_SALTO_DOBLEZ_PIE;
                         nieto->rotacionLocal.x = nieto->rotacionInicial.x + anguloPie;
                         
-                        // Crear quaternion compuesto: Z * Y * X
                         nieto->rotacionLocalQuat = 
                             glm::angleAxis(glm::radians(nieto->rotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
                             glm::angleAxis(glm::radians(nieto->rotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
