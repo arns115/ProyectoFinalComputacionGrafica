@@ -13,6 +13,7 @@ namespace AssetConstants {
 		const std::string TIERRA = "dirt";
 		const std::string EMPEDRADO = "empedrado";
 		const std::string AGUA = "agua";
+		const std::string MAYAN_BRICKS = "mayan_bricks";
 		// Texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
 		const std::string POPOTE_ROJO = "popote_rojo";
@@ -23,6 +24,12 @@ namespace AssetConstants {
 	namespace ModelNames{
 		const std::string CABEZA_OLMECA = "cabeza_olmeca";
 		const std::string PIRAMIDE = "piramide";
+		const std::string MAIZ = "maiz";
+		const std::string ARBOL_A = "arbol_a";
+		const std::string ARBOL_B = "arbol_b";
+		const std::string ARBOL_C = "arbol_c";
+		const std::string CANOA = "canoa";
+		const std::string MAYA_CANOA = "maya_canoa";
 
 		const std::string CUPHEAD = "cuphead";
 
@@ -79,8 +86,11 @@ namespace AssetConstants {
 		const std::string VEGETACION = "vegetacion";
 		const std::string ESFERA = "esfera";  
 		const std::string CAMINO = "camino";
-		const std::string PRISMA_AGUA = "prisma_agua";
-		const std::string PRISMA_PEQUENO = "prisma_pequeno";
+		const std::string CHINAMPA_AGUA = "chinampa_agua";
+		const std::string CHINAMPA_ISLA = "chinampa_isla";
+		const std::string CANCHA_PARED = "cancha_pared";
+		const std::string CANCHA_TECHO = "cancha_techo";
+		const std::string TOROIDE = "toroide";
 	}
 
 	// Nombres de materiales
@@ -112,6 +122,7 @@ namespace AssetConstants {
 		const std::string TIERRA_PATH = TEXTURE_PATH + "dirt.png";
 		const std::string EMPEDRADO_PATH = TEXTURE_PATH + "empedrado.png";
 		const std::string AGUA_PATH = TEXTURE_PATH + "agua.png";
+		const std::string MAYAN_BRICKS_PATH = TEXTURE_PATH + "mayan_bricks.png";
 		// Rutas de texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
 		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
@@ -123,6 +134,12 @@ namespace AssetConstants {
 
 		const std::string CABEZA_OLMECA = MODEL_PATH + "cabeza_olmeca.obj";
 		const std::string PIRAMIDE = MODEL_PATH + "piramide.obj";
+		const std::string MAIZ = MODEL_PATH + "maiz.obj";
+		const std::string ARBOL_A = MODEL_PATH + "arbol_a.obj";
+		const std::string ARBOL_B = MODEL_PATH + "arbol_b.obj";
+		const std::string ARBOL_C = MODEL_PATH + "arbol_c.obj";
+		const std::string CANOA = MODEL_PATH + "canoa.obj";
+		const std::string MAYA_CANOA = MODEL_PATH + "maya_canoa.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 

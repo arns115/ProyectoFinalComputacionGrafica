@@ -6,6 +6,12 @@ ModelManager::ModelManager()
 	
 	loadModel(AssetConstants::ModelNames::CABEZA_OLMECA, AssetConstants::ModelPaths::CABEZA_OLMECA);
 	loadModel(AssetConstants::ModelNames::PIRAMIDE, AssetConstants::ModelPaths::PIRAMIDE);
+	loadModel(AssetConstants::ModelNames::MAIZ, AssetConstants::ModelPaths::MAIZ);
+	loadModel(AssetConstants::ModelNames::ARBOL_A, AssetConstants::ModelPaths::ARBOL_A);
+	loadModel(AssetConstants::ModelNames::ARBOL_B, AssetConstants::ModelPaths::ARBOL_B);
+	loadModel(AssetConstants::ModelNames::ARBOL_C, AssetConstants::ModelPaths::ARBOL_C);
+	loadModel(AssetConstants::ModelNames::CANOA, AssetConstants::ModelPaths::CANOA);
+	loadModel(AssetConstants::ModelNames::MAYA_CANOA, AssetConstants::ModelPaths::MAYA_CANOA);
 
 	loadModel(AssetConstants::ModelNames::CABEZA_HOLLOW, AssetConstants::ModelPaths::CABEZA_HOLLOW);
 	loadModel(AssetConstants::ModelNames::CUERPO1_HOLLOW, AssetConstants::ModelPaths::CUERPO1_HOLLOW);

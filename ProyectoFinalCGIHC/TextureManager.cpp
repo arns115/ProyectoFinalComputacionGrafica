@@ -9,6 +9,7 @@ TextureManager::TextureManager()
 	loadTexture(AssetConstants::TextureNames::TIERRA, AssetConstants::TexturePaths::TIERRA_PATH);
 	loadTexture(AssetConstants::TextureNames::EMPEDRADO, AssetConstants::TexturePaths::EMPEDRADO_PATH);
 	loadTexture(AssetConstants::TextureNames::AGUA, AssetConstants::TexturePaths::AGUA_PATH);
+	loadTexture(AssetConstants::TextureNames::MAYAN_BRICKS, AssetConstants::TexturePaths::MAYAN_BRICKS_PATH);
 	// Cargar texturas de Cuphead
 	loadTexture(AssetConstants::TextureNames::CUPHEAD_TEXTURE, AssetConstants::TexturePaths::CUPHEAD_TEXTURE_PATH);
 	loadTexture(AssetConstants::TextureNames::POPOTE_ROJO, AssetConstants::TexturePaths::POPOTE_ROJO_PATH);
