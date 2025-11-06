@@ -43,7 +43,7 @@ void SceneInformation::actualizarFrame(float deltaTime)
 {
     // Actualizar el ciclo dia/noche
     acumuladorTiempoDesdeCambio += deltaTime;
-    if (acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    if (acumuladorTiempoDesdeCambio >= 30.0f / LIMIT_FPS) // 30 segundos = 1 minuto
     {
         esDeDia = !esDeDia; // Cambiar entre dia y noche
         acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
@@ -119,18 +119,18 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
 void SceneInformation::inicializarSkybox()
 {
     // Establecer el skybox por defecto
-    setSkyboxActual(AssetConstants::SkyboxNames::DAY);
+    setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
 }
 
 // Funcion para inicializar la luz direccional
 void SceneInformation::inicializarLuces()
 {
     // Obtener la luz del sol desde el LightManager
-    DirectionalLight* sunLight = lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+    DirectionalLight* nightLight = lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
     
-    if (sunLight != nullptr) {
+    if (nightLight != nullptr) {
         // Establecer la luz del sol como luz direccional principal
-        luzDireccional = *sunLight;
+        luzDireccional = *nightLight;
     } else {
         // Si no existe, crear una luz direccional por defecto
         luzDireccional = DirectionalLight(
@@ -157,6 +157,8 @@ void SceneInformation::inicializarEntidades()
     crearObjetosGeometricos(); 
     crearBossRoom();
 	crearSecretRoom();
+    crearFogatas();
+    crearComidaPerro();
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -449,6 +451,68 @@ void SceneInformation::crearSecretRoom() {
 	agregarEntidad(room);
 }
 
+// Crear fogatas en la escena
+void SceneInformation::crearFogatas(){
+    Entidad* fogata1 = new Entidad("fuego_rojo",
+        glm::vec3(-50.0f, -1.0f, 50.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
+
+    fogata1->setTipoObjeto(TipoObjeto::MODELO);
+    fogata1->nombreModelo = AssetConstants::ModelNames::FUEGO_ROJO;
+	fogata1->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata1);
+
+    Entidad* fogata2 = new Entidad("fuego_azul",
+        glm::vec3(50.0f, -1.0f, 50.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
+
+    fogata2->setTipoObjeto(TipoObjeto::MODELO);
+	fogata2->nombreModelo = AssetConstants::ModelNames::FUEGO_AZUL;
+    fogata2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata2);
+
+    Entidad* fogata3 = new Entidad("fuego_morado",
+        glm::vec3(0.0f, -1.0f, -50.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
+
+	fogata3->setTipoObjeto(TipoObjeto::MODELO);
+    fogata3->nombreModelo = AssetConstants::ModelNames::FUEGO_MORADO;
+	fogata3->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata3);
+
+}
+
+// Crea el objeto flotante de RKey de Isaac para posicionarlo en la secret room
+void SceneInformation::crearRKey() {
+    Entidad* rkey = new Entidad("rkey",
+        glm::vec3(0.0f, 15.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    rkey->setTipoObjeto(TipoObjeto::MODELO);
+    rkey->nombreModelo = AssetConstants::ModelNames::R_KEY;
+    rkey->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	agregarEntidad(rkey);
+
+
+}
+
+void SceneInformation::crearComidaPerro() {
+    Entidad* comida = new Entidad("comida_perro",
+        glm::vec3(0.0f, 10.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    comida->setTipoObjeto(TipoObjeto::MODELO);
+    comida->nombreModelo = AssetConstants::ModelNames::COMIDA_PERRO;
+    comida->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    agregarEntidad(comida);
+}
 
 // Crear entidad de la cabeza olmeca
 void SceneInformation::crearCabezaOlmeca()

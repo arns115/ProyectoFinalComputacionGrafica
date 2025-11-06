@@ -58,6 +58,13 @@ namespace AssetConstants {
 		const std::string SECRET_ROOM = "secret_room";
 		const std::string R_KEY = "r_key";
 
+
+		// Fogatas
+		const std::string FUEGO_ROJO = "fuego_rojo";
+		const std::string FUEGO_MORADO = "fuego_morado";
+		const std::string FUEGO_AZUL = "fuego_azul";
+
+		const std::string COMIDA_PERRO = "comida_perro";
 	}
 
 	// Nombres de meshes
@@ -142,11 +149,19 @@ namespace AssetConstants {
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
 
+		// Fogatas
+		const std::string FUEGO_ROJO = MODEL_PATH + "fuego_rojo.obj";
+		const std::string FUEGO_MORADO = MODEL_PATH + "fuego_morado.obj";
+		const std::string FUEGO_AZUL = MODEL_PATH + "fuego_azul.obj";
+
+
 		// Boss room
 		const std::string BOSS_ROOM = MODEL_PATH + "boss_room.obj";
 		const std::string SECRET_ROOM = MODEL_PATH + "secret_room.obj";
 
-		const std::string R_KEY = "r_key.obj";
+		const std::string R_KEY = MODEL_PATH + "r_key.obj";
+
+		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
 	}
 
 	// Nombres de shaders

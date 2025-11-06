@@ -43,6 +43,13 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
 
+	// Fogatas
+	loadModel(AssetConstants::ModelNames::FUEGO_ROJO, AssetConstants::ModelPaths::FUEGO_ROJO);
+	loadModel(AssetConstants::ModelNames::FUEGO_MORADO, AssetConstants::ModelPaths::FUEGO_MORADO);
+	loadModel(AssetConstants::ModelNames::FUEGO_AZUL, AssetConstants::ModelPaths::FUEGO_AZUL);
+
+	// Comida de perro (Item en Binding of isaac)
+	loadModel(AssetConstants::ModelNames::COMIDA_PERRO, AssetConstants::ModelPaths::COMIDA_PERRO);
 }
 
 

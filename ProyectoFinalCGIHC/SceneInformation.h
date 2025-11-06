@@ -125,7 +125,7 @@ private:
     unsigned int spotLightCountActual;
 
     // Booleano para saber si es de dia
-    bool esDeDia = true;
+    bool esDeDia = false;
 	// Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
 	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
@@ -158,6 +158,8 @@ private:
     void crearPrismaAgua();
     void crearPrismasPequenos();
     void crearSecretRoom();
+    void crearFogatas();
+	void crearComidaPerro();
     void crearRKey();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
