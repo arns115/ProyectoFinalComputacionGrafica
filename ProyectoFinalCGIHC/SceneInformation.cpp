@@ -132,15 +132,19 @@ void SceneInformation::actualizarFrame(float deltaTime)
     for (auto* entidad : entidades) {
         if (entidad != nullptr) {
             if (entidad->nombreObjeto == "hollow") {
-                entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
+                entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
             if (entidad->nombreObjeto == "pedestal_piedra") {
-                entidad->hijos[0]->animacion->actualizarAnimacion(1, deltaTime, 1.0);
+                entidad->hijos[0]->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
             if (entidad->nombreObjeto == "fuego_azul" || entidad->nombreObjeto == "fuego_azul2") {
 				pointLightActual = *lightManager.getPointLight(AssetConstants::LightNames::PUNTUAL_AZUL);
 				pointLightActual.setPosition(entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f));
 				agregarLuzPuntualActual(pointLightActual);
+            }
+            // si esta activa la animacion se llama a la funcion de actualizarala
+            if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
+				entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
         }
     }
@@ -178,7 +182,15 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         personajeActual = 3;
 
     }
-
+	// Se itera sobre las entidades para hacer acciones especificas
+    for (auto* entidad : entidades) {
+        if (entidad->nombreObjeto == "puerta_secret_room") {
+            // Z: Se abre o cierra la puerta secreta
+            if (keys[GLFW_KEY_Z]) {
+				entidad->animacion->activarAnimacion(0); // Activar animacion de abrir puerta
+            }
+        }
+    }
 
 
 }
@@ -472,6 +484,9 @@ void SceneInformation::crearPuertaSecreta() {
     puerta->setTipoObjeto(TipoObjeto::MODELO);
     puerta->nombreModelo = AssetConstants::ModelNames::PUERTA_SECRET_ROOM;
     puerta->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    
+    puerta->animacion = new ComponenteAnimacion(puerta);
+
 	agregarEntidad(puerta);
 }
 

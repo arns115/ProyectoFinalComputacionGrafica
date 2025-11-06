@@ -80,6 +80,11 @@ namespace {
     const float COMIDA_PERRO_FRECUENCIA = 2.0f / 60;    // Frecuencia del movimiento (ciclos por frame)
     float comidaPerroTiempo = 0.0f;                      // Tiempo acumulado para la animación
     
+    // Variables para Puerta
+    const float PUERTA_VELOCIDAD = 5.0f / 60;                 // Velocidad de movimiento de la puerta
+    const float PUERTA_DISTANCIA_TOTAL = 10.0f;           // Distancia total que baja la puerta
+    bool puertaBajando = true;                           // true = bajando (abriendo), false = subiendo (cerrando)
+    
     // Quaternion para guardar rotación pre-salto
     glm::quat rotacionPreSaltoQuat(1.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -139,6 +144,9 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
     else if (entidad->nombreObjeto == "comida_perro") {
 		animarComidaPerro(indiceAnimacion, deltaTime);
     }
+    else if(entidad->nombreObjeto == "puerta_secret_room") {
+        animarPuerta(indiceAnimacion, deltaTime);
+	}
     else if (entidad->nombreObjeto == "cuphead_torso") {
         // Índice 0: Animación de caminata
         // Índice 1: Animación de salto
@@ -743,6 +751,42 @@ void ComponenteAnimacion::animarComidaPerro(int indiceAnimacion, float deltaTime
 
     // Aplicar el desplazamiento 
     entidad->posicionLocal.y = entidad->posicionInicial.y + sin(comidaPerroTiempo) * COMIDA_PERRO_AMPLITUD;
+    
+    // Actualizar transformación
+    entidad->actualizarTransformacion();
+}
+
+// Animacion para la puerta de la secret room (abre y cierra verticalmente)
+void ComponenteAnimacion::animarPuerta(int indiceAnimacion, float deltaTime) {
+    if (entidad == nullptr) {
+        return;
+    }
+    
+    animacionActiva = estaActiva(indiceAnimacion);
+    
+    
+    // Calcular el desplazamiento hacia abajo
+    if (puertaBajando) {
+        // Abrir la puerta (bajar)
+        entidad->posicionLocal.y -= PUERTA_VELOCIDAD * deltaTime;
+        
+        // Verificar si ya se termino la animacion
+        if (entidad->posicionLocal.y <= entidad->posicionInicial.y - PUERTA_DISTANCIA_TOTAL) {
+            entidad->posicionLocal.y = entidad->posicionInicial.y - PUERTA_DISTANCIA_TOTAL;
+            puertaBajando = false;  // Cambiar dirección para la próxima activación
+            desactivarAnimacion(indiceAnimacion);  // Terminar animación
+        }
+    } else {
+        // Cerrar la puerta *subir)
+        entidad->posicionLocal.y += PUERTA_VELOCIDAD * deltaTime;
+        
+        // Verificar si llegó a la posición inicial
+        if (entidad->posicionLocal.y >= entidad->posicionInicial.y) {
+            entidad->posicionLocal.y = entidad->posicionInicial.y;
+            puertaBajando = true;                // Cambiar direccino
+            desactivarAnimacion(indiceAnimacion);  // Se termina la animacion
+        }
+    }
     
     // Actualizar transformación
     entidad->actualizarTransformacion();
