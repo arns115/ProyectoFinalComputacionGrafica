@@ -130,7 +130,7 @@ private:
 	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
     // Entero para saber que personaje es actualmente
-	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
+	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Luchador
 
     // Variables para animación de la canoa
     Entidad* canoa = nullptr;
@@ -161,10 +161,12 @@ private:
     void crearPiso();
     void crearObjetosGeometricos(); 
     void crearIsaac();
+    void crearLuchador();
     void crearCabezaOlmeca();
     void crearHollow();
 	void crearBossRoom();
     void crearPiramide();
+    void crearPrimo();
     void crearCamino();
     void crearChinampaAgua();
     void crearIslas();

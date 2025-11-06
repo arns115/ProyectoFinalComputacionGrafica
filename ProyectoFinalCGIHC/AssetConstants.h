@@ -30,6 +30,7 @@ namespace AssetConstants {
 		const std::string ARBOL_C = "arbol_c";
 		const std::string CANOA = "canoa";
 		const std::string MAYA_CANOA = "maya_canoa";
+		const std::string PRIMO = "primo";
 
 		const std::string CUPHEAD = "cuphead";
 
@@ -59,6 +60,14 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = "isaac_brazo_derecho";
 		const std::string ISAAC_PIERNA_IZQUIERDA = "isaac_pierna_izquierda";
 		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
+
+		// Luchador - modelo jerárquico
+		const std::string LUCHADOR_TORSO = "luchador_torso";
+		const std::string LUCHADOR_BRAZO_DERECHO = "luchador_brazo_derecho";
+		const std::string LUCHADOR_BRAZO_IZQUIERDO = "luchador_brazo_izquierdo";
+		const std::string LUCHADOR_ANTEBRAZO_IZQUIERDO = "luchador_antebrazo_izquierdo";
+		const std::string LUCHADOR_MUSLOS = "luchador_muslos";
+		const std::string LUCHADOR_PIERNAS = "luchador_piernas";
 
 		// Boss room
 		const std::string BOSS_ROOM = "boss_room";
@@ -127,6 +136,7 @@ namespace AssetConstants {
 		const std::string ARBOL_C = MODEL_PATH + "arbol_c.obj";
 		const std::string CANOA = MODEL_PATH + "canoa.obj";
 		const std::string MAYA_CANOA = MODEL_PATH + "maya_canoa.obj";
+		const std::string PRIMO = MODEL_PATH + "primo.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 
@@ -158,6 +168,14 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = MODEL_PATH + "isaac_brazo_derecho.obj";
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
+
+		// Luchador - modelo jerárquico
+		const std::string LUCHADOR_TORSO = MODEL_PATH + "luchador_torso.obj";
+		const std::string LUCHADOR_BRAZO_DERECHO = MODEL_PATH + "luchador_brazo_derecho.obj";
+		const std::string LUCHADOR_BRAZO_IZQUIERDO = MODEL_PATH + "luchador_brazo_izquierdo.obj";
+		const std::string LUCHADOR_ANTEBRAZO_IZQUIERDO = MODEL_PATH + "luchador_antebrazo_izquierdo.obj";
+		const std::string LUCHADOR_MUSLOS = MODEL_PATH + "luchador_muslos.obj";
+		const std::string LUCHADOR_PIERNAS = MODEL_PATH + "luchador_piernas.obj";
 
 		// Boss room
 		const std::string BOSS_ROOM = MODEL_PATH + "boss_room.obj";

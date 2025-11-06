@@ -113,7 +113,7 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         personajeActual = 2;
 
     }
-	// 3: Cambia el modo tercera persona a Gojo
+	// 3: Cambia el modo tercera persona a Luchador
     if (keys[GLFW_KEY_3]) {
         camera.setThirdPersonTarget(entidades[(int)entidades.size() - 1]);
         personajeActual = 3;
@@ -175,6 +175,8 @@ void SceneInformation::inicializarEntidades()
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
     crearPiramide();
+    crearPrimo();  // Agregar Primo cerca de la pirámide
+    crearLuchador();  // Agregar Luchador cerca de la pirámide (no jugable)
     crearHollow();
     crearObjetosGeometricos(); 
     crearBossRoom();
@@ -184,9 +186,9 @@ void SceneInformation::inicializarEntidades()
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
 	// Segundo Isaac
-    // Tercero Gojo
+    // Tercero Isaac (temporal)
     crearPersonajePrincipal();
-	  crearIsaac();
+	crearIsaac();
     crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
 
 
@@ -440,6 +442,114 @@ void SceneInformation::crearIsaac()
     agregarEntidad(isaac_cuerpo);
 }
 
+// Crear al luchador con modelo jerárquico
+void SceneInformation::crearLuchador()
+{
+    // Jerarquía del luchador:
+    // luchador_torso (raíz)
+    //   ├── luchador_brazo_derecho
+    //   ├── luchador_brazo_izquierdo
+    //   │   └── luchador_antebrazo_izquierdo
+    //   └── luchador_muslos
+    //       └── luchador_piernas
+    
+    // 1. Crear el torso (raíz)
+    // Posicionar cerca de la pirámide (que está en 0, -4, -150)
+    Entidad* luchador_torso = new Entidad("luchador_torso",
+        glm::vec3(-25.0f, -1.0f, -150.0f),    // Posición cerca de la pirámide (lado izquierdo)
+        glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
+        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala 2x
+    
+    luchador_torso->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_torso->setModelo(AssetConstants::ModelNames::LUCHADOR_TORSO, 
+                              modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_TORSO));
+    luchador_torso->setMaterial(AssetConstants::MaterialNames::BRILLANTE, 
+                               materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // No necesita física ni animación ya que es estático
+    
+    // 2. Crear brazo derecho (hijo del torso)
+    // Nota: El pivote está en la articulación
+    Entidad* luchador_brazo_derecho = new Entidad("luchador_brazo_derecho",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa (ajustar según el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    
+    luchador_brazo_derecho->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_brazo_derecho->setModelo(AssetConstants::ModelNames::LUCHADOR_BRAZO_DERECHO,
+                                     modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_BRAZO_DERECHO));
+    luchador_brazo_derecho->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                                       materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 3. Crear brazo izquierdo (hijo del torso)
+    // Nota: El pivote está en la articulación
+    Entidad* luchador_brazo_izquierdo = new Entidad("luchador_brazo_izquierdo",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa (ajustar según el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    
+    luchador_brazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_brazo_izquierdo->setModelo(AssetConstants::ModelNames::LUCHADOR_BRAZO_IZQUIERDO,
+                                       modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_BRAZO_IZQUIERDO));
+    luchador_brazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                                         materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 4. Crear antebrazo izquierdo (hijo del brazo izquierdo)
+    // Nota: El pivote está en la articulación
+    Entidad* luchador_antebrazo_izquierdo = new Entidad("luchador_antebrazo_izquierdo",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa (ajustar según el modelo)
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    
+    luchador_antebrazo_izquierdo->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_antebrazo_izquierdo->setModelo(AssetConstants::ModelNames::LUCHADOR_ANTEBRAZO_IZQUIERDO,
+                                           modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_ANTEBRAZO_IZQUIERDO));
+    luchador_antebrazo_izquierdo->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                                             materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 5. Crear muslos (hijo del torso)
+    Entidad* luchador_muslos = new Entidad("luchador_muslos",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    
+    luchador_muslos->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_muslos->setModelo(AssetConstants::ModelNames::LUCHADOR_MUSLOS,
+                              modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_MUSLOS));
+    luchador_muslos->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                                materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // 6. Crear piernas (hijo de muslos)
+    Entidad* luchador_piernas = new Entidad("luchador_piernas",
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Posición relativa
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    
+    luchador_piernas->setTipoObjeto(TipoObjeto::MODELO);
+    luchador_piernas->setModelo(AssetConstants::ModelNames::LUCHADOR_PIERNAS,
+                               modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_PIERNAS));
+    luchador_piernas->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                                 materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Construir la jerarquía
+    // Brazo izquierdo -> Antebrazo izquierdo
+    luchador_brazo_izquierdo->agregarHijo(luchador_antebrazo_izquierdo);
+    
+    // Muslos -> Piernas
+    luchador_muslos->agregarHijo(luchador_piernas);
+    
+    // Torso como padre de: brazo derecho, brazo izquierdo y muslos
+    luchador_torso->agregarHijo(luchador_brazo_derecho);
+    luchador_torso->agregarHijo(luchador_brazo_izquierdo);
+    luchador_torso->agregarHijo(luchador_muslos);
+    
+    // Actualizar transformaciones
+    luchador_torso->actualizarTransformacion();
+    
+    // Agregar a la escena (solo el padre, los hijos se renderizarán automáticamente)
+    agregarEntidad(luchador_torso);
+}
+
 // Crear la boss room
 void SceneInformation::crearBossRoom()
 {
@@ -470,7 +580,6 @@ void SceneInformation::crearSecretRoom() {
 	room->actualizarTransformacion();
 	agregarEntidad(room);
 }
-
 
 // Crear entidad de la cabeza olmeca
 void SceneInformation::crearCabezaOlmeca()
@@ -1050,8 +1159,8 @@ void SceneInformation::crearCanchaPelotaMaya()
         glm::vec3(posicionCentroCancha.x + separacionParedes / 2.0f, 
                   posicionCentroCancha.y, 
                   posicionCentroCancha.z),
-        glm::vec3(0.0f, 180.0f, 0.0f),     
-        glm::vec3(5.0f, 5.0f, 5.0f));      
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación de 180 grados para que mire hacia la izquierda
+        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala
     
     paredDerecha->setTipoObjeto(TipoObjeto::MESH);
     paredDerecha->nombreMesh = AssetConstants::MeshNames::CANCHA_PARED;
@@ -1211,7 +1320,22 @@ void SceneInformation::crearObjetosGeometricos()
     agregarEntidad(esfera3);
 }
 
-
+// Crear entidad de Primo cerca de la pirámide
+void SceneInformation::crearPrimo()
+{
+    // La pirámide está en (0.0f, -4.0f, -150.0f)
+    // Colocar a Primo al lado derecho de la pirámide
+    Entidad* primo = new Entidad("primo",
+        glm::vec3(25.0f, -1.0f, -150.0f),      // Posición cerca de la pirámide
+        glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
+        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala
+    
+    primo->setTipoObjeto(TipoObjeto::MODELO);
+    primo->nombreModelo = AssetConstants::ModelNames::PRIMO;
+    primo->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    primo->actualizarTransformacion();
+    agregarEntidad(primo);
+}
 
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {
