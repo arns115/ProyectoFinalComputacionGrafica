@@ -171,6 +171,7 @@ void SceneInformation::inicializarEntidades()
     crearIslas();
     crearArbolesAlrededorChinampa();
     crearCanoa();
+    crearCanchaPelotaMaya();
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
     crearPiramide();
@@ -388,7 +389,7 @@ void SceneInformation::crearIsaac()
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
-    Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierda",
+    Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierdo",
         glm::vec3(-0.48f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
@@ -574,7 +575,7 @@ void SceneInformation::crearIslas()
     float espaciado = 26.67f;
     
     // Desplazamiento desde el centro del prisma base
-    float desplazamientoInicial = -espaciado; // Comenzar desde la izquierda/atrás
+    float desplazamientoInicial = -espaciado; // Comenzar desde la izquierda
     
     // Semilla para generación aleatoria (usando tiempo actual)
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -1002,6 +1003,79 @@ void SceneInformation::actualizarAnimacionCanoa(float deltaTime)
     
     // Actualizar transformación de la canoa
     canoa->actualizarTransformacion();
+}
+
+// Crear cancha de juego de pelota Maya con jerarquía
+void SceneInformation::crearCanchaPelotaMaya()
+{
+    // Posición central de la cancha (entre las chinampas y la pirámide)
+    glm::vec3 posicionCentroCancha(100.0f, -1.0f, 100.0f);
+    float separacionParedes = 100.0f; // Distancia entre las dos paredes paralelas
+    
+    // Crear pared rectangular izquierda 
+    Entidad* paredIzquierda = new Entidad("cancha_pared_izquierda",
+        glm::vec3(posicionCentroCancha.x - separacionParedes / 2.0f, 
+                  posicionCentroCancha.y, 
+                  posicionCentroCancha.z),
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
+        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala normal
+    
+    paredIzquierda->setTipoObjeto(TipoObjeto::MESH);
+    paredIzquierda->nombreMesh = AssetConstants::MeshNames::CANCHA_PARED;
+    paredIzquierda->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
+    paredIzquierda->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    paredIzquierda->actualizarTransformacion();
+    
+    // Crear techo triangular izquierdo (hijo de pared izquierda)
+    Entidad* techoIzquierdo = new Entidad("cancha_techo_izquierdo",
+        glm::vec3(-1.5f, 0.0f, 0.0f),       // Posición relativa (ya está alineado con la pared)
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+    
+    techoIzquierdo->setTipoObjeto(TipoObjeto::MESH);
+    techoIzquierdo->nombreMesh = AssetConstants::MeshNames::CANCHA_TECHO;
+    techoIzquierdo->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
+    techoIzquierdo->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    techoIzquierdo->actualizarTransformacion();
+    
+    // Agregar techo como hijo de la pared izquierda
+    paredIzquierda->agregarHijo(techoIzquierdo);
+    
+    // Agregar pared izquierda a la escena
+    agregarEntidad(paredIzquierda);
+    
+    
+    // Crear pared rectangular derecha (padre)
+    Entidad* paredDerecha = new Entidad("cancha_pared_derecha",
+        glm::vec3(posicionCentroCancha.x + separacionParedes / 2.0f, 
+                  posicionCentroCancha.y, 
+                  posicionCentroCancha.z),
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación 180° para que mire hacia el centro
+        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala normal
+    
+    paredDerecha->setTipoObjeto(TipoObjeto::MESH);
+    paredDerecha->nombreMesh = AssetConstants::MeshNames::CANCHA_PARED;
+    paredDerecha->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
+    paredDerecha->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    paredDerecha->actualizarTransformacion();
+    
+    // Crear techo triangular derecho (hijo de pared derecha)
+    Entidad* techoDerecho = new Entidad("cancha_techo_derecho",
+        glm::vec3(-1.5f, 0.0f, 0.0f),       // Posición relativa
+        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación adicional
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+    
+    techoDerecho->setTipoObjeto(TipoObjeto::MESH);
+    techoDerecho->nombreMesh = AssetConstants::MeshNames::CANCHA_TECHO;
+    techoDerecho->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
+    techoDerecho->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    techoDerecho->actualizarTransformacion();
+    
+    // Agregar techo como hijo de la pared derecha
+    paredDerecha->agregarHijo(techoDerecho);
+    
+    // Agregar pared derecha a la escena
+    agregarEntidad(paredDerecha);
 }
 
 void SceneInformation::crearHollow() {

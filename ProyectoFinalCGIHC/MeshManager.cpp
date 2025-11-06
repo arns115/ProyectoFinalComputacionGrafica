@@ -12,6 +12,8 @@ MeshManager::MeshManager()
 	createCaminoMesh();
 	createPrismaAguaMesh();
 	createPrismaPequenoMesh();
+	createCanchaParedMesh();
+	createCanchaTechoMesh();
 }
 
 // Carga un mesh en el manager
@@ -374,6 +376,135 @@ void MeshManager::createPrismaPequenoMesh()
 	Mesh* prismaMesh = new Mesh();
 	prismaMesh->CreateMesh(prismaVertices, prismaIndices, 192, 36);
 	loadMesh(AssetConstants::MeshNames::CHINAMPA_ISLA, prismaMesh);
+}
+
+// Crear mesh de pared rectangular para la cancha de pelota maya
+void MeshManager::createCanchaParedMesh()
+{
+	// Prisma rectangular: 30 unidades de largo (Z), 5 de alto (Y), 3 de ancho (X)
+	unsigned int paredIndices[] = {
+		// Cara superior
+		0, 1, 2,
+		0, 2, 3,
+		// Cara inferior
+		4, 6, 5,
+		4, 7, 6,
+		// Cara frontal (hacia el centro de la cancha)
+		8, 9, 10,
+		8, 10, 11,
+		// Cara trasera (exterior)
+		12, 14, 13,
+		12, 15, 14,
+		// Cara lateral frontal (Z-)
+		16, 17, 18,
+		16, 18, 19,
+		// Cara lateral trasera (Z+)
+		20, 22, 21,
+		20, 23, 22
+	};
+
+	GLfloat paredVertices[] = {
+		// Cara superior (y = 5.0)
+		//    x      y      z        u     v      nx    ny    nz
+		-1.5f,  5.0f, -15.0f,   0.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 0
+		 1.5f,  5.0f, -15.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 1
+		 1.5f,  5.0f,  15.0f,   1.0f, 10.0f,  0.0f, -1.0f, 0.0f,  // 2
+		-1.5f,  5.0f,  15.0f,   0.0f, 10.0f,  0.0f, -1.0f, 0.0f,  // 3
+		
+		// Cara inferior (y = 0.0)
+		-1.5f,  0.0f, -15.0f,   0.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 4
+		 1.5f,  0.0f, -15.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 5
+		 1.5f,  0.0f,  15.0f,   1.0f, 10.0f,  0.0f, 1.0f, 0.0f, // 6
+		-1.5f,  0.0f,  15.0f,   0.0f, 10.0f,  0.0f, 1.0f, 0.0f, // 7
+		
+		// Cara frontal (x = -1.5, hacia el centro)
+		-1.5f,  0.0f, -15.0f,   0.0f, 0.0f,   1.0f, 0.0f, 0.0f, // 8
+		-1.5f,  0.0f,  15.0f,   10.0f, 0.0f,  1.0f, 0.0f, 0.0f, // 9
+		-1.5f,  5.0f,  15.0f,   10.0f, 2.0f,  1.0f, 0.0f, 0.0f, // 10
+		-1.5f,  5.0f, -15.0f,   0.0f, 2.0f,   1.0f, 0.0f, 0.0f, // 11
+		
+		// Cara trasera (x = 1.5, exterior)
+		 1.5f,  0.0f, -15.0f,   0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 12
+		 1.5f,  0.0f,  15.0f,   10.0f, 0.0f,  -1.0f, 0.0f, 0.0f,  // 13
+		 1.5f,  5.0f,  15.0f,   10.0f, 2.0f,  -1.0f, 0.0f, 0.0f,  // 14
+		 1.5f,  5.0f, -15.0f,   0.0f, 2.0f,   -1.0f, 0.0f, 0.0f,  // 15
+		
+		// Cara lateral frontal (z = -15.0)
+		-1.5f,  0.0f, -15.0f,   0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // 16
+		 1.5f,  0.0f, -15.0f,   1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // 17
+		 1.5f,  5.0f, -15.0f,   1.0f, 2.0f,  0.0f, 0.0f, 1.0f,  // 18
+		-1.5f,  5.0f, -15.0f,   0.0f, 2.0f,  0.0f, 0.0f, 1.0f,  // 19
+		
+		// Cara lateral trasera (z = 15.0)
+		-1.5f,  0.0f,  15.0f,   0.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 20
+		 1.5f,  0.0f,  15.0f,   1.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 21
+		 1.5f,  5.0f,  15.0f,   1.0f, 2.0f,   0.0f, 0.0f, -1.0f,  // 22
+		-1.5f,  5.0f,  15.0f,   0.0f, 2.0f,   0.0f, 0.0f, -1.0f   // 23
+	};
+
+	// Crear el mesh
+	Mesh* paredMesh = new Mesh();
+	paredMesh->CreateMesh(paredVertices, paredIndices, 192, 36);
+	loadMesh(AssetConstants::MeshNames::CANCHA_PARED, paredMesh);
+}
+
+// Crear mesh de techo triangular (prisma con base de triángulo rectángulo)
+void MeshManager::createCanchaTechoMesh()
+{
+	// Prisma triangular: 30 unidades de largo (Z), base de 3 unidades, altura de 3 unidades
+	// Triángulo rectángulo: un lado vertical y uno horizontal
+	// CORRECCIÓN: Hipotenusa va de (0, 8) a (3, 5), con tapas triangulares y normales invertidas
+	unsigned int techoIndices[] = {
+		// Cara inclinada (hipotenusa)
+		0, 2, 1,
+		0, 3, 2,
+		// Cara vertical (cateto vertical)
+		4, 6, 5,
+		4, 7, 6,
+		// Cara horizontal (cateto horizontal - base)
+		8, 10, 9,
+		8, 11, 10,
+		// Tapa triangular frontal (Z-)
+		12, 13, 14,
+		// Tapa triangular trasera (Z+)
+		15, 16, 17
+	};
+
+	GLfloat techoVertices[] = {
+		// Cara inclinada (hipotenusa) 
+		//    x      y      z        u     v      nx      ny      nz
+		 0.0f,  8.0f, -15.0f,   0.0f, 0.0f,  0.707f, -0.707f, 0.0f,  // 0
+		 0.0f,  8.0f,  15.0f,   10.0f, 0.0f, 0.707f, -0.707f, 0.0f,  // 1
+		 3.0f,  5.0f,  15.0f,   10.0f, 1.5f, 0.707f, -0.707f, 0.0f,  // 2
+		 3.0f,  5.0f, -15.0f,   0.0f, 1.5f,  0.707f, -0.707f, 0.0f,  // 3
+		
+		// Cara vertical 
+		 0.0f,  5.0f, -15.0f,   0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 4
+		 0.0f,  5.0f,  15.0f,   10.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // 5
+		 0.0f,  8.0f,  15.0f,   10.0f, 1.0f, 1.0f, 0.0f, 0.0f,  // 6
+		 0.0f,  8.0f, -15.0f,   0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 7
+		
+		// Cara horizontal 
+		 0.0f,  5.0f, -15.0f,   0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  // 8
+		 0.0f,  5.0f,  15.0f,   10.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // 9
+		 3.0f,  5.0f,  15.0f,   10.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 10
+		 3.0f,  5.0f, -15.0f,   0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  // 11
+		
+		// Tapa triangular frontal 
+		 0.0f,  5.0f, -15.0f,   0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // 12
+		 3.0f,  5.0f, -15.0f,   1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // 13
+		 0.0f,  8.0f, -15.0f,   0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // 14
+		
+		// Tapa triangular trasera
+		 0.0f,  5.0f,  15.0f,   0.0f, 0.0f,  0.0f, 0.0f, -1.0f,  // 15
+		 3.0f,  5.0f,  15.0f,   1.0f, 0.0f,  0.0f, 0.0f, -1.0f,  // 16
+		 0.0f,  8.0f,  15.0f,   0.0f, 1.0f,  0.0f, 0.0f, -1.0f   // 17
+	};
+
+	// Crear el mesh
+	Mesh* techoMesh = new Mesh();
+	techoMesh->CreateMesh(techoVertices, techoIndices, 144, 24);
+	loadMesh(AssetConstants::MeshNames::CANCHA_TECHO, techoMesh);
 }
 
 MeshManager::~MeshManager() 

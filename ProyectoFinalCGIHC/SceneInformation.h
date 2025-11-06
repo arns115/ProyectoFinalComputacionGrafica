@@ -178,6 +178,7 @@ private:
     void crearArbolesAlrededorChinampa();
     void crearCanoa();
     void actualizarAnimacionCanoa(float deltaTime);
+    void crearCanchaPelotaMaya();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

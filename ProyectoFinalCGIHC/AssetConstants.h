@@ -13,6 +13,7 @@ namespace AssetConstants {
 		const std::string TIERRA = "dirt";
 		const std::string EMPEDRADO = "empedrado";
 		const std::string AGUA = "agua";
+		const std::string MAYAN_BRICKS = "mayan_bricks";
 		// Texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
 		const std::string POPOTE_ROJO = "popote_rojo";
@@ -75,6 +76,8 @@ namespace AssetConstants {
 		const std::string CAMINO = "camino";
 		const std::string CHINAMPA_AGUA = "chinampa_agua";
 		const std::string CHINAMPA_ISLA = "chinampa_isla";
+		const std::string CANCHA_PARED = "cancha_pared";
+		const std::string CANCHA_TECHO = "cancha_techo";
 	}
 
 	// Nombres de materiales
@@ -105,6 +108,7 @@ namespace AssetConstants {
 		const std::string TIERRA_PATH = TEXTURE_PATH + "dirt.png";
 		const std::string EMPEDRADO_PATH = TEXTURE_PATH + "empedrado.png";
 		const std::string AGUA_PATH = TEXTURE_PATH + "agua.png";
+		const std::string MAYAN_BRICKS_PATH = TEXTURE_PATH + "mayan_bricks.png";
 		// Rutas de texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
 		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
