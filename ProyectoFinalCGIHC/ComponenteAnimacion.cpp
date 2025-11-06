@@ -38,8 +38,8 @@ namespace {
     const float CUPHEAD_SALTO_FACTOR_PIE_MIN = 0.3f;     // Factor multiplicador para doblez mínimo del pie
     
     // Hollow - Movimiento dentro de la boss room
-    const float HOLLOW_MIN_X = 85.0f;                   // Límite mínimo en X
-    const float HOLLOW_MAX_X = 165.0f;                   // Límite máximo en X
+    const float HOLLOW_MIN_X = 115.0f;                   // Límite mínimo en X
+    const float HOLLOW_MAX_X = 195.0f;                   // Límite máximo en X
     const float HOLLOW_MIN_Z = -150.0f;                  // Límite mínimo en Z
     const float HOLLOW_MAX_Z = -100.0f;                  // Límite máximo en Z
     const float HOLLOW_VELOCIDAD = 2.0f / 10;                 // Velocidad de movimiento
