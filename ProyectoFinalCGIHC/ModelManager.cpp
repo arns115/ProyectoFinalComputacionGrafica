@@ -44,11 +44,24 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
 
-	// Boss room
+	// Boss room y secret room
 	loadModel(AssetConstants::ModelNames::BOSS_ROOM, AssetConstants::ModelPaths::BOSS_ROOM);
 	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
+	loadModel(AssetConstants::ModelNames::PUERTA_SECRET_ROOM, AssetConstants::ModelPaths::PUERTA_SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
 
+
+	// Fogatas
+	loadModel(AssetConstants::ModelNames::FUEGO_ROJO, AssetConstants::ModelPaths::FUEGO_ROJO);
+	loadModel(AssetConstants::ModelNames::FUEGO_MORADO, AssetConstants::ModelPaths::FUEGO_MORADO);
+	loadModel(AssetConstants::ModelNames::FUEGO_AZUL, AssetConstants::ModelPaths::FUEGO_AZUL);
+
+	// Comida de perro (Item en Binding of isaac)
+	loadModel(AssetConstants::ModelNames::COMIDA_PERRO, AssetConstants::ModelPaths::COMIDA_PERRO);
+	loadModel(AssetConstants::ModelNames::PEDESTAL_PIEDRA, AssetConstants::ModelPaths::PEDESTAL_PIEDRA);
+
+	// Ring de pelea
+	loadModel(AssetConstants::ModelNames::RING_PELEA, AssetConstants::ModelPaths::RING_PELEA);
 }
 
 
