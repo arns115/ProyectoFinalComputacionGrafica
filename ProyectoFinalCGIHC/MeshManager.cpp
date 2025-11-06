@@ -10,6 +10,8 @@ MeshManager::MeshManager()
 	createVegetacionMesh();
 	createSphereMesh();
 	createCaminoMesh();
+	createPrismaAguaMesh();
+	createPrismaPequenoMesh();
 }
 
 // Carga un mesh en el manager
@@ -230,6 +232,148 @@ void MeshManager::createCaminoMesh()
 	Mesh* caminoMesh = new Mesh();
 	caminoMesh->CreateMesh(caminoVertices, caminoIndices, 192, 36);
 	loadMesh(AssetConstants::MeshNames::CAMINO, caminoMesh);
+}
+
+// Crear mesh de prisma cuadrado con textura de agua
+void MeshManager::createPrismaAguaMesh()
+{
+	// Prisma cuadrado: 10x10 unidades en x y z
+	// Altura: 0.1 unidades (igual que el camino)
+	unsigned int prismaIndices[] = {
+		// Cara superior
+		0, 1, 2,
+		0, 2, 3,
+		// Cara inferior
+		4, 6, 5,
+		4, 7, 6,
+		// Cara frontal
+		8, 9, 10,
+		8, 10, 11,
+		// Cara trasera
+		12, 14, 13,
+		12, 15, 14,
+		// Cara lateral izquierda
+		16, 17, 18,
+		16, 18, 19,
+		// Cara lateral derecha
+		20, 22, 21,
+		20, 23, 22
+	};
+
+	GLfloat prismaVertices[] = {
+		// Cara superior (y = 0.05)
+		//    x      y      z        u     v      nx    ny    nz
+		-5.0f,  0.05f, -5.0f,   0.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 0
+		 5.0f,  0.05f, -5.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 1
+		 5.0f,  0.05f,  5.0f,   1.0f, 1.0f,   0.0f, -1.0f, 0.0f,  // 2
+		-5.0f,  0.05f,  5.0f,   0.0f, 1.0f,   0.0f, -1.0f, 0.0f,  // 3
+		
+		// Cara inferior (y = -0.05)
+		-5.0f, -0.05f, -5.0f,   0.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 4
+		 5.0f, -0.05f, -5.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 5
+		 5.0f, -0.05f,  5.0f,   1.0f, 1.0f,   0.0f, 1.0f, 0.0f, // 6
+		-5.0f, -0.05f,  5.0f,   0.0f, 1.0f,   0.0f, 1.0f, 0.0f, // 7
+		
+		// Cara frontal (z = -5.0)
+		-5.0f, -0.05f, -5.0f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f, // 8
+		 5.0f, -0.05f, -5.0f,   1.0f, 0.0f,   0.0f, 0.0f, 1.0f, // 9
+		 5.0f,  0.05f, -5.0f,   1.0f, 1.0f,   0.0f, 0.0f, 1.0f, // 10
+		-5.0f,  0.05f, -5.0f,   0.0f, 1.0f,   0.0f, 0.0f, 1.0f, // 11
+		
+		// Cara trasera (z = 5.0)
+		-5.0f, -0.05f,  5.0f,   0.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 12
+		 5.0f, -0.05f,  5.0f,   1.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 13
+		 5.0f,  0.05f,  5.0f,   1.0f, 1.0f,   0.0f, 0.0f, -1.0f,  // 14
+		-5.0f,  0.05f,  5.0f,   0.0f, 1.0f,   0.0f, 0.0f, -1.0f,  // 15
+		
+		// Cara lateral izquierda (x = -5.0)
+		-5.0f, -0.05f, -5.0f,   0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 16
+		-5.0f, -0.05f,  5.0f,   1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 17
+		-5.0f,  0.05f,  5.0f,   1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 18
+		-5.0f,  0.05f, -5.0f,   0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 19
+		
+		// Cara lateral derecha (x = 5.0)
+		 5.0f, -0.05f, -5.0f,   0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 20
+		 5.0f, -0.05f,  5.0f,   1.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 21
+		 5.0f,  0.05f,  5.0f,   1.0f, 1.0f,   -1.0f, 0.0f, 0.0f,  // 22
+		 5.0f,  0.05f, -5.0f,   0.0f, 1.0f,   -1.0f, 0.0f, 0.0f   // 23
+	};
+
+	// Crear el mesh
+	Mesh* prismaMesh = new Mesh();
+	prismaMesh->CreateMesh(prismaVertices, prismaIndices, 192, 36);
+	loadMesh(AssetConstants::MeshNames::PRISMA_AGUA, prismaMesh);
+}
+
+// Crear mesh de prisma pequeño para colocar sobre el prisma de agua
+void MeshManager::createPrismaPequenoMesh()
+{
+	// Prisma pequeño: 2x2 unidades en x y z
+	// Altura: 0.1 unidades (igual que los otros prismas)
+	unsigned int prismaIndices[] = {
+		// Cara superior
+		0, 1, 2,
+		0, 2, 3,
+		// Cara inferior
+		4, 6, 5,
+		4, 7, 6,
+		// Cara frontal
+		8, 9, 10,
+		8, 10, 11,
+		// Cara trasera
+		12, 14, 13,
+		12, 15, 14,
+		// Cara lateral izquierda
+		16, 17, 18,
+		16, 18, 19,
+		// Cara lateral derecha
+		20, 22, 21,
+		20, 23, 22
+	};
+
+	GLfloat prismaVertices[] = {
+		// Cara superior (y = 0.05)
+		//    x      y      z        u     v      nx    ny    nz
+		-1.0f,  0.05f, -1.0f,   0.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 0
+		 1.0f,  0.05f, -1.0f,   1.0f, 0.0f,   0.0f, -1.0f, 0.0f,  // 1
+		 1.0f,  0.05f,  1.0f,   1.0f, 1.0f,   0.0f, -1.0f, 0.0f,  // 2
+		-1.0f,  0.05f,  1.0f,   0.0f, 1.0f,   0.0f, -1.0f, 0.0f,  // 3
+		
+		// Cara inferior (y = -0.05)
+		-1.0f, -0.05f, -1.0f,   0.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 4
+		 1.0f, -0.05f, -1.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f, // 5
+		 1.0f, -0.05f,  1.0f,   1.0f, 1.0f,   0.0f, 1.0f, 0.0f, // 6
+		-1.0f, -0.05f,  1.0f,   0.0f, 1.0f,   0.0f, 1.0f, 0.0f, // 7
+		
+		// Cara frontal (z = -1.0)
+		-1.0f, -0.05f, -1.0f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f, // 8
+		 1.0f, -0.05f, -1.0f,   1.0f, 0.0f,   0.0f, 0.0f, 1.0f, // 9
+		 1.0f,  0.05f, -1.0f,   1.0f, 1.0f,   0.0f, 0.0f, 1.0f, // 10
+		-1.0f,  0.05f, -1.0f,   0.0f, 1.0f,   0.0f, 0.0f, 1.0f, // 11
+		
+		// Cara trasera (z = 1.0)
+		-1.0f, -0.05f,  1.0f,   0.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 12
+		 1.0f, -0.05f,  1.0f,   1.0f, 0.0f,   0.0f, 0.0f, -1.0f,  // 13
+		 1.0f,  0.05f,  1.0f,   1.0f, 1.0f,   0.0f, 0.0f, -1.0f,  // 14
+		-1.0f,  0.05f,  1.0f,   0.0f, 1.0f,   0.0f, 0.0f, -1.0f,  // 15
+		
+		// Cara lateral izquierda (x = -1.0)
+		-1.0f, -0.05f, -1.0f,   0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 16
+		-1.0f, -0.05f,  1.0f,   1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // 17
+		-1.0f,  0.05f,  1.0f,   1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 18
+		-1.0f,  0.05f, -1.0f,   0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  // 19
+		
+		// Cara lateral derecha (x = 1.0)
+		 1.0f, -0.05f, -1.0f,   0.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 20
+		 1.0f, -0.05f,  1.0f,   1.0f, 0.0f,   -1.0f, 0.0f, 0.0f,  // 21
+		 1.0f,  0.05f,  1.0f,   1.0f, 1.0f,   -1.0f, 0.0f, 0.0f,  // 22
+		 1.0f,  0.05f, -1.0f,   0.0f, 1.0f,   -1.0f, 0.0f, 0.0f   // 23
+	};
+
+	// Crear el mesh
+	Mesh* prismaMesh = new Mesh();
+	prismaMesh->CreateMesh(prismaVertices, prismaIndices, 192, 36);
+	loadMesh(AssetConstants::MeshNames::PRISMA_PEQUENO, prismaMesh);
 }
 
 MeshManager::~MeshManager() 
