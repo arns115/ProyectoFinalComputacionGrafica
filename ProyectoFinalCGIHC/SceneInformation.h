@@ -123,6 +123,11 @@ private:
     // Contadores de luces activas
     unsigned int pointLightCountActual;
     unsigned int spotLightCountActual;
+    
+    // Variable auxiliar para cálculo de distancias de luces
+    float distanciaLuzActual;
+    int indiceLuzMasLejana;
+    float distanciaMaxima;
 
     // Booleano para saber si es de dia
     bool esDeDia = false;
@@ -131,7 +136,7 @@ private:
 
     // Entero para saber que personaje es actualmente
 	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
-
+    
 
     //Funciones para inicializar componentes de la escena
     

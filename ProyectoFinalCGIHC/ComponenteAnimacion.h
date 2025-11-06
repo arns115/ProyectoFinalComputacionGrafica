@@ -33,4 +33,5 @@ private:
     void animarHollow(int indiceAnimacion, float deltaTime);
     void animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
     void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animación de salto
+	void animarComidaPerro(int indiceAnimacion, float deltaTime); // Animacion de comida de perro(item del juego de isaac)
 };
