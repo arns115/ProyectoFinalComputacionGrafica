@@ -166,6 +166,7 @@ private:
     void crearFogatas();
 	void crearComidaPerro();
     void crearRKey();
+    void crearPuertaSecreta();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

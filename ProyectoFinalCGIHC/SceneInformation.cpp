@@ -83,6 +83,7 @@ void SceneInformation::inicializarEntidades()
     crearSecretRoom();
     crearFogatas();
     crearComidaPerro();
+    crearPuertaSecreta();
 
 
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -459,6 +460,19 @@ void SceneInformation::crearSecretRoom() {
 	room->nombreModelo = AssetConstants::ModelNames::SECRET_ROOM;
 	room->nombreMaterial = AssetConstants::MaterialNames::OPACO;
 	agregarEntidad(room);
+}
+
+// Crear puerta secreta
+void SceneInformation::crearPuertaSecreta() {
+    Entidad* puerta = new Entidad("puerta_secret_room",
+        glm::vec3(180.2f, 1.3f, 183.7f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala
+
+    puerta->setTipoObjeto(TipoObjeto::MODELO);
+    puerta->nombreModelo = AssetConstants::ModelNames::PUERTA_SECRET_ROOM;
+    puerta->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+	agregarEntidad(puerta);
 }
 
 // Crear fogatas en la escena

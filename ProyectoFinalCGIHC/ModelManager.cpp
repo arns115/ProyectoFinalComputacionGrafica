@@ -38,10 +38,12 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
 
-	// Boss room
+	// Boss room y secret room
 	loadModel(AssetConstants::ModelNames::BOSS_ROOM, AssetConstants::ModelPaths::BOSS_ROOM);
 	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
+	loadModel(AssetConstants::ModelNames::PUERTA_SECRET_ROOM, AssetConstants::ModelPaths::PUERTA_SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
+
 
 	// Fogatas
 	loadModel(AssetConstants::ModelNames::FUEGO_ROJO, AssetConstants::ModelPaths::FUEGO_ROJO);
