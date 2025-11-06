@@ -302,7 +302,7 @@ void MeshManager::createPrismaAguaMesh()
 	// Crear el mesh
 	Mesh* prismaMesh = new Mesh();
 	prismaMesh->CreateMesh(prismaVertices, prismaIndices, 192, 36);
-	loadMesh(AssetConstants::MeshNames::PRISMA_AGUA, prismaMesh);
+	loadMesh(AssetConstants::MeshNames::CHINAMPA_AGUA, prismaMesh);
 }
 
 // Crear mesh de prisma pequeño para colocar sobre el prisma de agua
@@ -373,7 +373,7 @@ void MeshManager::createPrismaPequenoMesh()
 	// Crear el mesh
 	Mesh* prismaMesh = new Mesh();
 	prismaMesh->CreateMesh(prismaVertices, prismaIndices, 192, 36);
-	loadMesh(AssetConstants::MeshNames::PRISMA_PEQUENO, prismaMesh);
+	loadMesh(AssetConstants::MeshNames::CHINAMPA_ISLA, prismaMesh);
 }
 
 MeshManager::~MeshManager() 

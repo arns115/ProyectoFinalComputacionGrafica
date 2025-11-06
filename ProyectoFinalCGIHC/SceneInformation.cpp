@@ -1,6 +1,8 @@
 #include "SceneInformation.h"
 #include "ComponenteFisico.h"
 #include "ComponenteAnimacion.h"
+#include <cstdlib>
+#include <ctime>
 
 SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
@@ -69,6 +71,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
     spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
 	agregarSpotLightActual(spotLightActual);
 
+	// Actualizar animación de la canoa
+	actualizarAnimacionCanoa(deltaTime);
+
 	// Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
         if (entidad != nullptr && entidad->animacion != nullptr) {
@@ -77,6 +82,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
             }
         }
     }
+
+	// Actualizar animación de la canoa
+	actualizarAnimacionCanoa(deltaTime);
 }
 
 
@@ -110,6 +118,17 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         camera.setThirdPersonTarget(entidades[(int)entidades.size() - 1]);
         personajeActual = 3;
 
+    }
+    
+    // G: Activar/Desactivar animación de la canoa
+    static bool teclaGPresionada = false;
+    if (keys[GLFW_KEY_G]) {
+        if (!teclaGPresionada) {
+            animacionCanoaActiva = !animacionCanoaActiva;
+            teclaGPresionada = true;
+        }
+    } else {
+        teclaGPresionada = false;
     }
 
 
@@ -148,8 +167,10 @@ void SceneInformation::inicializarEntidades()
 {
     crearPiso();
     crearCamino();
-    crearPrismaAgua();
-    crearPrismasPequenos();
+    crearChinampaAgua();
+    crearIslas();
+    crearArbolesAlrededorChinampa();
+    crearCanoa();
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
     crearPiramide();
@@ -512,24 +533,24 @@ void SceneInformation::crearCamino()
 }
 
 // Crear entidad del prisma cuadrado con textura de agua
-void SceneInformation::crearPrismaAgua()
+void SceneInformation::crearChinampaAgua()
 {
     // Crear el prisma cuadrado con textura de agua
-    Entidad* prismaAgua = new Entidad("prisma_agua",
+    Entidad* chinampaAgua = new Entidad("chinampa_agua",
         glm::vec3(-150.0f, -1.35f, -150.0f),     // Posición a la izquierda del camino
         glm::vec3(0.0f, 0.0f, 0.0f),        // Sin rotación
         glm::vec3(8.0f, 8.0f, 8.0f));       // Escala normal
     
-    prismaAgua->setTipoObjeto(TipoObjeto::MESH);
-    prismaAgua->nombreMesh = AssetConstants::MeshNames::PRISMA_AGUA;
-    prismaAgua->nombreTextura = AssetConstants::TextureNames::AGUA;
-    prismaAgua->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
-    prismaAgua->actualizarTransformacion();
-    agregarEntidad(prismaAgua);
+    chinampaAgua->setTipoObjeto(TipoObjeto::MESH);
+    chinampaAgua->nombreMesh = AssetConstants::MeshNames::CHINAMPA_AGUA;
+    chinampaAgua->nombreTextura = AssetConstants::TextureNames::AGUA;
+    chinampaAgua->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    chinampaAgua->actualizarTransformacion();
+    agregarEntidad(chinampaAgua);
 }
 
 // Crear 9 prismas pequeños distribuidos en cuadrícula 3x3 sobre el prisma de agua
-void SceneInformation::crearPrismasPequenos()
+void SceneInformation::crearIslas()
 {
     // Posición base del prisma de agua (sin cambios)
     glm::vec3 posicionBase(-150.0f, -1.35f, -150.0f);
@@ -555,6 +576,9 @@ void SceneInformation::crearPrismasPequenos()
     // Desplazamiento desde el centro del prisma base
     float desplazamientoInicial = -espaciado; // Comenzar desde la izquierda/atrás
     
+    // Semilla para generación aleatoria (usando tiempo actual)
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    
     int contador = 0;
     for (int fila = 0; fila < 3; fila++) {
         for (int columna = 0; columna < 3; columna++) {
@@ -562,27 +586,422 @@ void SceneInformation::crearPrismasPequenos()
             float xPos = posicionBase.x + desplazamientoInicial + (columna * espaciado);
             float zPos = posicionBase.z + desplazamientoInicial + (fila * espaciado);
             
-            // Crear el prisma pequeño
-            std::string nombrePrisma = "prisma_pequeno_" + std::to_string(contador);
-            Entidad* prismaPequeno = new Entidad(nombrePrisma,
+            // Crear el prisma pequeño (chinampa isla)
+            std::string nombrePrisma = "chinampa_isla_" + std::to_string(contador);
+            Entidad* chinampaIsla = new Entidad(nombrePrisma,
                 glm::vec3(xPos, yPrismas, zPos),
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(10.0f, 5.0f, 10.0f));
             
-            prismaPequeno->setTipoObjeto(TipoObjeto::MESH);
-            prismaPequeno->nombreMesh = AssetConstants::MeshNames::PRISMA_PEQUENO;
+            chinampaIsla->setTipoObjeto(TipoObjeto::MESH);
+            chinampaIsla->nombreMesh = AssetConstants::MeshNames::CHINAMPA_ISLA;
             if(columna == 1){
-                prismaPequeno->nombreTextura = AssetConstants::TextureNames::PASTO; 
+                chinampaIsla->nombreTextura = AssetConstants::TextureNames::PASTO; 
             } else {
-                prismaPequeno->nombreTextura = AssetConstants::TextureNames::TIERRA; 
+                chinampaIsla->nombreTextura = AssetConstants::TextureNames::TIERRA; 
 			}
-            prismaPequeno->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-            prismaPequeno->actualizarTransformacion();
-            agregarEntidad(prismaPequeno);
+            chinampaIsla->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+            chinampaIsla->actualizarTransformacion();
+            
+            // Si es columna 1, agregar 3 maíces como hijos con posiciones aleatorias
+            if (columna == 1) {
+                // Dimensiones de la chinampa isla en su espacio local
+                // El mesh va de -1 a 1 en x y z (2 unidades base)
+                // Con escala 10.0f, el rango real es de -10 y 10 en x y z
+                float rangoX = 1.5f;
+                float rangoZ = 1.5f;
+                
+                for (int i = 0; i < 10; i++) {
+                    // Generar posición aleatoria dentro de la chinampa
+                    // Reducir el rango un poco para que no queden en los bordes
+                    float xAleatorio = ((std::rand() % 100) / 100.0f - 0.5f) * rangoX * 0.9f;
+                    float zAleatorio = ((std::rand() % 100) / 100.0f - 0.5f) * rangoZ * 0.9f;
+                    
+                    // Crear entidad de maíz como hijo
+                    std::string nombreMaiz = "maiz_" + std::to_string(contador) + "_" + std::to_string(i);
+                    Entidad* maiz = new Entidad(nombreMaiz,
+                        glm::vec3(xAleatorio, 0.0f, zAleatorio),  // Posición aleatoria relativa al prisma
+                        glm::vec3(-90.0f, 0.0f, 0.0f),            // Rotación que ajustaste
+                        glm::vec3(0.009f, 0.009f, 0.009f));       // Escala que ajustaste
+                    
+                    maiz->setTipoObjeto(TipoObjeto::MODELO);
+                    maiz->nombreModelo = AssetConstants::ModelNames::MAIZ;
+                    maiz->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+                    maiz->actualizarTransformacion();
+                    
+                    // Agregar maíz como hijo del prisma
+                    chinampaIsla->agregarHijo(maiz);
+                }
+            }
+            
+            agregarEntidad(chinampaIsla);
             
             contador++;
         }
     }
+}
+
+// Crear árbol con parámetros configurables
+void SceneInformation::crearArbol(const std::string& tipoArbol,
+                                  const glm::vec3& posicion,
+                                  const glm::vec3& rotacion,
+                                  const glm::vec3& escala,
+                                  const std::string& nombre)
+{
+    // Determinar el modelo de árbol a usar
+    std::string modeloArbol;
+    std::string nombreArbol;
+    
+    if (tipoArbol == "A") {
+        modeloArbol = AssetConstants::ModelNames::ARBOL_A;
+        nombreArbol = nombre.empty() ? "arbol_a" : nombre;
+    } else if (tipoArbol == "B") {
+        modeloArbol = AssetConstants::ModelNames::ARBOL_B;
+        nombreArbol = nombre.empty() ? "arbol_b" : nombre;
+    } else if (tipoArbol == "C") {
+        modeloArbol = AssetConstants::ModelNames::ARBOL_C;
+        nombreArbol = nombre.empty() ? "arbol_c" : nombre;
+    } else {
+        // Por defecto usar árbol A
+        modeloArbol = AssetConstants::ModelNames::ARBOL_A;
+        nombreArbol = nombre.empty() ? "arbol_desconocido" : nombre;
+    }
+    
+    // Crear entidad del árbol
+    Entidad* arbol = new Entidad(nombreArbol,
+        posicion,
+        rotacion,
+        escala);
+    
+    arbol->setTipoObjeto(TipoObjeto::MODELO);
+    arbol->nombreModelo = modeloArbol;
+    arbol->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    arbol->actualizarTransformacion();
+    agregarEntidad(arbol);
+}
+
+// Crear 24 árboles alrededor de la chinampa de agua (6 por lado)
+void SceneInformation::crearArbolesAlrededorChinampa()
+{
+    // Posición y escala de la chinampa de agua
+    glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
+    float escalaChinampa = 8.0f;
+    
+    // Dimensiones de la chinampa escalada (el mesh base es 10x10)
+    float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
+    float altoChinampa = 10.0f * escalaChinampa;  // 80 unidades
+    
+    // Distancia desde el borde de la chinampa
+    float distanciaBorde = 8.0f;
+    
+    // Número de árboles por lado
+    int arbolesPorLado = 6;
+    
+    // Espaciado entre árboles
+    float espaciado = anchoChinampa / (arbolesPorLado - 1);
+    
+    // Array de tipos de árbol para selección aleatoria
+    std::string tiposArbol[] = {"A", "B", "C"};
+    int numTipos = 3;
+    
+    // Inicializar semilla aleatoria si no se ha hecho
+    static bool semillaInicializada = false;
+    if (!semillaInicializada) {
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        semillaInicializada = true;
+    }
+    
+    int contadorArboles = 0;
+    
+    // Lado NORTE (arriba, Z negativo)
+    for (int i = 0; i < arbolesPorLado; i++) {
+        float x = posicionChinampa.x - anchoChinampa / 2.0f + (i * espaciado);
+        float z = posicionChinampa.z - altoChinampa / 2.0f - distanciaBorde;
+        
+        // Seleccionar tipo aleatorio
+        std::string tipo = tiposArbol[std::rand() % numTipos];
+        
+        // Rotación aleatoria en Y (0-360 grados)
+        float rotY = static_cast<float>(std::rand() % 360);
+        
+        // Escala base con variación aleatoria (0.9 a 1.1)
+        float variacionEscala = 0.9f + (std::rand() % 20) / 100.0f;
+        
+        // Aplicar escala específica según el tipo de árbol
+        float escalaFinal;
+        if (tipo == "A") {
+            escalaFinal = 8.0f * variacionEscala;
+        }
+        else if (tipo == "B") {
+            escalaFinal = 1.5f * variacionEscala;
+        }
+        else { // tipo == "C"
+            escalaFinal = 30.0f * variacionEscala;
+        }
+        
+        std::string nombre = "arbol_norte_" + std::to_string(i);
+        crearArbol(tipo, 
+                   glm::vec3(x, -1.0f, z), 
+                   glm::vec3(0.0f, rotY, 0.0f), 
+                   glm::vec3(escalaFinal), 
+                   nombre);
+        contadorArboles++;
+    }
+    
+    // Lado SUR (abajo, Z positivo)
+    for (int i = 0; i < arbolesPorLado; i++) {
+        float x = posicionChinampa.x - anchoChinampa / 2.0f + (i * espaciado);
+        float z = posicionChinampa.z + altoChinampa / 2.0f + distanciaBorde;
+        
+        std::string tipo = tiposArbol[std::rand() % numTipos];
+        float rotY = static_cast<float>(std::rand() % 360);
+        float variacionEscala = 0.9f + (std::rand() % 20) / 100.0f;
+        
+        // Aplicar escala específica según el tipo de árbol
+        float escalaFinal;
+        if (tipo == "A") {
+            escalaFinal = 8.0f * variacionEscala;
+        } else if (tipo == "B") {
+            escalaFinal = 1.5f * variacionEscala;
+        } else { // tipo == "C"
+            escalaFinal = 30.0f * variacionEscala;
+        }
+        
+        std::string nombre = "arbol_sur_" + std::to_string(i);
+        crearArbol(tipo, 
+                   glm::vec3(x, -1.0f, z), 
+                   glm::vec3(0.0f, rotY, 0.0f), 
+                   glm::vec3(escalaFinal), 
+                   nombre);
+        contadorArboles++;
+    }
+    
+    // Lado OESTE (izquierda, X negativo)
+    for (int i = 0; i < arbolesPorLado; i++) {
+        float x = posicionChinampa.x - anchoChinampa / 2.0f - distanciaBorde;
+        float z = posicionChinampa.z - altoChinampa / 2.0f + (i * espaciado);
+        
+        std::string tipo = tiposArbol[std::rand() % numTipos];
+        float rotY = static_cast<float>(std::rand() % 360);
+        float variacionEscala = 0.9f + (std::rand() % 20) / 100.0f;
+        
+        // Aplicar escala específica según el tipo de árbol
+        float escalaFinal;
+        if (tipo == "A") {
+            escalaFinal = 8.0f * variacionEscala;
+        }
+        else if (tipo == "B") {
+            escalaFinal = 1.5f * variacionEscala;
+        }
+        else { // tipo == "C"
+            escalaFinal = 30.0f * variacionEscala;
+        }
+        
+        std::string nombre = "arbol_oeste_" + std::to_string(i);
+        crearArbol(tipo, 
+                   glm::vec3(x, -1.0f, z), 
+                   glm::vec3(0.0f, rotY, 0.0f), 
+                   glm::vec3(escalaFinal), 
+                   nombre);
+        contadorArboles++;
+    }
+    
+    // Lado ESTE (derecha, X positivo)
+    for (int i = 0; i < arbolesPorLado; i++) {
+        float x = posicionChinampa.x + anchoChinampa / 2.0f + distanciaBorde;
+        float z = posicionChinampa.z - altoChinampa / 2.0f + (i * espaciado);
+        
+        std::string tipo = tiposArbol[std::rand() % numTipos];
+        float rotY = static_cast<float>(std::rand() % 360);
+        float variacionEscala = 0.9f + (std::rand() % 20) / 100.0f;
+        
+        // Aplicar escala específica según el tipo de árbol
+        float escalaFinal;
+        if (tipo == "A") {
+            escalaFinal = 8.0f * variacionEscala;
+        }
+        else if (tipo == "B") {
+            escalaFinal = 1.5f * variacionEscala;
+        }
+        else { // tipo == "C"
+            escalaFinal = 30.0f * variacionEscala;
+        }
+        
+        std::string nombre = "arbol_este_" + std::to_string(i);
+        crearArbol(tipo, 
+                   glm::vec3(x, -1.0f, z), 
+                   glm::vec3(0.0f, rotY, 0.0f), 
+                   glm::vec3(escalaFinal), 
+                   nombre);
+        contadorArboles++;
+    }
+}
+
+// Crear canoa con maya jerárquica que navega por la chinampa de agua
+void SceneInformation::crearCanoa()
+{
+    // Posición y escala de la chinampa de agua
+    glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
+    float escalaChinampa = 8.0f;
+    float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
+    
+    // Altura del agua (encima del prisma de agua)
+    float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
+    
+    // Posición inicial: esquina superior izquierda
+    float margen = 10.0f; // Margen desde los bordes
+    glm::vec3 posicionInicial(
+        posicionChinampa.x - anchoChinampa / 2.0f + margen,
+        alturaAgua,
+        posicionChinampa.z - anchoChinampa / 2.0f + margen
+    );
+    
+    // Crear entidad de la canoa (padre)
+    canoa = new Entidad("canoa",
+        posicionInicial,
+        glm::vec3(0.0f, 0.0f, 0.0f),  // Inicialmente mirando al frente
+        glm::vec3(0.5f, 0.5f, 0.5f));  // Escala
+    
+    canoa->setTipoObjeto(TipoObjeto::MODELO);
+    canoa->nombreModelo = AssetConstants::ModelNames::CANOA;
+    canoa->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    canoa->actualizarTransformacion();
+    
+    // Crear maya como hijo de la canoa
+    Entidad* maya = new Entidad("maya_canoa",
+        glm::vec3(0.0f, 1.0f, 0.0f),  // Posición relativa encima de la canoa
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    maya->setTipoObjeto(TipoObjeto::MODELO);
+    maya->nombreModelo = AssetConstants::ModelNames::MAYA_CANOA;
+    maya->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    maya->actualizarTransformacion();
+    
+    // Agregar maya como hijo de la canoa
+    canoa->agregarHijo(maya);
+    
+    // Agregar canoa a la escena
+    agregarEntidad(canoa);
+    
+    // Inicializar variables de animación
+    estadoAnimacionCanoa = 0;
+    tiempoAnimacionCanoa = 0.0f;
+    posicionInicioCanoa = posicionInicial;
+    
+    // Calcular primera posición destino (esquina inferior izquierda)
+    posicionDestinoCanoa = glm::vec3(
+        posicionChinampa.x - anchoChinampa / 2.0f + margen,
+        alturaAgua,
+        posicionChinampa.z + anchoChinampa / 2.0f - margen
+    );
+    rotacionObjetivoCanoa = 0.0f;
+}
+
+// Actualizar animación cíclica de la canoa
+void SceneInformation::actualizarAnimacionCanoa(float deltaTime)
+{
+    if (canoa == nullptr || !animacionCanoaActiva) return;
+    
+    // Posición y dimensiones de la chinampa
+    glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
+    float escalaChinampa = 8.0f;
+    float anchoChinampa = 10.0f * escalaChinampa;
+    float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
+    float margen = 10.0f;
+    
+    // Estados:
+    // 0: Mover de esquina superior izquierda a inferior izquierda
+    // 1: Girar 90 grados (hacia la derecha)
+    // 2: Mover de esquina inferior izquierda a inferior derecha
+    // 3: Girar 90 grados
+    // 4: Mover de esquina inferior derecha a superior derecha
+    // 5: Girar 90 grados
+    // 6: Mover de esquina superior derecha a superior izquierda
+    // 7: Girar 90 grados
+    
+    bool estadoPar = (estadoAnimacionCanoa % 2 == 0);
+    
+    if (estadoPar) {
+        // Estados de movimiento (0, 2, 4, 6)
+        glm::vec3 direccion = glm::normalize(posicionDestinoCanoa - posicionInicioCanoa);
+        float distancia = glm::length(posicionDestinoCanoa - posicionInicioCanoa);
+        float distanciaRecorrida = velocidadCanoa * tiempoAnimacionCanoa;
+        
+        if (distanciaRecorrida >= distancia) {
+            // Llegó al destino, cambiar al siguiente estado (girar)
+            canoa->posicionLocal = posicionDestinoCanoa;
+            estadoAnimacionCanoa++;
+            tiempoAnimacionCanoa = 0.0f;
+            
+            // Calcular nueva rotación objetivo
+            rotacionObjetivoCanoa = canoa->rotacionLocal.y + 90.0f;
+        } else {
+            // Mover hacia el destino
+            canoa->posicionLocal = posicionInicioCanoa + direccion * distanciaRecorrida;
+            tiempoAnimacionCanoa += deltaTime;
+        }
+    } else {
+        // Estados de rotación (1, 3, 5, 7)
+        float rotacionInicial = rotacionObjetivoCanoa - 90.0f;
+        float anguloRecorrido = velocidadRotacionCanoa * tiempoAnimacionCanoa;
+        
+        if (anguloRecorrido >= 90.0f) {
+            // Completó el giro, cambiar al siguiente estado (mover)
+            canoa->rotacionLocal.y = rotacionObjetivoCanoa;
+            if (rotacionObjetivoCanoa >= 360.0f) {
+                canoa->rotacionLocal.y -= 360.0f;
+                rotacionObjetivoCanoa -= 360.0f;
+            }
+            
+            estadoAnimacionCanoa++;
+            if (estadoAnimacionCanoa >= 8) {
+                estadoAnimacionCanoa = 0; // Reiniciar ciclo
+            }
+            tiempoAnimacionCanoa = 0.0f;
+            
+            // Configurar nuevo movimiento según el estado
+            posicionInicioCanoa = canoa->posicionLocal;
+            
+            switch (estadoAnimacionCanoa) {
+                case 0: // Esquina superior izquierda a inferior izquierda
+                    posicionDestinoCanoa = glm::vec3(
+                        posicionChinampa.x - anchoChinampa / 2.0f + margen,
+                        alturaAgua,
+                        posicionChinampa.z + anchoChinampa / 2.0f - margen
+                    );
+                    break;
+                case 2: // Esquina inferior izquierda a inferior derecha
+                    posicionDestinoCanoa = glm::vec3(
+                        posicionChinampa.x + anchoChinampa / 2.0f - margen,
+                        alturaAgua,
+                        posicionChinampa.z + anchoChinampa / 2.0f - margen
+                    );
+                    break;
+                case 4: // Esquina inferior derecha a superior derecha
+                    posicionDestinoCanoa = glm::vec3(
+                        posicionChinampa.x + anchoChinampa / 2.0f - margen,
+                        alturaAgua,
+                        posicionChinampa.z - anchoChinampa / 2.0f + margen
+                    );
+                    break;
+                case 6: // Esquina superior derecha a superior izquierda
+                    posicionDestinoCanoa = glm::vec3(
+                        posicionChinampa.x - anchoChinampa / 2.0f + margen,
+                        alturaAgua,
+                        posicionChinampa.z - anchoChinampa / 2.0f + margen
+                    );
+                    break;
+            }
+        } else {
+            // Girar gradualmente
+            canoa->rotacionLocal.y = rotacionInicial + anguloRecorrido;
+            tiempoAnimacionCanoa += deltaTime;
+        }
+    }
+    
+    // Actualizar transformación de la canoa
+    canoa->actualizarTransformacion();
 }
 
 void SceneInformation::crearHollow() {

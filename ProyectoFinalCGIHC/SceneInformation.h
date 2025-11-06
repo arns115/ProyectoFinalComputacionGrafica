@@ -132,6 +132,17 @@ private:
     // Entero para saber que personaje es actualmente
 	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
 
+    // Variables para animación de la canoa
+    Entidad* canoa = nullptr;
+    int estadoAnimacionCanoa = 0; // 0-7: diferentes estados del ciclo
+    float tiempoAnimacionCanoa = 0.0f;
+    float velocidadCanoa = 0.2f; // Unidades por segundo (reducido de 5.0f)
+    float velocidadRotacionCanoa = 45.0f; // Grados por segundo (reducido de 90.0f)
+    glm::vec3 posicionInicioCanoa;
+    glm::vec3 posicionDestinoCanoa;
+    float rotacionObjetivoCanoa = 0.0f;
+    bool animacionCanoaActiva = false; // Control para activar/desactivar animación
+
 
     //Funciones para inicializar componentes de la escena
     
@@ -155,10 +166,18 @@ private:
 	void crearBossRoom();
     void crearPiramide();
     void crearCamino();
-    void crearPrismaAgua();
-    void crearPrismasPequenos();
+    void crearChinampaAgua();
+    void crearIslas();
     void crearSecretRoom();
     void crearRKey();
+    void crearArbol(const std::string& tipoArbol = "A", 
+                    const glm::vec3& posicion = glm::vec3(0.0f), 
+                    const glm::vec3& rotacion = glm::vec3(0.0f),
+                    const glm::vec3& escala = glm::vec3(1.0f),
+                    const std::string& nombre = "");
+    void crearArbolesAlrededorChinampa();
+    void crearCanoa();
+    void actualizarAnimacionCanoa(float deltaTime);
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
