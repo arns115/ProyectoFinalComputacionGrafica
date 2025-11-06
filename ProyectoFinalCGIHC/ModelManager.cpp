@@ -12,6 +12,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::CUERPO2_HOLLOW, AssetConstants::ModelPaths::CUERPO2_HOLLOW);
 	loadModel(AssetConstants::ModelNames::CUERPO3_HOLLOW, AssetConstants::ModelPaths::CUERPO3_HOLLOW);
 
+
 	loadModel("cuphead", AssetConstants::ModelPaths::CUPHEAD);
 
 
@@ -39,6 +40,9 @@ ModelManager::ModelManager()
 
 	// Boss room
 	loadModel(AssetConstants::ModelNames::BOSS_ROOM, AssetConstants::ModelPaths::BOSS_ROOM);
+	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
+	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
+
 }
 
 

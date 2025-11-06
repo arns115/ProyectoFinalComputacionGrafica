@@ -156,6 +156,7 @@ void SceneInformation::inicializarEntidades()
     crearHollow();
     crearObjetosGeometricos(); 
     crearBossRoom();
+	crearSecretRoom();
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -422,7 +423,7 @@ void SceneInformation::crearBossRoom()
 {
     // Crear entidad de la boss room
     Entidad* room = new Entidad("boss_room",
-        glm::vec3(125.0f, 17.45f, -125.0f),      // Posición inicial
+        glm::vec3(150.0f, 17.45f, -125.0f),      // Posición inicial
         glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
         glm::vec3(10.0f, 10.0f, 10.0f));      // Escala
 
@@ -433,6 +434,21 @@ void SceneInformation::crearBossRoom()
 
     agregarEntidad(room);
 }
+
+// Crear la secret room
+void SceneInformation::crearSecretRoom() {
+	Entidad* room = new Entidad("secret room",
+        glm::vec3(180.0f, 8.25f, 200.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(5.0f, 5.0f, 5.0f));      // Escala
+
+	room->setTipoObjeto(TipoObjeto::MODELO);
+	room->nombreModelo = AssetConstants::ModelNames::SECRET_ROOM;
+	room->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+	room->actualizarTransformacion();
+	agregarEntidad(room);
+}
+
 
 // Crear entidad de la cabeza olmeca
 void SceneInformation::crearCabezaOlmeca()
@@ -500,7 +516,7 @@ void SceneInformation::crearPrismaAgua()
 {
     // Crear el prisma cuadrado con textura de agua
     Entidad* prismaAgua = new Entidad("prisma_agua",
-        glm::vec3(-120.0f, -1.35f, -150.0f),     // Posición a la izquierda del camino
+        glm::vec3(-150.0f, -1.35f, -150.0f),     // Posición a la izquierda del camino
         glm::vec3(0.0f, 0.0f, 0.0f),        // Sin rotación
         glm::vec3(8.0f, 8.0f, 8.0f));       // Escala normal
     
@@ -516,7 +532,7 @@ void SceneInformation::crearPrismaAgua()
 void SceneInformation::crearPrismasPequenos()
 {
     // Posición base del prisma de agua (sin cambios)
-    glm::vec3 posicionBase(-120.0f, -1.35f, -150.0f);
+    glm::vec3 posicionBase(-150.0f, -1.35f, -150.0f);
     float escalaBase = 8.0f;
     
     // Calcular altura sobre el prisma de agua
@@ -571,7 +587,7 @@ void SceneInformation::crearPrismasPequenos()
 
 void SceneInformation::crearHollow() {
     Entidad* cabeza_hollow = new Entidad("hollow",
-        glm::vec3(125.0f, 4.0f, -125.0f),      // Posición inicial
+        glm::vec3(155.0f, 4.0f, -125.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
 
@@ -689,6 +705,8 @@ void SceneInformation::crearObjetosGeometricos()
     esfera3->actualizarTransformacion();
     agregarEntidad(esfera3);
 }
+
+
 
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {

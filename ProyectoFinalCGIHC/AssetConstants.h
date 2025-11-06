@@ -55,6 +55,8 @@ namespace AssetConstants {
 
 		// Boss room
 		const std::string BOSS_ROOM = "boss_room";
+		const std::string SECRET_ROOM = "secret_room";
+		const std::string R_KEY = "r_key";
 
 	}
 
@@ -142,6 +144,9 @@ namespace AssetConstants {
 
 		// Boss room
 		const std::string BOSS_ROOM = MODEL_PATH + "boss_room.obj";
+		const std::string SECRET_ROOM = MODEL_PATH + "secret_room.obj";
+
+		const std::string R_KEY = "r_key.obj";
 	}
 
 	// Nombres de shaders

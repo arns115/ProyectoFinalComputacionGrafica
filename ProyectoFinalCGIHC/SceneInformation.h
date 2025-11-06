@@ -157,6 +157,8 @@ private:
     void crearCamino();
     void crearPrismaAgua();
     void crearPrismasPequenos();
+    void crearSecretRoom();
+    void crearRKey();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
