@@ -74,8 +74,8 @@ void SceneInformation::inicializarEntidades()
 {
     crearPiso();
     crearCamino();
-    crearPrismaAgua();
-    crearPrismasPequenos();
+    crearIslas();
+    crearChinampaAgua();
     crearObjetosGeometricos();
     crearCabezaOlmeca();
     crearPiramide();
@@ -86,6 +86,9 @@ void SceneInformation::inicializarEntidades()
     crearFogatas();
     crearComidaPerro();
     crearPuertaSecreta();
+    crearArbolesAlrededorChinampa();
+    crearCanoa();
+    crearCanchaPelotaMaya();
 
 
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -210,64 +213,6 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     } else {
         teclaGPresionada = false;
     }
-
-
-}
-
-// Funcion para inicializar la skybox
-void SceneInformation::inicializarSkybox()
-{
-    // Establecer el skybox por defecto
-    setSkyboxActual(AssetConstants::SkyboxNames::DAY);
-}
-
-// Funcion para inicializar la luz direccional
-void SceneInformation::inicializarLuces()
-{
-    // Obtener la luz del sol desde el LightManager
-    DirectionalLight* sunLight = lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
-    
-    if (sunLight != nullptr) {
-        // Establecer la luz del sol como luz direccional principal
-        luzDireccional = *sunLight;
-    } else {
-        // Si no existe, crear una luz direccional por defecto
-        luzDireccional = DirectionalLight(
-            1.0f, 1.0f, 1.0f,      
-            0.3f, 0.5f,           
-            0.0f, -1.0f, 0.0f     
-        );
-    }
-    
-
-}
-
-// Funcion para inicializar todas las entidades
-void SceneInformation::inicializarEntidades()
-{
-    crearPiso();
-    crearCamino();
-    crearChinampaAgua();
-    crearIslas();
-    crearArbolesAlrededorChinampa();
-    crearCanoa();
-    crearCanchaPelotaMaya();
-    crearObjetosGeometricos();
-	crearCabezaOlmeca();
-    crearPiramide();
-    crearHollow();
-    crearObjetosGeometricos(); 
-    crearBossRoom();
-	crearSecretRoom();
-
-
-	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
-    // Primero Cuphead
-	// Segundo Isaac
-    // Tercero Gojo
-    crearPersonajePrincipal();
-	  crearIsaac();
-    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
 
 
 }
