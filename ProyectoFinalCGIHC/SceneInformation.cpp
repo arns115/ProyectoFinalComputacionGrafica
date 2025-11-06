@@ -147,8 +147,12 @@ void SceneInformation::inicializarLuces()
 void SceneInformation::inicializarEntidades()
 {
     crearPiso();
+    crearCamino();
+    crearPrismaAgua();
+    crearPrismasPequenos();
     crearObjetosGeometricos();
 	crearCabezaOlmeca();
+    crearPiramide();
     crearHollow();
     crearObjetosGeometricos(); 
     crearBossRoom();
@@ -201,23 +205,27 @@ void SceneInformation::crearPersonajePrincipal()
     
     // 3. Crear la leche (hijo de la cabeza)
     Entidad* cuphead_leche = new Entidad("cuphead_leche",
-        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(0.0f, 0.0f, 0.6f),       // Posición relativa (ya está en el modelo)
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
     
     cuphead_leche->setTipoObjeto(TipoObjeto::MODELO);
     cuphead_leche->setModelo(AssetConstants::ModelNames::CUPHEAD_LECHE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_LECHE));
     cuphead_leche->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    // Forzar la textura
+    cuphead_leche->setTextura(AssetConstants::TextureNames::CUPHEAD_TEXTURE, textureManager.getTexture(AssetConstants::TextureNames::CUPHEAD_TEXTURE));
     
     // 4. Crear el popote (hijo de la leche)
     Entidad* cuphead_popote = new Entidad("cuphead_popote",
-        glm::vec3(0.0f, 0.0f, 1.0f),       // Posición relativa (ya está en el modelo)
+        glm::vec3(-0.3f, 0.0f, 0.3f),       // Posición relativa (ya está en el modelo)
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::vec3(0.2f, 0.2f, 0.2f));
     
     cuphead_popote->setTipoObjeto(TipoObjeto::MODELO);
     cuphead_popote->setModelo(AssetConstants::ModelNames::CUPHEAD_POPOTE, modelManager.getModel(AssetConstants::ModelNames::CUPHEAD_POPOTE));
     cuphead_popote->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    // Forzar la textura
+    cuphead_popote->setTextura(AssetConstants::TextureNames::POPOTE_ROJO, textureManager.getTexture(AssetConstants::TextureNames::POPOTE_ROJO));
     
     // 5. Crear brazo derecho (hijo del torso)
     Entidad* cuphead_brazo_derecho = new Entidad("cuphead_brazo_derecho",
@@ -452,6 +460,113 @@ void SceneInformation::crearCabezaOlmeca()
     cabezaOlmeca->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     cabezaOlmeca->actualizarTransformacion();
     agregarEntidad(cabezaOlmeca);
+}
+
+// Crear entidad de la pirámide
+void SceneInformation::crearPiramide()
+{
+    // Pirámide 1
+    Entidad* piramide = new Entidad("piramide1",
+        glm::vec3(0.0f, -4.0f, -150.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),         // Rotación
+        glm::vec3(1.2f, 1.2f, 1.2f));        // Escala
+    
+    piramide->setTipoObjeto(TipoObjeto::MODELO);
+    piramide->nombreModelo = AssetConstants::ModelNames::PIRAMIDE;
+    piramide->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    piramide->actualizarTransformacion();
+    agregarEntidad(piramide);
+}
+
+// Crear entidad del camino empedrado
+void SceneInformation::crearCamino()
+{
+    // Crear el camino empedrado que une las cabezas olmecas con la pirámide
+    Entidad* camino = new Entidad("camino_empedrado",
+        glm::vec3(2.0f, -1.0f, 25.0f),      // Posición centrada entre olmecas y pirámide
+        glm::vec3(0.0f, 0.0f, 0.0f),        // Sin rotación
+        glm::vec3(1.8f, 1.0f, 1.0f));       // Escala normal (el mesh ya tiene el tamaño correcto)
+    
+    camino->setTipoObjeto(TipoObjeto::MESH);
+    camino->nombreMesh = AssetConstants::MeshNames::CAMINO;
+    camino->nombreTextura = AssetConstants::TextureNames::EMPEDRADO;
+    camino->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    camino->actualizarTransformacion();
+    agregarEntidad(camino);
+}
+
+// Crear entidad del prisma cuadrado con textura de agua
+void SceneInformation::crearPrismaAgua()
+{
+    // Crear el prisma cuadrado con textura de agua
+    Entidad* prismaAgua = new Entidad("prisma_agua",
+        glm::vec3(-120.0f, -1.35f, -150.0f),     // Posición a la izquierda del camino
+        glm::vec3(0.0f, 0.0f, 0.0f),        // Sin rotación
+        glm::vec3(8.0f, 8.0f, 8.0f));       // Escala normal
+    
+    prismaAgua->setTipoObjeto(TipoObjeto::MESH);
+    prismaAgua->nombreMesh = AssetConstants::MeshNames::PRISMA_AGUA;
+    prismaAgua->nombreTextura = AssetConstants::TextureNames::AGUA;
+    prismaAgua->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    prismaAgua->actualizarTransformacion();
+    agregarEntidad(prismaAgua);
+}
+
+// Crear 9 prismas pequeños distribuidos en cuadrícula 3x3 sobre el prisma de agua
+void SceneInformation::crearPrismasPequenos()
+{
+    // Posición base del prisma de agua (sin cambios)
+    glm::vec3 posicionBase(-120.0f, -1.35f, -150.0f);
+    float escalaBase = 8.0f;
+    
+    // Calcular altura sobre el prisma de agua
+    // El prisma de agua tiene altura 0.1 * escala = 0.8
+    // Los prismas pequeños deben estar justo encima
+    float alturaAguaEscalada = 0.1f * escalaBase;
+    float alturaPrismasPequenos = 0.1f * 2.0f; // escala de prismas pequeños será 2.0
+    float yPrismas = posicionBase.y + alturaAguaEscalada + alturaPrismasPequenos;
+    
+    // Dimensiones del prisma de agua escalado: 10 * 8 = 80 unidades
+    // Queremos distribuir 9 prismas en 3x3
+    // Espacio total disponible: 80 unidades
+    // Espacio entre prismas: dividir en 3 secciones con espaciado uniforme
+    
+    // Tamaño de cada prisma pequeño escalado: 2 * 2 = 4 unidades
+    // Espacio disponible para los 3 prismas en una fila: 80 unidades
+    // Espaciado entre centros: 80 / 3 = 26.67 unidades aproximadamente
+    float espaciado = 26.67f;
+    
+    // Desplazamiento desde el centro del prisma base
+    float desplazamientoInicial = -espaciado; // Comenzar desde la izquierda/atrás
+    
+    int contador = 0;
+    for (int fila = 0; fila < 3; fila++) {
+        for (int columna = 0; columna < 3; columna++) {
+            // Calcular posición de cada prisma pequeño
+            float xPos = posicionBase.x + desplazamientoInicial + (columna * espaciado);
+            float zPos = posicionBase.z + desplazamientoInicial + (fila * espaciado);
+            
+            // Crear el prisma pequeño
+            std::string nombrePrisma = "prisma_pequeno_" + std::to_string(contador);
+            Entidad* prismaPequeno = new Entidad(nombrePrisma,
+                glm::vec3(xPos, yPrismas, zPos),
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(10.0f, 5.0f, 10.0f));
+            
+            prismaPequeno->setTipoObjeto(TipoObjeto::MESH);
+            prismaPequeno->nombreMesh = AssetConstants::MeshNames::PRISMA_PEQUENO;
+            if(columna == 1){
+                prismaPequeno->nombreTextura = AssetConstants::TextureNames::PASTO; 
+            } else {
+                prismaPequeno->nombreTextura = AssetConstants::TextureNames::TIERRA; 
+			}
+            prismaPequeno->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+            prismaPequeno->actualizarTransformacion();
+            agregarEntidad(prismaPequeno);
+            
+            contador++;
+        }
+    }
 }
 
 void SceneInformation::crearHollow() {
