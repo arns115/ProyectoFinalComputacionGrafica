@@ -2,8 +2,8 @@
 #define COMMONVALS
 #include "stb_image.h"
 
-const int MAX_POINT_LIGHTS = 3;
-const int MAX_SPOT_LIGHTS = 4;
+const int MAX_POINT_LIGHTS = 5;
+const int MAX_SPOT_LIGHTS = 2;
 
 // Se mueve esta constante aqui para poder utilizarla en SceneInformation.cpp y Main.cpp
 const double LIMIT_FPS = 1.0 / 60.0;  
