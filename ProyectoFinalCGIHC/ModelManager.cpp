@@ -53,6 +53,9 @@ ModelManager::ModelManager()
 	// Comida de perro (Item en Binding of isaac)
 	loadModel(AssetConstants::ModelNames::COMIDA_PERRO, AssetConstants::ModelPaths::COMIDA_PERRO);
 	loadModel(AssetConstants::ModelNames::PEDESTAL_PIEDRA, AssetConstants::ModelPaths::PEDESTAL_PIEDRA);
+
+	// Ring de pelea
+	loadModel(AssetConstants::ModelNames::RING_PELEA, AssetConstants::ModelPaths::RING_PELEA);
 }
 
 

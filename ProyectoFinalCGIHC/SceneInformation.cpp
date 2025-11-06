@@ -621,8 +621,19 @@ void SceneInformation::crearPiramide()
     piramide->setTipoObjeto(TipoObjeto::MODELO);
     piramide->nombreModelo = AssetConstants::ModelNames::PIRAMIDE;
     piramide->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-    piramide->actualizarTransformacion();
+
+    Entidad* ring = new Entidad("ring_pelea",
+        glm::vec3(2.0f, 36.2f, 0.5f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),         // Rotación
+		glm::vec3(0.9f, 0.9f, 0.9f));        // Escala
+
+	ring->setTipoObjeto(TipoObjeto::MODELO);
+	ring->nombreModelo = AssetConstants::ModelNames::RING_PELEA;    
+	ring->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	piramide->agregarHijo(ring);
     agregarEntidad(piramide);
+
 }
 
 // Crear entidad del camino empedrado

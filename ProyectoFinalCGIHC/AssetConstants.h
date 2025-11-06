@@ -68,6 +68,8 @@ namespace AssetConstants {
 		// Item de comida de perro (Binding of Isaac)
 		const std::string COMIDA_PERRO = "comida_perro";
 		const std::string PEDESTAL_PIEDRA = "pedestal_piedra";
+	
+		const std::string RING_PELEA = "ring_pelea";
 	}
 
 	// Nombres de meshes
@@ -166,8 +168,12 @@ namespace AssetConstants {
 
 		const std::string R_KEY = MODEL_PATH + "r_key.obj";
 
+		// Item de comida de perro (Binding of Isaac)
 		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
 		const std::string PEDESTAL_PIEDRA = MODEL_PATH + "pedestal_piedra.obj";
+
+		// Ring de pelea
+		const std::string RING_PELEA = MODEL_PATH + "ring_pelea.obj";
 	}
 
 	// Nombres de shaders
