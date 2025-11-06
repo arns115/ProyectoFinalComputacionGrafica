@@ -79,7 +79,6 @@ void SceneRenderer::configurarLuces(DirectionalLight* directionalLight,
     
     // Configurar spotlights
     if (spotLights != nullptr && spotLightCount > 0) {
-        std::cout << " " << spotLightCount << " " << std::endl;
         shader->SetSpotLights(spotLights, spotLightCount);
     }
 }

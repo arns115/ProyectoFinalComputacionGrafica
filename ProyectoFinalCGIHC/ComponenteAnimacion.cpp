@@ -183,7 +183,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     else if (animacionActiva) {
         // Continuar hasta completar el ciclo
         tiemposAnimacion[indiceAnimacion] += deltaTime * velocidadesAnimacion[indiceAnimacion];
-        
+
         // Verificar si ya termino la animacion
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
             // Ajustar el tiempo para que se posicionen bien las partes del cuerpo
@@ -790,5 +790,72 @@ void ComponenteAnimacion::animarPuerta(int indiceAnimacion, float deltaTime) {
     
     // Actualizar transformación
     entidad->actualizarTransformacion();
+}
+
+void ComponenteAnimacion::cargarKeyframes(void)
+{
+    std::ifstream file(std::string("keyframes_" + entidad->nombreObjeto + ".txt"));
+
+    while (file >> KeyFrame[FrameIndex].movX
+        >> KeyFrame[FrameIndex].movY
+        >> KeyFrame[FrameIndex].movZ
+        >> KeyFrame[FrameIndex].giroX
+        >> KeyFrame[FrameIndex].giroY
+        >> KeyFrame[FrameIndex].giroZ)
+    {
+        FrameIndex++;
+    }
+
+    file.close();
+}
+
+void ComponenteAnimacion::interpolation(void)
+{
+    KeyFrame[playIndex].movXInc = (KeyFrame[playIndex + 1].movX - KeyFrame[playIndex].movX) / i_max_steps;
+    KeyFrame[playIndex].movYInc = (KeyFrame[playIndex + 1].movY - KeyFrame[playIndex].movY) / i_max_steps;
+    KeyFrame[playIndex].movZInc = (KeyFrame[playIndex + 1].movZ - KeyFrame[playIndex].movZ) / i_max_steps;
+    KeyFrame[playIndex].giroYInc = (KeyFrame[playIndex + 1].giroY - KeyFrame[playIndex].giroY) / i_max_steps;
+    KeyFrame[playIndex].giroXInc = (KeyFrame[playIndex + 1].giroX - KeyFrame[playIndex].giroX) / i_max_steps;
+    KeyFrame[playIndex].giroZInc = (KeyFrame[playIndex + 1].giroZ - KeyFrame[playIndex].giroZ) / i_max_steps;
+}
+
+void ComponenteAnimacion::animateKeyframes(void)
+{
+    //Movimiento del objeto con barra espaciadora
+    if (play)
+    {
+        if (i_curr_steps >= i_max_steps) //fin de animación entre frames?
+        {
+            playIndex++;
+            printf("playindex : %d\n", playIndex);
+            if (playIndex > FrameIndex - 2)	//Fin de toda la animación con último frame?
+            {
+                printf("Frame index= %d\n", FrameIndex);
+                printf("termino la animacion\n");
+                playIndex = 0;
+                play = false;
+            }
+            else //Interpolación del próximo cuadro
+            {
+
+                i_curr_steps = 0; //Resetea contador
+                //Interpolar
+                interpolation();
+            }
+        }
+        else
+        {
+            //Dibujar Animación
+            entidad->posicionLocal.x += KeyFrame[playIndex].movXInc;
+            entidad->posicionLocal.y += KeyFrame[playIndex].movYInc;
+            entidad->posicionLocal.z += KeyFrame[playIndex].movZInc;
+            entidad->rotacionLocal.x += KeyFrame[playIndex].giroXInc;
+            entidad->rotacionLocal.y += KeyFrame[playIndex].giroYInc;
+            entidad->rotacionLocal.z += KeyFrame[playIndex].giroZInc;
+            entidad->actualizarTransformacion();
+            i_curr_steps++;
+        }
+
+    }
 }
 

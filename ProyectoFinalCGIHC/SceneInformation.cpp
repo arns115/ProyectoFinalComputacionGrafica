@@ -80,7 +80,6 @@ void SceneInformation::inicializarEntidades()
     crearCabezaOlmeca();
     crearPiramide();
     crearHollow();
-    crearObjetosGeometricos();
     crearBossRoom();
     crearSecretRoom();
     crearFogatas();
@@ -89,6 +88,7 @@ void SceneInformation::inicializarEntidades()
     crearArbolesAlrededorChinampa();
     crearCanoa();
     crearCanchaPelotaMaya();
+	crearPelotaDeJuegoDePelota();
 
 
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -154,6 +154,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
             if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
 				entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
+            if(entidad->nombreObjeto == "pelota") {
+                entidad->animacion->animateKeyframes();
+			}
         }
     }
 
@@ -199,6 +202,12 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
             // Z: Se abre o cierra la puerta secreta
             if (keys[GLFW_KEY_Z]) {
 				entidad->animacion->activarAnimacion(0); // Activar animacion de abrir puerta
+            }
+        }
+		// P: Lanza la pelota del juego de pelota maya
+        if (entidad->nombreObjeto == "pelota") {
+            if (keys[GLFW_KEY_P]) {
+				entidad->animacion->play = true;
             }
         }
     }
@@ -1309,6 +1318,25 @@ void SceneInformation::crearPiso()
     piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
     piso->actualizarTransformacion();
     agregarEntidad(piso);
+}
+
+// Crear pelota del juego de pelota
+void SceneInformation::crearPelotaDeJuegoDePelota() {
+
+    Entidad* pelota = new Entidad("pelota",
+        glm::vec3(132.0f, 6.0f, 75.0f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    pelota->setTipoObjeto(TipoObjeto::MESH);
+    pelota->nombreMesh = AssetConstants::MeshNames::ESFERA;
+    pelota->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    pelota->nombreTextura = AssetConstants::TextureNames::CAUCHO;
+    // Crear y configurar componente de animación
+    pelota->animacion = new ComponenteAnimacion(pelota);
+    pelota->animacion->cargarKeyframes();
+	agregarEntidad(pelota);
+
 }
 
 void SceneInformation::crearObjetosGeometricos()

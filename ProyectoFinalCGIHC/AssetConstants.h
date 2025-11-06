@@ -17,6 +17,7 @@ namespace AssetConstants {
 		// Texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
 		const std::string POPOTE_ROJO = "popote_rojo";
+		const std::string CAUCHO = "caucho";
 	}
 
 
@@ -126,6 +127,8 @@ namespace AssetConstants {
 		// Rutas de texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
 		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
+
+		const std::string CAUCHO_PATH = TEXTURE_PATH + "caucho.png";
 	}
 
 	// Rutas de modelos
