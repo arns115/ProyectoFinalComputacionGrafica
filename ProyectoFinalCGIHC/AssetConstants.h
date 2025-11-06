@@ -64,7 +64,9 @@ namespace AssetConstants {
 		const std::string FUEGO_MORADO = "fuego_morado";
 		const std::string FUEGO_AZUL = "fuego_azul";
 
+		// Item de comida de perro (Binding of Isaac)
 		const std::string COMIDA_PERRO = "comida_perro";
+		const std::string PEDESTAL_PIEDRA = "pedestal_piedra";
 	}
 
 	// Nombres de meshes
@@ -91,7 +93,8 @@ namespace AssetConstants {
 		const std::string SOL = "sol";  
 		
 		// Luces puntuales
-		const std::string PUNTUAL_ROJA = "puntual_roja"; 
+		const std::string PUNTUAL_ROJA = "puntual_roja";
+		const std::string PUNTUAL_AZUL = "puntual_azul";
 		
 		// Spotlights
 		const std::string LINTERNA = "linterna";  
@@ -162,6 +165,7 @@ namespace AssetConstants {
 		const std::string R_KEY = MODEL_PATH + "r_key.obj";
 
 		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
+		const std::string PEDESTAL_PIEDRA = MODEL_PATH + "pedestal_piedra.obj";
 	}
 
 	// Nombres de shaders
