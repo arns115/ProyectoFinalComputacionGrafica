@@ -79,6 +79,7 @@ void SceneRenderer::configurarLuces(DirectionalLight* directionalLight,
     
     // Configurar spotlights
     if (spotLights != nullptr && spotLightCount > 0) {
+        std::cout << " " << spotLightCount << " " << std::endl;
         shader->SetSpotLights(spotLights, spotLightCount);
     }
 }
@@ -116,13 +117,12 @@ void SceneRenderer::renderizarFrame(Skybox* skybox,
     // 3. Configurar matrices (view, projection, y eye position)
     configurarMatrices(camera, projectionMatrix);
     
-    // 4. Inicializar color uniforme (blanco por defecto)
     glUniform3f(uniformColor, 1.0f, 1.0f, 1.0f);
     
-    // 5. Configurar luces
+    // 4. Configurar luces
     configurarLuces(directionalLight, pointLights, pointLightCount, spotLights, spotLightCount);
     
-    // 6. Renderizar todas las entidades 
+    // 5. Renderizar todas las entidades 
     renderizar(entidades);
 
 	stopShader();

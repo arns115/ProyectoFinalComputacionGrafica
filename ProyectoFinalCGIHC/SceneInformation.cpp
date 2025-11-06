@@ -62,11 +62,17 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
     
+	// Se posiciona linterna en la posicion y direccion de la camara
+    spotLightActual = *lightManager.getSpotLight(AssetConstants::LightNames::LINTERNA);
+	posicionLuzActual = camera.getCameraPosition();
+	direccionLuzActual = camera.getCameraDirection();
+    spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
+	agregarSpotLightActual(spotLightActual);
+
 	// Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
         if (entidad != nullptr && entidad->animacion != nullptr) {
             if (entidad->nombreObjeto == "hollow") {
-                std::cout << 1 << std::endl;
                 entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
             }
         }
@@ -77,6 +83,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
 // Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
 {
+	limpiarSpotLightsActuales(); // Limpiar los spotlights actuales para actualizarlos cada frame
+	limpiarLucesPuntualesActuales(); // Limpiar las luces puntuales actuales para actualizarlas cada frame
+
     // Actualizar cámara con input del usuario (mouse y teclado)
     camera.keyControl(keys, deltaTime);
     camera.mouseControl(mouseXChange, mouseYChange);
@@ -146,6 +155,7 @@ void SceneInformation::inicializarEntidades()
     crearPiramide();
     crearHollow();
     crearObjetosGeometricos(); 
+    crearBossRoom();
 
 
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
@@ -337,7 +347,7 @@ void SceneInformation::crearIsaac()
 {
     // Crear entidad de Isaac ya con Jerarquia
     Entidad* isaac_cuerpo = new Entidad("isaac_cuerpo",
-        glm::vec3(0.0f, -1.0f, 10.0f),      // Posición inicial
+        glm::vec3(0.0f, -1.15f, 10.0f),      // Posición inicial
         glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
         glm::vec3(0.8f, 0.8f, 0.8f));      // Escala
 
@@ -357,12 +367,12 @@ void SceneInformation::crearIsaac()
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierda",
-        glm::vec3(-0.48f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(-0.48f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     Entidad* isaac_pierna_derecha = new Entidad("isaac_pierna_derecha",
-        glm::vec3(0.455f, 0.51f, 0.0f),      // Posición inicial
+        glm::vec3(0.455f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -405,6 +415,23 @@ void SceneInformation::crearIsaac()
     isaac_cuerpo->agregarHijo(isaac_pierna_derecha);
 
     agregarEntidad(isaac_cuerpo);
+}
+
+// Crear la boss room
+void SceneInformation::crearBossRoom()
+{
+    // Crear entidad de la boss room
+    Entidad* room = new Entidad("boss_room",
+        glm::vec3(125.0f, 17.45f, -125.0f),      // Posición inicial
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
+        glm::vec3(10.0f, 10.0f, 10.0f));      // Escala
+
+    room->setTipoObjeto(TipoObjeto::MODELO);
+    room->nombreModelo = AssetConstants::ModelNames::BOSS_ROOM;
+    room->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+	room->actualizarTransformacion();
+
+    agregarEntidad(room);
 }
 
 // Crear entidad de la cabeza olmeca
@@ -544,8 +571,8 @@ void SceneInformation::crearPrismasPequenos()
 
 void SceneInformation::crearHollow() {
     Entidad* cabeza_hollow = new Entidad("hollow",
-        glm::vec3(10.0f, 4.0f, 50.0f),      // Posición inicial
-        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(125.0f, 4.0f, -125.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
 
     cabeza_hollow->setTipoObjeto(TipoObjeto::MODELO);
@@ -558,7 +585,7 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow1 = new Entidad("cuerpo_hollow1",
-        glm::vec3(0.0f, -18.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, -16.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -568,7 +595,7 @@ void SceneInformation::crearHollow() {
 	cuerpo_hollow1->actualizarTransformacion();
 
     Entidad* cuerpo_hollow2 = new Entidad("cuerpo_hollow2",
-        glm::vec3(3.0f, -14.0f, -1.0f),      // Posición inicial
+        glm::vec3(1.0f, 2.0f, -14.0f),      // Posición inicial
 		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -579,7 +606,7 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow3 = new Entidad("cuerpo_hollow3",
-        glm::vec3(3.0f, -14.0f, 0.0f),      // Posición inicial
+        glm::vec3(1.0f, 1.0f, -14.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -590,8 +617,8 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow4 = new Entidad("cuerpo_hollow4",
-        glm::vec3(7.0f, -10.0f, 0.0f),      // Posición inicial
-        glm::vec3(0.0f, 0.0f, 40.0f),     // Rotación
+        glm::vec3(0.0f, 0.0f, -10.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     cuerpo_hollow4->setTipoObjeto(TipoObjeto::MODELO);

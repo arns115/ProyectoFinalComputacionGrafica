@@ -1,4 +1,4 @@
-ï»¿#include "ComponenteAnimacion.h"
+#include "ComponenteAnimacion.h"
 #include "Entidad.h"
 #include "ComponenteFisico.h"
 #include <glm.hpp>
@@ -6,6 +6,7 @@
 #include <gtc/quaternion.hpp>
 #include <cmath>
 #include <random>
+#include <chrono>
 
 // Parametros de las diferentes animaciones
 namespace {
@@ -24,17 +25,28 @@ namespace {
     const float CUPHEAD_BOBBING = 0.06f;                 // Movimiento vertical del cuerpo
     
     // Cuphead - Salto
-    const float CUPHEAD_SALTO_COMPRESION = 0.3f;         // Factor de compresiÃ³n (escala)
-    const float CUPHEAD_SALTO_ROTACION = 360.0f;         // Grados de rotaciÃ³n del mortal
-    const float CUPHEAD_SALTO_VELOCIDAD_ROTACION = 2.0f; // Velocidad de rotaciÃ³n (grados por unidad de velocidad vertical)
-    const float CUPHEAD_SALTO_FASE_COMPRESION = 0.15f;   // DuraciÃ³n de la fase de compresiÃ³n en segundos
-    const float CUPHEAD_SALTO_ANGULO_BRAZOS = 120.0f;    // Amplitud mÃ¡xima de brazos durante el mortal
-    const float CUPHEAD_SALTO_ANGULO_MUSLOS = 90.0f;     // Amplitud mÃ¡xima de muslos durante el mortal
-    const float CUPHEAD_SALTO_DOBLEZ_BRAZO = 60.0f;      // Grados de doblez de brazos en compresiÃ³n
-    const float CUPHEAD_SALTO_DOBLEZ_MUSLO = 80.0f;      // Grados de doblez de muslos en compresiÃ³n
-    const float CUPHEAD_SALTO_DOBLEZ_PIE = 60.0f;        // Grados de doblez de pies en compresiÃ³n
-    const float CUPHEAD_SALTO_FACTOR_PIE_MAX = 1.5f;     // Factor multiplicador para doblez mÃ¡ximo del pie
-    const float CUPHEAD_SALTO_FACTOR_PIE_MIN = 0.3f;     // Factor multiplicador para doblez mÃ­nimo del pie
+    const float CUPHEAD_SALTO_COMPRESION = 0.3f;         // Factor de compresión (escala)
+    const float CUPHEAD_SALTO_ROTACION = 360.0f;         // Grados de rotación del mortal
+    const float CUPHEAD_SALTO_VELOCIDAD_ROTACION = 2.0f; // Velocidad de rotación (grados por unidad de velocidad vertical)
+    const float CUPHEAD_SALTO_FASE_COMPRESION = 0.15f;   // Duración de la fase de compresión en segundos
+    const float CUPHEAD_SALTO_ANGULO_BRAZOS = 120.0f;    // Amplitud máxima de brazos durante el mortal
+    const float CUPHEAD_SALTO_ANGULO_MUSLOS = 90.0f;     // Amplitud máxima de muslos durante el mortal
+    const float CUPHEAD_SALTO_DOBLEZ_BRAZO = 60.0f;      // Grados de doblez de brazos en compresión
+    const float CUPHEAD_SALTO_DOBLEZ_MUSLO = 80.0f;      // Grados de doblez de muslos en compresión
+    const float CUPHEAD_SALTO_DOBLEZ_PIE = 60.0f;        // Grados de doblez de pies en compresión
+    const float CUPHEAD_SALTO_FACTOR_PIE_MAX = 1.5f;     // Factor multiplicador para doblez máximo del pie
+    const float CUPHEAD_SALTO_FACTOR_PIE_MIN = 0.3f;     // Factor multiplicador para doblez mínimo del pie
+    
+    // Hollow - Movimiento dentro de la boss room
+    const float HOLLOW_MIN_X = 85.0f;                   // Límite mínimo en X
+    const float HOLLOW_MAX_X = 165.0f;                   // Límite máximo en X
+    const float HOLLOW_MIN_Z = -150.0f;                  // Límite mínimo en Z
+    const float HOLLOW_MAX_Z = -100.0f;                  // Límite máximo en Z
+    const float HOLLOW_VELOCIDAD = 2.0f / 10;                 // Velocidad de movimiento
+    const float HOLLOW_VELOCIDAD_ROTACION = 90.0f / 10;      // Velocidad de rotación en grados por segundo
+    const float HOLLOW_MARGEN_BORDE = 2.0f;             // Margen antes de llegar al borde para cambiar dirección
+    const float HOLLOW_AMPLITUD_ONDULACION = 15.0f;     // Amplitud de la ondulación del cuerpo
+    const float HOLLOW_FRECUENCIA_ONDULACION = 3.0f / 60;    // Frecuencia de la ondulación
     
     // Variables globales para los calculos de animacion
     bool animacionActiva = false;
@@ -42,7 +54,28 @@ namespace {
     float anguloBase = 0.0f;
     float anguloOpuesto = 0.0f;
     
-    // Quaternion para guardar rotaciÃ³n pre-salto
+    // Generador de números aleatorios compartido por todas las animaciones
+    std::mt19937 generadorAleatorioAnimaciones(std::chrono::system_clock::now().time_since_epoch().count());
+    
+    // Variables para Hollow
+    float hollowDireccionObjetivo = 0.0f;                // Dirección objetivo en grados (rotación Y)
+    float hollowDireccionActual = 0.0f;                  // Dirección actual en grados
+    Entidad* entidadActual = nullptr;                    // Variable por si se tienen que recorrer varois hijos
+    glm::vec3 hollowPosicionActual = glm::vec3(0.0f);   // Posición actual de hollow
+    glm::vec3 hollowDireccionAdelante = glm::vec3(0.0f, 0.0f, 1.0f); // Dirección hacia adelante
+    glm::vec3 hollowPosicionFutura = glm::vec3(0.0f);   // Posición futura para verificar colisión con bordes
+    bool hollowCercaDelBorde = false;                    // Indica si está cerca del borde
+    glm::vec3 hollowCentroRectangulo = glm::vec3(0.0f); // Centro del área de movimiento
+    glm::vec3 hollowHaciaElCentro = glm::vec3(0.0f);    // Vector hacia el centro
+    float hollowAnguloHaciaCentro = 0.0f;                // Ángulo hacia el centro en grados
+    float hollowNuevaDireccion = 0.0f;                   // Nueva dirección aleatoria
+    float hollowDiferencia = 0.0f;                       // Diferencia entre dirección objetivo y actual
+    float hollowRotacionDelta = 0.0f;                    // Delta de rotación por frame
+    float hollowRotacionAplicar = 0.0f;                  // Rotación a aplicar en este frame
+    float hollowFase = 0.0f;                             // Fase de ondulación
+    float hollowAngulo = 0.0f;                           // Ángulo de ondulación
+    
+    // Quaternion para guardar rotación pre-salto
     glm::quat rotacionPreSaltoQuat(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
@@ -99,8 +132,8 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
         animarHollow(indiceAnimacion, deltaTime);
     }
     else if (entidad->nombreObjeto == "cuphead_torso") {
-        // Ãndice 0: AnimaciÃ³n de caminata
-        // Ãndice 1: AnimaciÃ³n de salto
+        // Índice 0: Animación de caminata
+        // Índice 1: Animación de salto
         if (indiceAnimacion == 0) {
             animarCuphead(indiceAnimacion, deltaTime, velocidadMovimiento);
         }
@@ -116,7 +149,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
 {
     bool animacionActiva = estaActiva(indiceAnimacion);
     
-    // Si hay movimiento, activar animaciÃ³n
+    // Si hay movimiento, activar animación
     if (velocidadMovimiento > 0.01f) {
         if (!animacionActiva) {
             activarAnimacion(indiceAnimacion);
@@ -136,16 +169,16 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
         
         // Verificar si ya termino la animacion
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
-			// Ajustar el tiempo para que se posicionen bien las partes del cuerpo
+            // Ajustar el tiempo para que se posicionen bien las partes del cuerpo
             tiemposAnimacion[indiceAnimacion] = glm::two_pi<float>();
         }
     }
     else {
-        // No hay movimiento y no hay animaciÃ³n activa
+        // No hay movimiento y no hay animación activa
         return;
     }
     
-    // Aplicar transformaciones de animaciÃ³n
+    // Aplicar transformaciones de animación
     tiempo = tiemposAnimacion[indiceAnimacion];
     anguloBase = sin(tiempo);
     anguloOpuesto = sin(tiempo + glm::pi<float>());
@@ -179,7 +212,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
         hijo->actualizarTransformacion();
     }
     
-    // DespuÃ©s de aplicar transformaciones, verificar si ya termino la animacion para desactivarla
+    // Después de aplicar transformaciones, verificar si ya termino la animacion para desactivarla
     if (velocidadMovimiento <= 0.01f && tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
         desactivarAnimacion(indiceAnimacion);
         tiemposAnimacion[indiceAnimacion] = 0.0f;
@@ -187,28 +220,157 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
 }
 
 void ComponenteAnimacion::animarHollow(int indiceAnimacion, float deltaTime) {
-
-}
-
-// AnimaciÃ³n de caminata para Cuphead
-void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento)
-{
-    if (estaActiva(1)) {  // Ãndice 1 = animaciÃ³n de salto
-        // Si la animaciÃ³n de caminata estaba activa, desactivarla
-        if (estaActiva(indiceAnimacion)) {
-            desactivarAnimacion(indiceAnimacion);
-            tiemposAnimacion[indiceAnimacion] = 0.0f;
-            
-            // Restaurar posiciÃ³n Y original del torso
-            entidad->posicionLocal.y = entidad->posicionInicial.y;
-            entidad->actualizarTransformacion();
-        }
-        return;  // No ejecutar animaciÃ³n de caminata mientras se salta
+    if (entidad == nullptr) {
+        return;
     }
     
     animacionActiva = estaActiva(indiceAnimacion);
     
-    // Si hay movimiento, activar animaciÃ³n
+    // Inicializar la configuración específica de Hollow solo al activar la animación
+    if (!animacionActiva) {
+        // Activar la animación
+        activarAnimacion(indiceAnimacion);
+        
+        // Extraer el ángulo Y actual del quaternion
+        glm::vec3 eulerAngles = glm::eulerAngles(entidad->rotacionLocalQuat);
+        hollowDireccionActual = glm::degrees(eulerAngles.y);
+        hollowDireccionObjetivo = hollowDireccionActual;
+    }
+    
+    // Obtener posición actual
+    hollowPosicionActual = entidad->posicionLocal;
+    
+    // Calcular la dirección hacia adelante
+    hollowDireccionAdelante = entidad->rotacionLocalQuat * glm::vec3(0.0f, 0.0f, 1.0f);
+    hollowDireccionAdelante.y = 0.0f; 
+    if (glm::length(hollowDireccionAdelante) > 0.01f) {
+        hollowDireccionAdelante = glm::normalize(hollowDireccionAdelante);
+    } else {
+        // Si la dirección es muy pequeña, usar una por defecto
+        hollowDireccionAdelante = glm::vec3(0.0f, 0.0f, 1.0f);
+    }
+    
+    // Calcular posición futura basada en la dirección actual
+    hollowPosicionFutura = hollowPosicionActual + hollowDireccionAdelante * HOLLOW_VELOCIDAD * deltaTime * 2.0f;
+    
+    // Verificar si está cerca del borde
+    hollowCercaDelBorde = (hollowPosicionFutura.x <= HOLLOW_MIN_X + HOLLOW_MARGEN_BORDE ||
+                           hollowPosicionFutura.x >= HOLLOW_MAX_X - HOLLOW_MARGEN_BORDE ||
+                           hollowPosicionFutura.z <= HOLLOW_MIN_Z + HOLLOW_MARGEN_BORDE ||
+                           hollowPosicionFutura.z >= HOLLOW_MAX_Z - HOLLOW_MARGEN_BORDE);
+    
+    // Cambiar dirección aleatoriamente si está cerca del borde
+    if (hollowCercaDelBorde) {
+        // Calcular dirección hacia el centro del área
+        hollowCentroRectangulo = glm::vec3((HOLLOW_MIN_X + HOLLOW_MAX_X) * 0.5f, 
+                                            hollowPosicionActual.y, 
+                                            (HOLLOW_MIN_Z + HOLLOW_MAX_Z) * 0.5f);
+        hollowHaciaElCentro = glm::normalize(hollowCentroRectangulo - hollowPosicionActual);
+        
+        // Calcular ángulo hacia el centro
+        hollowAnguloHaciaCentro = glm::degrees(atan2(hollowHaciaElCentro.x, hollowHaciaElCentro.z));
+        
+        // Añadir variación aleatoria de ±90 grados alrededor de la dirección al centro
+        std::uniform_real_distribution<float> distribVariacion(-90.0f, 90.0f);
+        hollowNuevaDireccion = hollowAnguloHaciaCentro + distribVariacion(generadorAleatorioAnimaciones);
+        
+        hollowDireccionObjetivo = hollowNuevaDireccion;
+    }
+    
+    // Rotar hacia la dirección objetivo
+    hollowDiferencia = hollowDireccionObjetivo - hollowDireccionActual;
+    
+    // Ajustar a que sea entre -180 y 180
+    while (hollowDiferencia > 180.0f) hollowDiferencia -= 360.0f;
+    while (hollowDiferencia < -180.0f) hollowDiferencia += 360.0f;
+    
+    // Aplicar rotación gradual
+    if (abs(hollowDiferencia) > 0.1f) {
+        hollowRotacionDelta = HOLLOW_VELOCIDAD_ROTACION * deltaTime;
+        hollowRotacionAplicar = 0.0f;
+        
+        if (abs(hollowDiferencia) < hollowRotacionDelta) {
+            hollowRotacionAplicar = hollowDiferencia;
+            hollowDireccionActual = hollowDireccionObjetivo;
+        } else {
+            hollowRotacionAplicar = (hollowDiferencia > 0.0f ? hollowRotacionDelta : -hollowRotacionDelta);
+            hollowDireccionActual += hollowRotacionAplicar;
+        }
+        
+        // Ajustar a que sea entre -180 y 180
+        while (hollowDireccionActual >= 360.0f) hollowDireccionActual -= 360.0f;
+        while (hollowDireccionActual < 0.0f) hollowDireccionActual += 360.0f;
+        
+        // Aplicar la rotación
+        entidad->rotacionLocal.y = hollowRotacionAplicar;
+    }
+    
+    // Mover hacia adelante en la dirección actual
+    hollowDireccionAdelante = entidad->rotacionLocalQuat * glm::vec3(0.0f, 0.0f, 1.0f);
+    hollowDireccionAdelante.y = 0.0f;
+    if (glm::length(hollowDireccionAdelante) > 0.01f) {
+        hollowDireccionAdelante = glm::normalize(hollowDireccionAdelante);
+    } else {
+        hollowDireccionAdelante = glm::vec3(0.0f, 0.0f, 1.0f);
+    }
+    
+    entidad->posicionLocal += hollowDireccionAdelante * HOLLOW_VELOCIDAD * deltaTime;
+    
+    // Limitar la posición dentro de los límites
+    entidad->posicionLocal.x = glm::clamp(entidad->posicionLocal.x, HOLLOW_MIN_X, HOLLOW_MAX_X);
+    entidad->posicionLocal.z = glm::clamp(entidad->posicionLocal.z, HOLLOW_MIN_Z, HOLLOW_MAX_Z);
+    
+    // Aplicar ondulación al cuerpo 
+    tiempo += deltaTime * HOLLOW_FRECUENCIA_ONDULACION;
+    
+    // Rotar cada una de las partes de hollow
+    entidadActual = entidad->hijos[0];
+        
+    for (int i = 0; i < 5 && entidadActual != nullptr; i++) {
+        // Calcular fase de ondulación para este segmento
+        hollowFase = tiempo - (i * 0.3f);
+        hollowAngulo = sin(hollowFase) * HOLLOW_AMPLITUD_ONDULACION;
+            
+        // Aplicar rotación de ondulación 
+        entidadActual->rotacionLocalQuat = 
+            glm::angleAxis(glm::radians(entidadActual->rotacionInicial.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
+            glm::angleAxis(glm::radians(entidadActual->rotacionInicial.y + hollowAngulo), glm::vec3(0.0f, 1.0f, 0.0f)) *
+            glm::angleAxis(glm::radians(entidadActual->rotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f));
+            
+        entidadActual->rotacionLocal = glm::vec3(0.0f);
+            
+        // Avanzar al hijo de la entidad
+        if (!entidadActual->hijos.empty()) {
+            entidadActual = entidadActual->hijos[0];
+        } else {
+            entidadActual = nullptr;
+        }
+        
+    }
+    
+    // Actualizar transformación de la cabeza
+    entidad->actualizarTransformacion();
+}
+
+// Animación de caminata para Cuphead
+void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, float velocidadMovimiento)
+{
+    if (estaActiva(1)) {  // Índice 1 = animación de salto
+        // Si la animación de caminata estaba activa, desactivarla
+        if (estaActiva(indiceAnimacion)) {
+            desactivarAnimacion(indiceAnimacion);
+            tiemposAnimacion[indiceAnimacion] = 0.0f;
+            
+            // Restaurar posición Y original del torso
+            entidad->posicionLocal.y = entidad->posicionInicial.y;
+            entidad->actualizarTransformacion();
+        }
+        return;  // No ejecutar animación de caminata mientras se salta
+    }
+    
+    animacionActiva = estaActiva(indiceAnimacion);
+    
+    // Si hay movimiento, activar animación
     if (velocidadMovimiento > 0.01f) {
         if (!animacionActiva) {
             activarAnimacion(indiceAnimacion);
@@ -217,7 +379,7 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
         // Acumular tiempo
         tiemposAnimacion[indiceAnimacion] += deltaTime * velocidadesAnimacion[indiceAnimacion];
         
-        // Se ajusta para que la posicion sea la misma cuando se empezÃ³ a mover
+        // Se ajusta para que la posicion sea la misma cuando se empezó a mover
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
             tiemposAnimacion[indiceAnimacion] -= glm::two_pi<float>();
         }
@@ -226,18 +388,18 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
         // Continuar hasta completar el ciclo
         tiemposAnimacion[indiceAnimacion] += deltaTime * velocidadesAnimacion[indiceAnimacion];
         
-        // Verificar si ya terminÃ³ la animaciÃ³n
+        // Verificar si ya terminó la animación
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
             // Ajustar el tiempo para que se posicionen bien las partes del cuerpo
             tiemposAnimacion[indiceAnimacion] = glm::two_pi<float>();
         }
     }
     else {
-        // No hay movimiento y no hay animaciÃ³n activa
+        // No hay movimiento y no hay animación activa
         return;
     }
     
-    // Aplicar transformaciones de animaciÃ³n
+    // Aplicar transformaciones de animación
     tiempo = tiemposAnimacion[indiceAnimacion];
     anguloBase = sin(tiempo);
     anguloOpuesto = sin(tiempo + glm::pi<float>());
@@ -251,7 +413,7 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
         
         const std::string& nombre = hijo->nombreObjeto;
         
-        // Brazos - movimiento alternado adelante/atrÃ¡s (rotaciÃ³n en eje X)
+        // Brazos - movimiento alternado adelante/atrás (rotación en eje X)
         if (nombre.find("cuphead_brazo_derecho") != std::string::npos) {
             hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloBase * CUPHEAD_AMPLITUD_BRAZOS);
             
@@ -295,7 +457,7 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
             }
         }
         
-        // Piernas - movimiento pronunciado adelante/atrÃ¡s (rotaciÃ³n en eje X)
+        // Piernas - movimiento pronunciado adelante/atrás (rotación en eje X)
         else if (nombre.find("cuphead_muslo_derecho") != std::string::npos) {
             hijo->rotacionLocal.x = hijo->rotacionInicial.x + (anguloOpuesto * CUPHEAD_AMPLITUD_MUSLOS);
             
@@ -304,10 +466,10 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
                 glm::angleAxis(glm::radians(hijo->rotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
                 glm::angleAxis(glm::radians(hijo->rotacionLocal.x), glm::vec3(1.0f, 0.0f, 0.0f));
             
-            // Animar pie derecho con movimiento mÃ¡s pronunciado
+            // Animar pie derecho con movimiento más pronunciado
             for (auto* nieto : hijo->hijos) {
                 if (nieto && nieto->nombreObjeto.find("cuphead_pie_derecho") != std::string::npos) {
-                    // El pie se dobla mÃ¡s cuando el muslo estÃ¡ hacia atrÃ¡s
+                    // El pie se dobla más cuando el muslo está hacia atrás
                     float factorPie = anguloOpuesto < 0 ? abs(anguloOpuesto) * CUPHEAD_SALTO_FACTOR_PIE_MAX : anguloOpuesto * CUPHEAD_SALTO_FACTOR_PIE_MIN;
                     nieto->rotacionLocal.x = nieto->rotacionInicial.x + (factorPie * CUPHEAD_AMPLITUD_PIES);
                     
@@ -327,10 +489,10 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
                 glm::angleAxis(glm::radians(hijo->rotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
                 glm::angleAxis(glm::radians(hijo->rotacionLocal.x), glm::vec3(1.0f, 0.0f, 0.0f));
             
-            // Animar pie izquierdo con movimiento mÃ¡s pronunciado
+            // Animar pie izquierdo con movimiento más pronunciado
             for (auto* nieto : hijo->hijos) {
                 if (nieto && nieto->nombreObjeto.find("cuphead_pie_izquierdo") != std::string::npos) {
-                    // El pie se dobla mÃ¡s cuando el muslo estÃ¡ hacia atrÃ¡s 
+                    // El pie se dobla más cuando el muslo está hacia atrás 
                     float factorPie = anguloBase < 0 ? abs(anguloBase) * CUPHEAD_SALTO_FACTOR_PIE_MAX : anguloBase * CUPHEAD_SALTO_FACTOR_PIE_MIN;
                     nieto->rotacionLocal.x = nieto->rotacionInicial.x + (factorPie * CUPHEAD_AMPLITUD_PIES);
                     
@@ -347,12 +509,12 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
     }
     
     
-    // DespuÃ©s de aplicar transformaciones, verificar si ya terminÃ³ la animaciÃ³n para desactivarla
+    // Después de aplicar transformaciones, verificar si ya terminó la animación para desactivarla
     if (velocidadMovimiento <= 0.01f && tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
         desactivarAnimacion(indiceAnimacion);
         tiemposAnimacion[indiceAnimacion] = 0.0f;
         
-        // Restaurar posiciÃ³n Y original
+        // Restaurar posición Y original
         entidad->posicionLocal.y = entidad->posicionInicial.y;
     }
     entidad->actualizarTransformacion();
@@ -360,30 +522,30 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
 }
 
 
-// AnimaciÃ³n de salto con mortal para Cuphead
+// Animación de salto con mortal para Cuphead
 void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTime)
 {
     bool animacionActiva = estaActiva(indiceAnimacion);
     
-    // Si la animaciÃ³n no estÃ¡ activa, no hacer nada
+    // Si la animación no está activa, no hacer nada
     if (!animacionActiva) {
         return;
     }
     
-    // Verificar si la entidad tiene componente fÃ­sico
+    // Verificar si la entidad tiene componente físico
     if (entidad->fisica == nullptr) {
         desactivarAnimacion(indiceAnimacion);
         return;
     }
     
-    // Al inicio de la animaciÃ³n (tiempo = 0), guardar la rotaciÃ³n actual
+    // Al inicio de la animación (tiempo = 0), guardar la rotación actual
     if (tiemposAnimacion[indiceAnimacion] == 0.0f) {
         rotacionPreSaltoQuat = entidad->rotacionLocalQuat;
     }
     
     // Verificar si el personaje ha aterrizado
     if (entidad->fisica->estaEnSuelo() && tiemposAnimacion[indiceAnimacion] > 0.0f) {
-        // Terminar la animaciÃ³n
+        // Terminar la animación
         desactivarAnimacion(indiceAnimacion);
         tiemposAnimacion[indiceAnimacion] = 0.0f;
         
@@ -397,7 +559,7 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
             hijo->escalaLocal = hijo->escalaInicial;
             hijo->actualizarTransformacion();
 
-            // Restaurar tambiÃ©n los nietos (antebrazos y pies)
+            // Restaurar también los nietos (antebrazos y pies)
             for (auto* nieto : hijo->hijos) {
                 if (nieto == nullptr) continue;
 				nieto->posicionLocal = nieto->posicionInicial;
@@ -408,7 +570,7 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
             }
         }
         
-        // Restaurar a la rotaciÃ³n antes del salto
+        // Restaurar a la rotación antes del salto
         entidad->rotacionLocalQuat = rotacionPreSaltoQuat;
         entidad->escalaLocal = entidad->escalaInicial;
         entidad->actualizarTransformacion();
@@ -416,10 +578,10 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
         return;
     }
     
-    // Acumular tiempo solo si no estÃ¡ en el suelo
+    // Acumular tiempo solo si no está en el suelo
     tiemposAnimacion[indiceAnimacion] += deltaTime;
     
-    // Fase 1: CompresiÃ³n 
+    // Fase 1: Compresión 
     if (tiemposAnimacion[indiceAnimacion] < CUPHEAD_SALTO_FASE_COMPRESION && !entidad->fisica->estaEnSuelo()) {
         float factorCompresion = tiemposAnimacion[indiceAnimacion] / CUPHEAD_SALTO_FASE_COMPRESION; // 0.0 a 1.0
         
@@ -458,7 +620,7 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
                     glm::angleAxis(glm::radians(hijo->rotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
                     glm::angleAxis(glm::radians(hijo->rotacionLocal.x), glm::vec3(1.0f, 0.0f, 0.0f));
                 
-                // Doblar los pies mÃ¡s
+                // Doblar los pies más
                 for (auto* nieto : hijo->hijos) {
                     if (nieto && nieto->nombreObjeto.find("cuphead_pie") != std::string::npos) {
                         nieto->rotacionLocal.x = nieto->rotacionInicial.x + (factorCompresion * CUPHEAD_SALTO_DOBLEZ_PIE);
@@ -480,24 +642,24 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
         // Descomprimir completamente
         entidad->escalaLocal = entidad->escalaInicial;
         
-        // Calcular rotaciÃ³n basada en la velocidad vertical acumulada
-        // La rotaciÃ³n aumenta mientras el personaje estÃ¡ en el aire
+        // Calcular rotación basada en la velocidad vertical acumulada
+        // La rotación aumenta mientras el personaje está en el aire
         float velocidadVertical = entidad->fisica->velocidad.y;
         float tiempoEnAire = tiemposAnimacion[indiceAnimacion] - CUPHEAD_SALTO_FASE_COMPRESION;
         
-        // Calcular rotaciÃ³n acumulada (mÃ¡s rÃ¡pida al inicio, mÃ¡s lenta al final)
+        // Calcular rotación acumulada (más rápida al inicio, más lenta al final)
         float rotacionActual = tiempoEnAire * CUPHEAD_SALTO_VELOCIDAD_ROTACION * abs(velocidadVertical);
         
-        // Limitar la rotaciÃ³n a un mÃ¡ximo para evitar giros excesivos
+        // Limitar la rotación a un máximo para evitar giros excesivos
         if (rotacionActual > CUPHEAD_SALTO_ROTACION) {
             rotacionActual = CUPHEAD_SALTO_ROTACION;
         }
         
-        // Aplicar rotaciÃ³n del mortal sobre la rotaciÃ³n pre-salto
+        // Aplicar rotación del mortal sobre la rotación pre-salto
         glm::quat rotacionMortal = glm::angleAxis(glm::radians(rotacionActual), glm::vec3(1.0f, 0.0f, 0.0f));
         entidad->rotacionLocalQuat = rotacionPreSaltoQuat * rotacionMortal;
         
-        // Factor de progreso del mortal (0.0 a 1.0 basado en la rotaciÃ³n)
+        // Factor de progreso del mortal (0.0 a 1.0 basado en la rotación)
         float factorMortal = rotacionActual / CUPHEAD_SALTO_ROTACION;
         
         // Extender extremidades gradualmente durante el mortal
@@ -506,7 +668,7 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
             
             const std::string& nombre = hijo->nombreObjeto;
             
-            // Brazos: primero hacia adelante, luego hacia atrÃ¡s siguiendo el mortal
+            // Brazos: primero hacia adelante, luego hacia atrás siguiendo el mortal
             if (nombre.find("cuphead_brazo") != std::string::npos) {
                 float anguloBrazo = sin(factorMortal * glm::pi<float>()) * CUPHEAD_SALTO_ANGULO_BRAZOS;
                 hijo->rotacionLocal.x = hijo->rotacionInicial.x + anguloBrazo;
@@ -546,7 +708,7 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
         }
     }
     
-    // Actualizar transformaciÃ³n del torso
+    // Actualizar transformación del torso
     entidad->actualizarTransformacion();
 }
 

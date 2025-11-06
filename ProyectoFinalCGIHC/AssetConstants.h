@@ -52,6 +52,10 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = "isaac_brazo_derecho";
 		const std::string ISAAC_PIERNA_IZQUIERDA = "isaac_pierna_izquierda";
 		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
+
+		// Boss room
+		const std::string BOSS_ROOM = "boss_room";
+
 	}
 
 	// Nombres de meshes
@@ -135,6 +139,9 @@ namespace AssetConstants {
 		const std::string ISAAC_BRAZO_DERECHO = MODEL_PATH + "isaac_brazo_derecho.obj";
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
+
+		// Boss room
+		const std::string BOSS_ROOM = MODEL_PATH + "boss_room.obj";
 	}
 
 	// Nombres de shaders
