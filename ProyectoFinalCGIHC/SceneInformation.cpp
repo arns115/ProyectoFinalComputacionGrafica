@@ -1017,8 +1017,8 @@ void SceneInformation::crearCanchaPelotaMaya()
         glm::vec3(posicionCentroCancha.x - separacionParedes / 2.0f, 
                   posicionCentroCancha.y, 
                   posicionCentroCancha.z),
-        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
-        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala normal
+        glm::vec3(0.0f, 0.0f, 0.0f),       
+        glm::vec3(5.0f, 5.0f, 5.0f));      
     
     paredIzquierda->setTipoObjeto(TipoObjeto::MESH);
     paredIzquierda->nombreMesh = AssetConstants::MeshNames::CANCHA_PARED;
@@ -1026,11 +1026,11 @@ void SceneInformation::crearCanchaPelotaMaya()
     paredIzquierda->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     paredIzquierda->actualizarTransformacion();
     
-    // Crear techo triangular izquierdo (hijo de pared izquierda)
+    // Crear techo triangular izquierdo
     Entidad* techoIzquierdo = new Entidad("cancha_techo_izquierdo",
-        glm::vec3(-1.5f, 0.0f, 0.0f),       // Posición relativa (ya está alineado con la pared)
-        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación
-        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+        glm::vec3(-1.5f, 0.0f, 0.0f),       
+        glm::vec3(0.0f, 0.0f, 0.0f),       
+        glm::vec3(1.0f, 1.0f, 1.0f));      
     
     techoIzquierdo->setTipoObjeto(TipoObjeto::MESH);
     techoIzquierdo->nombreMesh = AssetConstants::MeshNames::CANCHA_TECHO;
@@ -1045,13 +1045,13 @@ void SceneInformation::crearCanchaPelotaMaya()
     agregarEntidad(paredIzquierda);
     
     
-    // Crear pared rectangular derecha (padre)
+    // Crear pared rectangular derecha 
     Entidad* paredDerecha = new Entidad("cancha_pared_derecha",
         glm::vec3(posicionCentroCancha.x + separacionParedes / 2.0f, 
                   posicionCentroCancha.y, 
                   posicionCentroCancha.z),
-        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación 180° para que mire hacia el centro
-        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala normal
+        glm::vec3(0.0f, 180.0f, 0.0f),     
+        glm::vec3(5.0f, 5.0f, 5.0f));      
     
     paredDerecha->setTipoObjeto(TipoObjeto::MESH);
     paredDerecha->nombreMesh = AssetConstants::MeshNames::CANCHA_PARED;
@@ -1059,11 +1059,11 @@ void SceneInformation::crearCanchaPelotaMaya()
     paredDerecha->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     paredDerecha->actualizarTransformacion();
     
-    // Crear techo triangular derecho (hijo de pared derecha)
+    // Crear techo triangular derecho 
     Entidad* techoDerecho = new Entidad("cancha_techo_derecho",
-        glm::vec3(-1.5f, 0.0f, 0.0f),       // Posición relativa
-        glm::vec3(0.0f, 0.0f, 0.0f),       // Sin rotación adicional
-        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala normal
+        glm::vec3(-1.5f, 0.0f, 0.0f),      
+        glm::vec3(0.0f, 0.0f, 0.0f),      
+        glm::vec3(1.0f, 1.0f, 1.0f));      
     
     techoDerecho->setTipoObjeto(TipoObjeto::MESH);
     techoDerecho->nombreMesh = AssetConstants::MeshNames::CANCHA_TECHO;
@@ -1071,8 +1071,20 @@ void SceneInformation::crearCanchaPelotaMaya()
     techoDerecho->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     techoDerecho->actualizarTransformacion();
     
-    // Agregar techo como hijo de la pared derecha
+    Entidad* aroCancha = new Entidad("cancha_aro",
+        glm::vec3(2.0f, 3.5f, 0.0f),   
+        glm::vec3(90.0f, 0.0f, 0.0f), 
+        glm::vec3(0.5f, 0.5f, 0.5f));  
+    
+    aroCancha->setTipoObjeto(TipoObjeto::MESH);
+    aroCancha->nombreMesh = AssetConstants::MeshNames::TOROIDE;
+    aroCancha->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
+    aroCancha->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    aroCancha->actualizarTransformacion();
+    
+    // Agregar techo y aro como hijos de la pared derecha
     paredDerecha->agregarHijo(techoDerecho);
+    paredDerecha->agregarHijo(aroCancha);
     
     // Agregar pared derecha a la escena
     agregarEntidad(paredDerecha);

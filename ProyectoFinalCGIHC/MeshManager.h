@@ -36,6 +36,7 @@ private:
 	void createPrismaPequenoMesh();
 	void createCanchaParedMesh();
 	void createCanchaTechoMesh();
+	void createToroideMesh();
 	
 	// Función auxiliar para calcular normales por promedio de vértices
 	void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, 

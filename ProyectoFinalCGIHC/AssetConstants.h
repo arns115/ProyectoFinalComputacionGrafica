@@ -78,6 +78,7 @@ namespace AssetConstants {
 		const std::string CHINAMPA_ISLA = "chinampa_isla";
 		const std::string CANCHA_PARED = "cancha_pared";
 		const std::string CANCHA_TECHO = "cancha_techo";
+		const std::string TOROIDE = "toroide";
 	}
 
 	// Nombres de materiales

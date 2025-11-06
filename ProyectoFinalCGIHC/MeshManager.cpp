@@ -14,6 +14,7 @@ MeshManager::MeshManager()
 	createPrismaPequenoMesh();
 	createCanchaParedMesh();
 	createCanchaTechoMesh();
+	createToroideMesh();
 }
 
 // Carga un mesh en el manager
@@ -505,6 +506,100 @@ void MeshManager::createCanchaTechoMesh()
 	Mesh* techoMesh = new Mesh();
 	techoMesh->CreateMesh(techoVertices, techoIndices, 144, 24);
 	loadMesh(AssetConstants::MeshNames::CANCHA_TECHO, techoMesh);
+}
+
+// Crear mesh de toroide para el aro de la cancha de pelota maya
+void MeshManager::createToroideMesh()
+{
+	// Parámetros del toroide
+	float mainRadius = 1.0f;    // Radio del círculo principal
+	float tubeRadius = 0.2f;    // Radio del tubo
+	int mainSegments = 32;      // Segmentos del círculo principal
+	int tubeSegments = 16;      // Segmentos del tubo
+	
+	std::vector<GLfloat> vertices;
+	std::vector<unsigned int> indices;
+	
+	// Por cada segmento del círculo principal
+	for (int i = 0; i <= mainSegments; i++)
+	{
+		// Ángulo alrededor del círculo principal
+		float theta = (float)i / mainSegments * 2.0f * 3.14159265f;
+		float cosTheta = cos(theta); // Calculamos el coseno de theta antes de el bucle interno
+		float sinTheta = sin(theta); // Calculamos el seno de theta antes de el bucle interno
+
+		// Por cada segmento del tubo
+		for (int j = 0; j <= tubeSegments; j++)
+		{
+			// Obtenemos el ángulo alrededor del tubo
+			float phi = (float)j / tubeSegments * 2.0f * 3.14159265f;
+			float cosPhi = cos(phi); // Coseno de phi
+			float sinPhi = sin(phi); // Seno de phi
+
+			// Centro del tubo en el círculo principal (calculado respecto al ángulo del circulo principal actual)
+			float cx = mainRadius * cosTheta;
+			float cz = mainRadius * sinTheta;
+
+			// Posición del vértice (usando las fórmulas paramétricas del toroide)
+			float x = (mainRadius + tubeRadius * cosPhi) * cosTheta;
+			float y = tubeRadius * sinPhi;
+			float z = (mainRadius + tubeRadius * cosPhi) * sinTheta;
+
+			// La coordenada de textura u,v actual se calcula normalizando 
+			// el índice del segmento actual tanto para el círculo principal como para el tubo
+			float u = (float)i / mainSegments;
+			float v = (float)j / tubeSegments;
+
+			// Cálculo de las normales del vértice (del centro a la posición de x calculada en la iteración actual.
+			// C = (cx, 0, cz) y P = (x, y, z)
+			float nx = x - cx; // Componente en x
+			float ny = y; // Componente en y
+			float nz = z - cz; // Componente en z
+
+			// Normalizar el vector normal 
+			float length = sqrt(nx * nx + ny * ny + nz * nz);
+			if (length > 0.0f) {
+				nx /= length;
+				ny /= length;
+				nz /= length;
+			}
+
+			// Agregar vértice: x, y, z, u, v, nx, ny, nz
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+			vertices.push_back(u);
+			vertices.push_back(v);
+			vertices.push_back(nx);
+			vertices.push_back(ny);
+			vertices.push_back(nz);
+		}
+	}
+
+	// Generar índices
+	for (int i = 0; i < mainSegments; i++)
+	{
+		for (int j = 0; j < tubeSegments; j++)
+		{
+			int first = i * (tubeSegments + 1) + j;
+			int second = first + tubeSegments + 1;
+
+			// Primer triángulo
+			indices.push_back(first);
+			indices.push_back(second);
+			indices.push_back(first + 1);
+
+			// Segundo triángulo
+			indices.push_back(second);
+			indices.push_back(second + 1);
+			indices.push_back(first + 1);
+		}
+	}
+	
+	// Crear el mesh
+	Mesh* toroideMesh = new Mesh();
+	toroideMesh->CreateMesh(vertices.data(), indices.data(), vertices.size(), indices.size());
+	loadMesh(AssetConstants::MeshNames::TOROIDE, toroideMesh);
 }
 
 MeshManager::~MeshManager() 
