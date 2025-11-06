@@ -73,7 +73,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
     for (auto* entidad : entidades) {
         if (entidad != nullptr && entidad->animacion != nullptr) {
             if (entidad->nombreObjeto == "hollow") {
-                std::cout << 1 << std::endl;
                 entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
             }
         }
@@ -458,7 +457,7 @@ void SceneInformation::crearCabezaOlmeca()
 void SceneInformation::crearHollow() {
     Entidad* cabeza_hollow = new Entidad("hollow",
         glm::vec3(125.0f, 4.0f, -125.0f),      // Posición inicial
-        glm::vec3(-90.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
 
     cabeza_hollow->setTipoObjeto(TipoObjeto::MODELO);
@@ -471,7 +470,7 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow1 = new Entidad("cuerpo_hollow1",
-        glm::vec3(0.0f, -18.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, -16.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -481,7 +480,7 @@ void SceneInformation::crearHollow() {
 	cuerpo_hollow1->actualizarTransformacion();
 
     Entidad* cuerpo_hollow2 = new Entidad("cuerpo_hollow2",
-        glm::vec3(3.0f, -14.0f, -1.0f),      // Posición inicial
+        glm::vec3(1.0f, 2.0f, -14.0f),      // Posición inicial
 		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
 		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -492,7 +491,7 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow3 = new Entidad("cuerpo_hollow3",
-        glm::vec3(3.0f, -14.0f, 0.0f),      // Posición inicial
+        glm::vec3(1.0f, 1.0f, -14.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
@@ -503,8 +502,8 @@ void SceneInformation::crearHollow() {
 
 
     Entidad* cuerpo_hollow4 = new Entidad("cuerpo_hollow4",
-        glm::vec3(7.0f, -10.0f, 0.0f),      // Posición inicial
-        glm::vec3(0.0f, 0.0f, 40.0f),     // Rotación
+        glm::vec3(0.0f, 0.0f, -10.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
     cuerpo_hollow4->setTipoObjeto(TipoObjeto::MODELO);
