@@ -45,6 +45,24 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
 
+	// Cargar modelos de Gojo (jerarqu�a)
+	loadModel(AssetConstants::ModelNames::GOJO, AssetConstants::ModelPaths::GOJO);
+	loadModel(AssetConstants::ModelNames::GOJO_BRAZO_IZQ, AssetConstants::ModelPaths::GOJOBRAZOIZQ);
+	loadModel(AssetConstants::ModelNames::GOJO_BRAZO_DER, AssetConstants::ModelPaths::GOJOBRAZODER);
+	loadModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, AssetConstants::ModelPaths::GOJOPIERNAIZQ);
+	loadModel(AssetConstants::ModelNames::GOJO_PIERNA_DER, AssetConstants::ModelPaths::GOJOPIERNADER);
+	loadModel(AssetConstants::ModelNames::GOJO_RODILLA_IZQ, AssetConstants::ModelPaths::GOJORODILLAIZQ);
+	loadModel(AssetConstants::ModelNames::GOJO_RODILLA_DER, AssetConstants::ModelPaths::GOJORODILLADER);
+
+	//Modelo prueba escenario
+	loadModel(AssetConstants::ModelNames::ESCENARIOAZTECA, AssetConstants::ModelPaths::ESCENARIOAZTECA);
+
+	//Modelos para el mercado
+	loadModel(AssetConstants::ModelNames::CARPAVACIA, AssetConstants::ModelPaths::CARPAVACIA);
+	loadModel(AssetConstants::ModelNames::CARPAYMESA, AssetConstants::ModelPaths::CARPAYMESA);
+	loadModel(AssetConstants::ModelNames::CARPABUENA, AssetConstants::ModelPaths::CARPABUENA);
+	loadModel(AssetConstants::ModelNames::PUESTOPESCADOS, AssetConstants::ModelPaths::PUESTOPESCADOS);
+	loadModel(AssetConstants::ModelNames::PUESTOKEKAS, AssetConstants::ModelPaths::PUESTOKEKAS);
 	// Cargar modelos de Luchador (jerárquico)
 	loadModel(AssetConstants::ModelNames::LUCHADOR_TORSO, AssetConstants::ModelPaths::LUCHADOR_TORSO);
 	loadModel(AssetConstants::ModelNames::LUCHADOR_BRAZO_DERECHO, AssetConstants::ModelPaths::LUCHADOR_BRAZO_DERECHO);

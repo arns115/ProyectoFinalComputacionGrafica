@@ -167,6 +167,9 @@ private:
     void crearPiso();
     void crearObjetosGeometricos(); 
     void crearIsaac();
+    void crearGojo(); // Nueva función para crear Gojo jerárquico
+	void creaEscenarioAzteca();
+	void creaCarpa ();
     void crearLuchador();
     void crearCabezaOlmeca();
     void crearHollow();

@@ -62,6 +62,24 @@ namespace AssetConstants {
 		const std::string ISAAC_PIERNA_IZQUIERDA = "isaac_pierna_izquierda";
 		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
 
+		// Modelos para Gojo (jerarquia)
+		const std::string GOJO = "gojo"; // modelo principal
+		const std::string GOJO_BRAZO_IZQ = "gojobrazoizq";
+		const std::string GOJO_BRAZO_DER = "gojobrazoder";
+		const std::string GOJO_PIERNA_IZQ = "gojopiernaizq";
+		const std::string GOJO_PIERNA_DER = "gojopiernader";
+		const std::string GOJO_RODILLA_IZQ = "gojorodillaizq";
+		const std::string GOJO_RODILLA_DER = "gojorodillader";
+
+		//ESCENARIO AZTECA
+		const std::string ESCENARIOAZTECA = "escenarioazteca";
+
+		//Modelos para el mercado
+		const std::string CARPAVACIA = "carpavacia";
+		const std::string CARPAYMESA = "carpaymesa";
+		const std::string CARPABUENA = "carpabuena";
+		const std::string PUESTOPESCADOS = "puestopescados";
+		const std::string PUESTOKEKAS = "puestokekas";
 		// Luchador - modelo jerárquico
 		const std::string LUCHADOR_TORSO = "luchador_torso";
 		const std::string LUCHADOR_BRAZO_DERECHO = "luchador_brazo_derecho";
@@ -185,6 +203,24 @@ namespace AssetConstants {
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
 
+		// Rutas para modelos de Gojo (jerarquia)
+		const std::string GOJO = MODEL_PATH + "gojo.obj";
+		const std::string GOJOBRAZOIZQ = MODEL_PATH + "gojobrazoizq.obj";
+		const std::string GOJOBRAZODER = MODEL_PATH + "gojobrazoder.obj";
+		const std::string GOJOPIERNAIZQ = MODEL_PATH + "gojopiernaizq.obj";
+		const std::string GOJOPIERNADER = MODEL_PATH + "gojopiernader.obj";
+		const std::string GOJORODILLAIZQ = MODEL_PATH + "gojorodillaizq.obj";
+		const std::string GOJORODILLADER = MODEL_PATH + "gojorodillader.obj";
+
+		//ESCENARIO AZTECA
+		const std::string ESCENARIOAZTECA = MODEL_PATH + "escenarioazteca.obj";
+
+		//Modelos para el mercado
+		const std::string CARPAVACIA = MODEL_PATH + "carpavacia.obj";
+		const std::string CARPAYMESA = MODEL_PATH + "carpaymesa.obj";
+		const std::string CARPABUENA = MODEL_PATH + "carpabuena.obj";
+		const std::string PUESTOPESCADOS = MODEL_PATH + "puestopescados.obj";
+		const std::string PUESTOKEKAS = MODEL_PATH + "puestokekas.obj";
 		// Luchador - modelo jerárquico
 		const std::string LUCHADOR_TORSO = MODEL_PATH + "luchador_torso.obj";
 		const std::string LUCHADOR_BRAZO_DERECHO = MODEL_PATH + "luchador_brazo_derecho.obj";
