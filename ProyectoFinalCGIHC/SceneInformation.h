@@ -167,10 +167,12 @@ private:
     void crearPiso();
     void crearObjetosGeometricos(); 
     void crearIsaac();
+    void crearLuchador();
     void crearCabezaOlmeca();
     void crearHollow();
 	void crearBossRoom();
     void crearPiramide();
+    void crearPrimo();
     void crearCamino();
     void crearChinampaAgua();
     void crearIslas();

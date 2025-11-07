@@ -12,6 +12,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ARBOL_C, AssetConstants::ModelPaths::ARBOL_C);
 	loadModel(AssetConstants::ModelNames::CANOA, AssetConstants::ModelPaths::CANOA);
 	loadModel(AssetConstants::ModelNames::MAYA_CANOA, AssetConstants::ModelPaths::MAYA_CANOA);
+	loadModel(AssetConstants::ModelNames::PRIMO, AssetConstants::ModelPaths::PRIMO);
 
 	loadModel(AssetConstants::ModelNames::CABEZA_HOLLOW, AssetConstants::ModelPaths::CABEZA_HOLLOW);
 	loadModel(AssetConstants::ModelNames::CUERPO1_HOLLOW, AssetConstants::ModelPaths::CUERPO1_HOLLOW);
@@ -44,6 +45,14 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
 
+	// Cargar modelos de Luchador (jerárquico)
+	loadModel(AssetConstants::ModelNames::LUCHADOR_TORSO, AssetConstants::ModelPaths::LUCHADOR_TORSO);
+	loadModel(AssetConstants::ModelNames::LUCHADOR_BRAZO_DERECHO, AssetConstants::ModelPaths::LUCHADOR_BRAZO_DERECHO);
+	loadModel(AssetConstants::ModelNames::LUCHADOR_BRAZO_IZQUIERDO, AssetConstants::ModelPaths::LUCHADOR_BRAZO_IZQUIERDO);
+	loadModel(AssetConstants::ModelNames::LUCHADOR_ANTEBRAZO_IZQUIERDO, AssetConstants::ModelPaths::LUCHADOR_ANTEBRAZO_IZQUIERDO);
+	loadModel(AssetConstants::ModelNames::LUCHADOR_MUSLOS, AssetConstants::ModelPaths::LUCHADOR_MUSLOS);
+	loadModel(AssetConstants::ModelNames::LUCHADOR_PIERNAS, AssetConstants::ModelPaths::LUCHADOR_PIERNAS);
+  
 	// Boss room y secret room
 	loadModel(AssetConstants::ModelNames::BOSS_ROOM, AssetConstants::ModelPaths::BOSS_ROOM);
 	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
