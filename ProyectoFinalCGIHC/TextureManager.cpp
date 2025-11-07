@@ -13,6 +13,8 @@ TextureManager::TextureManager()
 	// Cargar texturas de Cuphead
 	loadTexture(AssetConstants::TextureNames::CUPHEAD_TEXTURE, AssetConstants::TexturePaths::CUPHEAD_TEXTURE_PATH);
 	loadTexture(AssetConstants::TextureNames::POPOTE_ROJO, AssetConstants::TexturePaths::POPOTE_ROJO_PATH);
+
+	loadTexture(AssetConstants::TextureNames::CAUCHO, AssetConstants::TexturePaths::CAUCHO_PATH);
 }
 
 // Obtiene una textura por su nombre 

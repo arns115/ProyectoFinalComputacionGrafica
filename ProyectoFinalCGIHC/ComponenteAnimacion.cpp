@@ -75,6 +75,16 @@ namespace {
     float hollowFase = 0.0f;                             // Fase de ondulación
     float hollowAngulo = 0.0f;                           // Ángulo de ondulación
     
+    // Variables para ComidaPerro 
+    const float COMIDA_PERRO_AMPLITUD = 0.3f;           // Amplitud del movimiento vertical
+    const float COMIDA_PERRO_FRECUENCIA = 2.0f / 60;    // Frecuencia del movimiento (ciclos por frame)
+    float comidaPerroTiempo = 0.0f;                      // Tiempo acumulado para la animación
+    
+    // Variables para Puerta
+    const float PUERTA_VELOCIDAD = 5.0f / 60;                 // Velocidad de movimiento de la puerta
+    const float PUERTA_DISTANCIA_TOTAL = 10.0f;           // Distancia total que baja la puerta
+    bool puertaBajando = true;                           // true = bajando (abriendo), false = subiendo (cerrando)
+    
     // Quaternion para guardar rotación pre-salto
     glm::quat rotacionPreSaltoQuat(1.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -131,6 +141,12 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
     else if (entidad->nombreObjeto == "hollow") {
         animarHollow(indiceAnimacion, deltaTime);
     }
+    else if (entidad->nombreObjeto == "comida_perro") {
+		animarComidaPerro(indiceAnimacion, deltaTime);
+    }
+    else if(entidad->nombreObjeto == "puerta_secret_room") {
+        animarPuerta(indiceAnimacion, deltaTime);
+	}
     else if (entidad->nombreObjeto == "cuphead_torso") {
         // Índice 0: Animación de caminata
         // Índice 1: Animación de salto
@@ -140,6 +156,7 @@ void ComponenteAnimacion::actualizarAnimacion(int indiceAnimacion, float deltaTi
         else if (indiceAnimacion == 1) {
             animarCupheadSalto(indiceAnimacion, deltaTime);
         }
+
     }
 }
 
@@ -166,7 +183,7 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     else if (animacionActiva) {
         // Continuar hasta completar el ciclo
         tiemposAnimacion[indiceAnimacion] += deltaTime * velocidadesAnimacion[indiceAnimacion];
-        
+
         // Verificar si ya termino la animacion
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
             // Ajustar el tiempo para que se posicionen bien las partes del cuerpo
@@ -521,7 +538,6 @@ void ComponenteAnimacion::animarCuphead(int indiceAnimacion, float deltaTime, fl
 
 }
 
-
 // Animación de salto con mortal para Cuphead
 void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTime)
 {
@@ -710,5 +726,136 @@ void ComponenteAnimacion::animarCupheadSalto(int indiceAnimacion, float deltaTim
     
     // Actualizar transformación del torso
     entidad->actualizarTransformacion();
+}
+
+// Animacion para el item de la secret room (sube y baja todo el tiempo)
+void ComponenteAnimacion::animarComidaPerro(int indiceAnimacion, float deltaTime) {
+    if (entidad == nullptr) {
+        return;
+    }
+    
+    animacionActiva = estaActiva(indiceAnimacion);
+    
+    // Activar la animación si no está activa
+    if (!animacionActiva) {
+        activarAnimacion(indiceAnimacion);
+    }
+    
+    // Acumular tiempo para el movimiento sinusoidal
+    comidaPerroTiempo += deltaTime * COMIDA_PERRO_FRECUENCIA;
+    
+    // Mantener el tiempo en el rango 0 y 2 * pi
+    if (comidaPerroTiempo >= glm::two_pi<float>()) {
+        comidaPerroTiempo -= glm::two_pi<float>();
+    }
+
+    // Aplicar el desplazamiento 
+    entidad->posicionLocal.y = entidad->posicionInicial.y + sin(comidaPerroTiempo) * COMIDA_PERRO_AMPLITUD;
+    
+    // Actualizar transformación
+    entidad->actualizarTransformacion();
+}
+
+// Animacion para la puerta de la secret room (abre y cierra verticalmente)
+void ComponenteAnimacion::animarPuerta(int indiceAnimacion, float deltaTime) {
+    if (entidad == nullptr) {
+        return;
+    }
+    
+    animacionActiva = estaActiva(indiceAnimacion);
+    
+    
+    // Calcular el desplazamiento hacia abajo
+    if (puertaBajando) {
+        // Abrir la puerta (bajar)
+        entidad->posicionLocal.y -= PUERTA_VELOCIDAD * deltaTime;
+        
+        // Verificar si ya se termino la animacion
+        if (entidad->posicionLocal.y <= entidad->posicionInicial.y - PUERTA_DISTANCIA_TOTAL) {
+            entidad->posicionLocal.y = entidad->posicionInicial.y - PUERTA_DISTANCIA_TOTAL;
+            puertaBajando = false;  // Cambiar dirección para la próxima activación
+            desactivarAnimacion(indiceAnimacion);  // Terminar animación
+        }
+    } else {
+        // Cerrar la puerta *subir)
+        entidad->posicionLocal.y += PUERTA_VELOCIDAD * deltaTime;
+        
+        // Verificar si llegó a la posición inicial
+        if (entidad->posicionLocal.y >= entidad->posicionInicial.y) {
+            entidad->posicionLocal.y = entidad->posicionInicial.y;
+            puertaBajando = true;                // Cambiar direccino
+            desactivarAnimacion(indiceAnimacion);  // Se termina la animacion
+        }
+    }
+    
+    // Actualizar transformación
+    entidad->actualizarTransformacion();
+}
+
+void ComponenteAnimacion::cargarKeyframes(void)
+{
+    std::ifstream file(std::string("keyframes_" + entidad->nombreObjeto + ".txt"));
+
+    while (file >> KeyFrame[FrameIndex].movX
+        >> KeyFrame[FrameIndex].movY
+        >> KeyFrame[FrameIndex].movZ
+        >> KeyFrame[FrameIndex].giroX
+        >> KeyFrame[FrameIndex].giroY
+        >> KeyFrame[FrameIndex].giroZ)
+    {
+        FrameIndex++;
+    }
+
+    file.close();
+}
+
+void ComponenteAnimacion::interpolation(void)
+{
+    KeyFrame[playIndex].movXInc = (KeyFrame[playIndex + 1].movX - KeyFrame[playIndex].movX) / i_max_steps;
+    KeyFrame[playIndex].movYInc = (KeyFrame[playIndex + 1].movY - KeyFrame[playIndex].movY) / i_max_steps;
+    KeyFrame[playIndex].movZInc = (KeyFrame[playIndex + 1].movZ - KeyFrame[playIndex].movZ) / i_max_steps;
+    KeyFrame[playIndex].giroYInc = (KeyFrame[playIndex + 1].giroY - KeyFrame[playIndex].giroY) / i_max_steps;
+    KeyFrame[playIndex].giroXInc = (KeyFrame[playIndex + 1].giroX - KeyFrame[playIndex].giroX) / i_max_steps;
+    KeyFrame[playIndex].giroZInc = (KeyFrame[playIndex + 1].giroZ - KeyFrame[playIndex].giroZ) / i_max_steps;
+}
+
+void ComponenteAnimacion::animateKeyframes(void)
+{
+    //Movimiento del objeto con barra espaciadora
+    if (play)
+    {
+        if (i_curr_steps >= i_max_steps) //fin de animación entre frames?
+        {
+            playIndex++;
+            printf("playindex : %d\n", playIndex);
+            if (playIndex > FrameIndex - 2)	//Fin de toda la animación con último frame?
+            {
+                printf("Frame index= %d\n", FrameIndex);
+                printf("termino la animacion\n");
+                playIndex = 0;
+                play = false;
+            }
+            else //Interpolación del próximo cuadro
+            {
+
+                i_curr_steps = 0; //Resetea contador
+                //Interpolar
+                interpolation();
+            }
+        }
+        else
+        {
+            //Dibujar Animación
+            entidad->posicionLocal.x += KeyFrame[playIndex].movXInc;
+            entidad->posicionLocal.y += KeyFrame[playIndex].movYInc;
+            entidad->posicionLocal.z += KeyFrame[playIndex].movZInc;
+            entidad->rotacionLocal.x += KeyFrame[playIndex].giroXInc;
+            entidad->rotacionLocal.y += KeyFrame[playIndex].giroYInc;
+            entidad->rotacionLocal.z += KeyFrame[playIndex].giroZInc;
+            entidad->actualizarTransformacion();
+            i_curr_steps++;
+        }
+
+    }
 }
 

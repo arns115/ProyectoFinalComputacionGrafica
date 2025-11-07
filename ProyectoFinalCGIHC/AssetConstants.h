@@ -17,6 +17,7 @@ namespace AssetConstants {
 		// Texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE = "cuphead_texture";
 		const std::string POPOTE_ROJO = "popote_rojo";
+		const std::string CAUCHO = "caucho";
 	}
 
 
@@ -72,8 +73,20 @@ namespace AssetConstants {
 		// Boss room
 		const std::string BOSS_ROOM = "boss_room";
 		const std::string SECRET_ROOM = "secret_room";
+		const std::string PUERTA_SECRET_ROOM = "puerta_secret_room";
 		const std::string R_KEY = "r_key";
 
+
+		// Fogatas
+		const std::string FUEGO_ROJO = "fuego_rojo";
+		const std::string FUEGO_MORADO = "fuego_morado";
+		const std::string FUEGO_AZUL = "fuego_azul";
+
+		// Item de comida de perro (Binding of Isaac)
+		const std::string COMIDA_PERRO = "comida_perro";
+		const std::string PEDESTAL_PIEDRA = "pedestal_piedra";
+	
+		const std::string RING_PELEA = "ring_pelea";
 	}
 
 	// Nombres de meshes
@@ -103,7 +116,8 @@ namespace AssetConstants {
 		const std::string SOL = "sol";  
 		
 		// Luces puntuales
-		const std::string PUNTUAL_ROJA = "puntual_roja"; 
+		const std::string PUNTUAL_ROJA = "puntual_roja";
+		const std::string PUNTUAL_AZUL = "puntual_azul";
 		
 		// Spotlights
 		const std::string LINTERNA = "linterna";  
@@ -122,6 +136,8 @@ namespace AssetConstants {
 		// Rutas de texturas de Cuphead
 		const std::string CUPHEAD_TEXTURE_PATH = TEXTURE_PATH + "cuphead_texture.png";
 		const std::string POPOTE_ROJO_PATH = TEXTURE_PATH + "popote_rojo.png";
+
+		const std::string CAUCHO_PATH = TEXTURE_PATH + "caucho.png";
 	}
 
 	// Rutas de modelos
@@ -176,12 +192,26 @@ namespace AssetConstants {
 		const std::string LUCHADOR_ANTEBRAZO_IZQUIERDO = MODEL_PATH + "luchador_antebrazo_izquierdo.obj";
 		const std::string LUCHADOR_MUSLOS = MODEL_PATH + "luchador_muslos.obj";
 		const std::string LUCHADOR_PIERNAS = MODEL_PATH + "luchador_piernas.obj";
+    
+		// Fogatas
+		const std::string FUEGO_ROJO = MODEL_PATH + "fuego_rojo.obj";
+		const std::string FUEGO_MORADO = MODEL_PATH + "fuego_morado.obj";
+		const std::string FUEGO_AZUL = MODEL_PATH + "fuego_azul.obj";
+
 
 		// Boss room
 		const std::string BOSS_ROOM = MODEL_PATH + "boss_room.obj";
 		const std::string SECRET_ROOM = MODEL_PATH + "secret_room.obj";
+		const std::string PUERTA_SECRET_ROOM = MODEL_PATH + "puerta_secret_room.obj";
 
-		const std::string R_KEY = "r_key.obj";
+		const std::string R_KEY = MODEL_PATH + "r_key.obj";
+
+		// Item de comida de perro (Binding of Isaac)
+		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
+		const std::string PEDESTAL_PIEDRA = MODEL_PATH + "pedestal_piedra.obj";
+
+		// Ring de pelea
+		const std::string RING_PELEA = MODEL_PATH + "ring_pelea.obj";
 	}
 
 	// Nombres de shaders

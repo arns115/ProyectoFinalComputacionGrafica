@@ -26,6 +26,13 @@ LightManager::LightManager()
 		0.3f, 0.2f, 0.1f);
 
 
+	loadPointLight(AssetConstants::LightNames::PUNTUAL_AZUL,
+		0.12f, 0.31f, 1.0f,                 // Azul
+		0.3f, 1.0f,
+		-5.0f, 2.0f, 0.0f,
+		0.1f, 0.05f, 0.0f);
+
+
 	// Cargar spotlights predefinidos
 	loadSpotLight(AssetConstants::LightNames::LINTERNA,
 		1.0f, 1.0f, 1.0f,

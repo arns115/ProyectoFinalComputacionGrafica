@@ -40,12 +40,75 @@ void SceneInformation::inicializarCamara(glm::vec3 startPosition,
     camera = Camera(startPosition, startUp, startYaw, startPitch, startMoveSpeed, startTurnSpeed);
 }
 
+// Funcion para inicializar la skybox
+void SceneInformation::inicializarSkybox()
+{
+    // Establecer el skybox por defecto
+    setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
+}
+
+// Funcion para inicializar la luz direccional
+void SceneInformation::inicializarLuces()
+{
+    // Obtener la luz del sol desde el LightManager
+    DirectionalLight* nightLight = lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
+
+    if (nightLight != nullptr) {
+        // Establecer la luz del sol como luz direccional principal
+        luzDireccional = *nightLight;
+    }
+    else {
+        // Si no existe, crear una luz direccional por defecto
+        luzDireccional = DirectionalLight(
+            1.0f, 1.0f, 1.0f,
+            0.3f, 0.5f,
+            0.0f, -1.0f, 0.0f
+        );
+    }
+
+
+}
+
+// Funcion para inicializar todas las entidades
+void SceneInformation::inicializarEntidades()
+{
+    crearPiso();
+    crearCamino();
+    crearIslas();
+    crearChinampaAgua();
+    crearObjetosGeometricos();
+    crearCabezaOlmeca();
+    crearPiramide();
+    crearHollow();
+    crearBossRoom();
+    crearSecretRoom();
+    crearFogatas();
+    crearComidaPerro();
+    crearPuertaSecreta();
+    crearArbolesAlrededorChinampa();
+    crearCanoa();
+    crearCanchaPelotaMaya();
+	  crearPelotaDeJuegoDePelota();
+    crearPrimo();               
+    crearLuchador();   
+
+    // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
+    // Primero Cuphead
+    // Segundo Isaac
+    // Tercero Gojo
+    crearPersonajePrincipal();
+    crearIsaac();
+    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
+
+
+}
+
 // Funcion para actualizar cada frame con las cosas que no dependen del input del usuario
 void SceneInformation::actualizarFrame(float deltaTime)
 {
     // Actualizar el ciclo dia/noche
     acumuladorTiempoDesdeCambio += deltaTime;
-    if (acumuladorTiempoDesdeCambio >= 60.0f / LIMIT_FPS) // 60 segundos = 1 minuto
+    if (acumuladorTiempoDesdeCambio >= 30.0f / LIMIT_FPS) // 30 segundos = 1 minuto
     {
         esDeDia = !esDeDia; // Cambiar entre dia y noche
         acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
@@ -76,10 +139,25 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
 	// Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
-        if (entidad != nullptr && entidad->animacion != nullptr) {
+        if (entidad != nullptr) {
             if (entidad->nombreObjeto == "hollow") {
-                entidad->animacion->actualizarAnimacion(1, deltaTime, 1.0);
+                entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
+            if (entidad->nombreObjeto == "pedestal_piedra") {
+                entidad->hijos[0]->animacion->actualizarAnimacion(0, deltaTime, 1.0);
+            }
+            if (entidad->nombreObjeto == "fuego_azul" || entidad->nombreObjeto == "fuego_azul2") {
+				pointLightActual = *lightManager.getPointLight(AssetConstants::LightNames::PUNTUAL_AZUL);
+				pointLightActual.setPosition(entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f));
+				agregarLuzPuntualActual(pointLightActual);
+            }
+            // si esta activa la animacion se llama a la funcion de actualizarala
+            if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
+				entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
+            }
+            if(entidad->nombreObjeto == "pelota") {
+                entidad->animacion->animateKeyframes();
+			}
         }
     }
 
@@ -119,6 +197,21 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         personajeActual = 3;
 
     }
+	// Se itera sobre las entidades para hacer acciones especificas
+    for (auto* entidad : entidades) {
+        if (entidad->nombreObjeto == "puerta_secret_room") {
+            // Z: Se abre o cierra la puerta secreta
+            if (keys[GLFW_KEY_Z]) {
+				entidad->animacion->activarAnimacion(0); // Activar animacion de abrir puerta
+            }
+        }
+		// P: Lanza la pelota del juego de pelota maya
+        if (entidad->nombreObjeto == "pelota") {
+            if (keys[GLFW_KEY_P]) {
+				entidad->animacion->play = true;
+            }
+        }
+    }
     
     // G: Activar/Desactivar animación de la canoa
     static bool teclaGPresionada = false;
@@ -130,66 +223,6 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     } else {
         teclaGPresionada = false;
     }
-
-
-}
-
-// Funcion para inicializar la skybox
-void SceneInformation::inicializarSkybox()
-{
-    // Establecer el skybox por defecto
-    setSkyboxActual(AssetConstants::SkyboxNames::DAY);
-}
-
-// Funcion para inicializar la luz direccional
-void SceneInformation::inicializarLuces()
-{
-    // Obtener la luz del sol desde el LightManager
-    DirectionalLight* sunLight = lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
-    
-    if (sunLight != nullptr) {
-        // Establecer la luz del sol como luz direccional principal
-        luzDireccional = *sunLight;
-    } else {
-        // Si no existe, crear una luz direccional por defecto
-        luzDireccional = DirectionalLight(
-            1.0f, 1.0f, 1.0f,      
-            0.3f, 0.5f,           
-            0.0f, -1.0f, 0.0f     
-        );
-    }
-    
-
-}
-
-// Funcion para inicializar todas las entidades
-void SceneInformation::inicializarEntidades()
-{
-    crearPiso();
-    crearCamino();
-    crearChinampaAgua();
-    crearIslas();
-    crearArbolesAlrededorChinampa();
-    crearCanoa();
-    crearCanchaPelotaMaya();
-    crearObjetosGeometricos();
-	crearCabezaOlmeca();
-    crearPiramide();
-    crearPrimo();  // Agregar Primo cerca de la pirámide
-    crearLuchador();  // Agregar Luchador cerca de la pirámide (no jugable)
-    crearHollow();
-    crearObjetosGeometricos(); 
-    crearBossRoom();
-	crearSecretRoom();
-
-
-	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
-    // Primero Cuphead
-	// Segundo Isaac
-    // Tercero Isaac (temporal)
-    crearPersonajePrincipal();
-	crearIsaac();
-    crearIsaac(); // se crea por segunda vez en lo que se agrega a gojo
 
 
 }
@@ -445,18 +478,10 @@ void SceneInformation::crearIsaac()
 // Crear al luchador con modelo jerárquico
 void SceneInformation::crearLuchador()
 {
-    // Jerarquía del luchador:
-    // luchador_torso (raíz)
-    //   ├── luchador_brazo_derecho
-    //   ├── luchador_brazo_izquierdo
-    //   │   └── luchador_antebrazo_izquierdo
-    //   └── luchador_muslos
-    //       └── luchador_piernas
-    
     // 1. Crear el torso (raíz)
-    // Posicionar cerca de la pirámide (que está en 0, -4, -150)
+    // Posicionar cerca de la pirámide
     Entidad* luchador_torso = new Entidad("luchador_torso",
-        glm::vec3(-25.0f, -1.0f, -150.0f),    // Posición cerca de la pirámide (lado izquierdo)
+        glm::vec3(-25.0f, -1.0f, -150.0f),    // Posición cerca de la pirámide
         glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
         glm::vec3(2.0f, 2.0f, 2.0f));          // Escala 2x
     
@@ -577,8 +602,114 @@ void SceneInformation::crearSecretRoom() {
 	room->setTipoObjeto(TipoObjeto::MODELO);
 	room->nombreModelo = AssetConstants::ModelNames::SECRET_ROOM;
 	room->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-	room->actualizarTransformacion();
 	agregarEntidad(room);
+}
+
+// Crear puerta secreta
+void SceneInformation::crearPuertaSecreta() {
+    Entidad* puerta = new Entidad("puerta_secret_room",
+        glm::vec3(180.2f, 1.3f, 183.7f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(5.0f, 5.0f, 5.0f));      // Escala
+
+    puerta->setTipoObjeto(TipoObjeto::MODELO);
+    puerta->nombreModelo = AssetConstants::ModelNames::PUERTA_SECRET_ROOM;
+    puerta->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    
+    puerta->animacion = new ComponenteAnimacion(puerta);
+
+	agregarEntidad(puerta);
+}
+
+// Crear fogatas en la escena
+void SceneInformation::crearFogatas(){
+    Entidad* fogata1 = new Entidad("fuego_rojo",
+        glm::vec3(-50.0f, -1.0f, 50.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(0.5f, 0.5f, 0.5f));      // Escala
+
+    fogata1->setTipoObjeto(TipoObjeto::MODELO);
+    fogata1->nombreModelo = AssetConstants::ModelNames::FUEGO_ROJO;
+	fogata1->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata1);
+
+    Entidad* fogata2 = new Entidad("fuego_azul",
+        glm::vec3(195.0f, -1.0f, 210.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
+
+    fogata2->setTipoObjeto(TipoObjeto::MODELO);
+	fogata2->nombreModelo = AssetConstants::ModelNames::FUEGO_AZUL;
+    fogata2->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata2);
+
+    Entidad* fogata4 = new Entidad("fuego_azul2",
+        glm::vec3(165.0f, -1.0f, 210.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+        glm::vec3(0.3f, 0.3f, 0.3f));      // Escala
+
+    fogata4->setTipoObjeto(TipoObjeto::MODELO);
+    fogata4->nombreModelo = AssetConstants::ModelNames::FUEGO_AZUL;
+    fogata4->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+    agregarEntidad(fogata4);
+
+    Entidad* fogata3 = new Entidad("fuego_morado",
+        glm::vec3(0.0f, -1.0f, -50.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(0.3f, 0.5f, 0.5f));      // Escala
+
+	fogata3->setTipoObjeto(TipoObjeto::MODELO);
+    fogata3->nombreModelo = AssetConstants::ModelNames::FUEGO_MORADO;
+	fogata3->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	agregarEntidad(fogata3);
+
+}
+
+// Crea el objeto flotante de RKey de Isaac para posicionarlo en la secret room
+void SceneInformation::crearRKey() {
+    Entidad* rkey = new Entidad("rkey",
+        glm::vec3(0.0f, 15.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    rkey->setTipoObjeto(TipoObjeto::MODELO);
+    rkey->nombreModelo = AssetConstants::ModelNames::R_KEY;
+    rkey->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+	agregarEntidad(rkey);
+
+
+}
+
+// Crear item de isaac
+void SceneInformation::crearComidaPerro() {
+
+    Entidad* pedestal = new Entidad("pedestal_piedra",
+        glm::vec3(180.0f, -1.0f, 200.0f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(2.0f, 2.0f, 2.0f));      // Escala
+
+	pedestal->setTipoObjeto(TipoObjeto::MODELO);
+	pedestal->nombreModelo = AssetConstants::ModelNames::PEDESTAL_PIEDRA;
+	pedestal->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+
+
+    Entidad* comida = new Entidad("comida_perro",
+        glm::vec3(0.0f, 0.0f, 0.0f),      // Posición inicial
+        glm::vec3(0.0f, 180.0f, 0.0f),     // Rotación
+        glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+    comida->setTipoObjeto(TipoObjeto::MODELO);
+    comida->nombreModelo = AssetConstants::ModelNames::COMIDA_PERRO;
+    comida->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+    comida->animacion = new ComponenteAnimacion(comida);
+
+	pedestal->agregarHijo(comida);
+
+    agregarEntidad(pedestal);
 }
 
 // Crear entidad de la cabeza olmeca
@@ -621,8 +752,19 @@ void SceneInformation::crearPiramide()
     piramide->setTipoObjeto(TipoObjeto::MODELO);
     piramide->nombreModelo = AssetConstants::ModelNames::PIRAMIDE;
     piramide->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-    piramide->actualizarTransformacion();
+
+    Entidad* ring = new Entidad("ring_pelea",
+        glm::vec3(2.0f, 36.2f, 0.5f),      // Posición inicial
+        glm::vec3(0.0f, 0.0f, 0.0f),         // Rotación
+		glm::vec3(0.9f, 0.9f, 0.9f));        // Escala
+
+	ring->setTipoObjeto(TipoObjeto::MODELO);
+	ring->nombreModelo = AssetConstants::ModelNames::RING_PELEA;    
+	ring->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+
+	piramide->agregarHijo(ring);
     agregarEntidad(piramide);
+
 }
 
 // Crear entidad del camino empedrado
@@ -1278,6 +1420,25 @@ void SceneInformation::crearPiso()
     agregarEntidad(piso);
 }
 
+// Crear pelota del juego de pelota
+void SceneInformation::crearPelotaDeJuegoDePelota() {
+
+    Entidad* pelota = new Entidad("pelota",
+        glm::vec3(132.0f, 6.0f, 75.0f),      // Posición inicial
+		glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
+		glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
+
+    pelota->setTipoObjeto(TipoObjeto::MESH);
+    pelota->nombreMesh = AssetConstants::MeshNames::ESFERA;
+    pelota->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    pelota->nombreTextura = AssetConstants::TextureNames::CAUCHO;
+    // Crear y configurar componente de animación
+    pelota->animacion = new ComponenteAnimacion(pelota);
+    pelota->animacion->cargarKeyframes();
+	agregarEntidad(pelota);
+
+}
+
 void SceneInformation::crearObjetosGeometricos()
 {
     // Crear esfera de prueba 1 - Flotando en el aire
@@ -1383,17 +1544,38 @@ void SceneInformation::setLuzDireccional(const DirectionalLight& light)
     luzDireccional = light;
 }
 
+// La mas lejana se elimina
 bool SceneInformation::agregarLuzPuntualActual(const PointLight& light)
 {
-    if (pointLightCountActual >= MAX_POINT_LIGHTS) {
-        return false; // No hay espacio para más luces actuales
+    // Si hay espacio disponible, agregar directamente
+    if (pointLightCountActual < MAX_POINT_LIGHTS) {
+        pointLightsActuales[pointLightCountActual] = light;
+        pointLightCountActual++;
+        return true;
     }
     
-    // Agregar al arreglo de luces actuales
-    pointLightsActuales[pointLightCountActual] = light;
-    pointLightCountActual++;
+    // Si no hay espacio, buscar y reemplazar la luz más lejana en un solo paso
+    distanciaMaxima = glm::distance(camera.getCameraPosition(), light.GetPosition());
+    indiceLuzMasLejana = -1;
     
-    return true;
+    // Buscar la luz más lejana
+    for (int i = 0; i < pointLightCountActual; i++) {
+        distanciaLuzActual = glm::distance(camera.getCameraPosition(), pointLightsActuales[i].GetPosition());
+        
+        if (distanciaLuzActual > distanciaMaxima) {
+            distanciaMaxima = distanciaLuzActual;
+            indiceLuzMasLejana = i;
+        }
+    }
+    
+    // Si encontramos una luz más lejana, reemplazarla y retornar true
+    if (indiceLuzMasLejana != -1) {
+        pointLightsActuales[indiceLuzMasLejana] = light;
+        return true;
+    }
+    
+    // La nueva luz está más lejos que todas las existentes, no agregarla
+    return false;
 }
 
 void SceneInformation::limpiarLucesPuntualesActuales()
