@@ -130,14 +130,16 @@ void SceneInformation::inicializarEntidades()
     crearPiso();
     crearObjetosGeometricos();  // NUEVO
 
-
+    creaEscenarioAzteca();
+	creaCarpa();
 	// Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
 	// Segundo Isaac
     // Tercero Gojo
     crearPersonajePrincipal();
-	  crearIsaac();
+	crearIsaac();
     crearGojo(); // Crear Gojo en lugar de crear Isaac nuevamente
+	
 
 }
 
@@ -250,37 +252,55 @@ void SceneInformation::crearIsaac()
 // Nuevo: Crear jerarquía Gojo (pruebagojo y sus partes)
 void SceneInformation::crearGojo()
 {
-    Entidad* gojo_cuerpo = new Entidad("pruebagojo",
+    Entidad* gojo_cuerpo = new Entidad("gojo",
         glm::vec3(3.0f, -1.0f, 10.0f),
         glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(20.0f, 20.0f, 20.0f));
+        glm::vec3(5.0f, 5.0f, 5.0f));
+
+    Entidad* gojo_brazo_izq = new Entidad("gojobrazoizq",
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    Entidad* gojo_brazo_der = new Entidad("gojobrazoder",
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
 
     Entidad* gojo_pierna_izq = new Entidad("gojopiernaizq",
-        glm::vec3(-0.5f, 0.5f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
 
     Entidad* gojo_pierna_der = new Entidad("gojopiernader",
-        glm::vec3(0.5f, 0.5f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
 
     Entidad* gojo_rodilla_izq = new Entidad("gojorodillaizq",
-        glm::vec3(0.0f, -0.6f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
 
     Entidad* gojo_rodilla_der = new Entidad("gojorodillader",
-        glm::vec3(0.0f, -0.6f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
 
     // Configurar tipos y recursos
     gojo_cuerpo->setTipoObjeto(TipoObjeto::MODELO);
-    gojo_cuerpo->setModelo(AssetConstants::ModelNames::PRUEBAGOJO, modelManager.getModel(AssetConstants::ModelNames::PRUEBAGOJO));
+    gojo_cuerpo->setModelo(AssetConstants::ModelNames::GOJO, modelManager.getModel(AssetConstants::ModelNames::GOJO));
     gojo_cuerpo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     gojo_cuerpo->actualizarTransformacion();
-    /*
+
+	gojo_brazo_izq->setTipoObjeto(TipoObjeto::MODELO);
+	gojo_brazo_izq->setModelo(AssetConstants::ModelNames::GOJO_BRAZO_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_BRAZO_IZQ));
+	gojo_brazo_izq->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+
+	gojo_brazo_der->setTipoObjeto(TipoObjeto::MODELO);
+	gojo_brazo_der->setModelo(AssetConstants::ModelNames::GOJO_BRAZO_DER, modelManager.getModel(AssetConstants::ModelNames::GOJO_BRAZO_DER));
+	gojo_brazo_der->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));  
+
     gojo_pierna_izq->setTipoObjeto(TipoObjeto::MODELO);
     gojo_pierna_izq->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ));
     gojo_pierna_izq->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
@@ -302,8 +322,10 @@ void SceneInformation::crearGojo()
     gojo_pierna_der->agregarHijo(gojo_rodilla_der);
     gojo_cuerpo->agregarHijo(gojo_pierna_izq);
     gojo_cuerpo->agregarHijo(gojo_pierna_der);
+	gojo_cuerpo->agregarHijo(gojo_brazo_izq);
+	gojo_cuerpo->agregarHijo(gojo_brazo_der);
 
-    */
+    
     // Agregar componentes de física
     gojo_cuerpo->fisica = new ComponenteFisico();
     gojo_cuerpo->fisica->habilitar(true);
@@ -311,6 +333,95 @@ void SceneInformation::crearGojo()
 
     // Agregar a la escena
     agregarEntidad(gojo_cuerpo);
+}
+
+// Escenario azteca
+void SceneInformation::creaEscenarioAzteca()
+{
+    Entidad* escenarioazteca = new Entidad("escenarioazteca",
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(10.0f, 10.0f, 10.0f));
+
+    
+    escenarioazteca->setTipoObjeto(TipoObjeto::MODELO);
+    escenarioazteca->setModelo(AssetConstants::ModelNames::ESCENARIOAZTECA, modelManager.getModel(AssetConstants::ModelNames::ESCENARIOAZTECA));
+    escenarioazteca->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    escenarioazteca->actualizarTransformacion();
+
+    //agregarEntidad(escenarioazteca); 
+}
+
+// Mercado
+void SceneInformation::creaCarpa()
+{
+    Entidad* carpavacia = new Entidad("carpavacia",
+        glm::vec3(8.0f, -1.0f, 8.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    Entidad* carpaymesa = new Entidad("carpaymesa",
+        glm::vec3(16.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    Entidad* carpabuena = new Entidad("carpabuena",
+        glm::vec3(8.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    Entidad* puestopescados = new Entidad("puestopescados",
+        glm::vec3(20.0f, -1.0f, 5.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    Entidad* puestokekas = new Entidad("puestokekas",
+        glm::vec3(17.0f, -1.0f, 5.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    Entidad* puestokekas2 = new Entidad("puestokekas",
+        glm::vec3(-17.0f, -1.0f, 5.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(2.5f, 2.5f, 2.5f));
+
+    carpavacia->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia->actualizarTransformacion();
+
+    carpaymesa->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa->actualizarTransformacion();
+
+    carpabuena->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena->actualizarTransformacion();
+
+    puestopescados->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados->actualizarTransformacion();
+
+    puestokekas->setTipoObjeto(TipoObjeto::MODELO);
+    puestokekas->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+    puestokekas->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestokekas->actualizarTransformacion();
+
+    puestokekas2->setTipoObjeto(TipoObjeto::MODELO);
+    puestokekas2->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+    puestokekas2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestokekas2->actualizarTransformacion();
+
+
+    agregarEntidad(carpavacia); 
+	agregarEntidad(carpaymesa); 
+	agregarEntidad(carpabuena);
+	agregarEntidad(puestopescados);
+	agregarEntidad(puestokekas);
+	agregarEntidad(puestokekas2);
 }
 
 void SceneInformation::crearPiso()
