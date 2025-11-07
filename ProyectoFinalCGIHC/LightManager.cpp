@@ -7,13 +7,13 @@ LightManager::LightManager()
 	loadDirectionalLight(AssetConstants::LightNames::SOL,
 		1.0f, 1.0f, 1.0f,           // Color blanco
 		0.3f, 0.5f,
-		0.0f, -1.0f, 0.0f);
+		0.0f, 0.0f, -1.0f);
 
 
 	loadDirectionalLight(AssetConstants::LightNames::ESTRELLAS,
 		0.8f, 0.85f, 1.0f,           // Color azulado
 		0.3f, 0.5f,
-		0.0f, -1.0f, 0.0f);
+		0.0f, 0.0f, -1.0f);
 
 
 
@@ -24,6 +24,13 @@ LightManager::LightManager()
 		0.3f, 1.0f,
 		-5.0f, 2.0f, 0.0f,
 		0.3f, 0.2f, 0.1f);
+
+
+	loadPointLight(AssetConstants::LightNames::PUNTUAL_AZUL,
+		0.12f, 0.31f, 1.0f,                 // Azul
+		0.3f, 1.0f,
+		-5.0f, 2.0f, 0.0f,
+		0.1f, 0.05f, 0.0f);
 
 
 	// Cargar spotlights predefinidos

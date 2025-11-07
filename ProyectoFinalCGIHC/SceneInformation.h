@@ -23,9 +23,15 @@ public:
     SceneInformation();
     ~SceneInformation();
     
-    // Inicializar la escena creando todos los objetos
-    void inicializarEscena();
+	// Variables para luces actuales (para tomar la luz y meterla al arreglo)
+    SpotLight spotLightActual;
+    PointLight pointLightActual;
     
+    // Variables para manejar posicion y direccion de luz que se agregara a luces actuales 
+	glm::vec3 posicionLuzActual;
+	glm::vec3 direccionLuzActual;
+
+
     // Inicializar la cámara con parámetros personalizados
     void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),
                           glm::vec3 startUp = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -117,14 +123,31 @@ private:
     // Contadores de luces activas
     unsigned int pointLightCountActual;
     unsigned int spotLightCountActual;
+    
+    // Variable auxiliar para cálculo de distancias de luces
+    float distanciaLuzActual;
+    int indiceLuzMasLejana;
+    float distanciaMaxima;
 
     // Booleano para saber si es de dia
-    bool esDeDia = true;
+    bool esDeDia = false;
 	// Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
 	GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
     // Entero para saber que personaje es actualmente
 	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
+    
+
+    // Variables para animación de la canoa
+    Entidad* canoa = nullptr;
+    int estadoAnimacionCanoa = 0; // 0-7: diferentes estados del ciclo
+    float tiempoAnimacionCanoa = 0.0f;
+    float velocidadCanoa = 0.2f; // Unidades por segundo (reducido de 5.0f)
+    float velocidadRotacionCanoa = 45.0f; // Grados por segundo (reducido de 90.0f)
+    glm::vec3 posicionInicioCanoa;
+    glm::vec3 posicionDestinoCanoa;
+    float rotacionObjetivoCanoa = 0.0f;
+    bool animacionCanoaActiva = false; // Control para activar/desactivar animación
 
 
     //Funciones para inicializar componentes de la escena
@@ -142,11 +165,35 @@ private:
     // Funciones para crear entidades específicas
     void crearPersonajePrincipal();
     void crearPiso();
-    void crearObjetosGeometricos();  // NUEVO
+    void crearObjetosGeometricos(); 
     void crearIsaac();
     void crearGojo(); // Nueva función para crear Gojo jerárquico
 	void creaEscenarioAzteca();
 	void creaCarpa ();
+    void crearLuchador();
+    void crearCabezaOlmeca();
+    void crearHollow();
+	void crearBossRoom();
+    void crearPiramide();
+    void crearPrimo();
+    void crearCamino();
+    void crearChinampaAgua();
+    void crearIslas();
+    void crearSecretRoom();
+    void crearFogatas();
+	void crearComidaPerro();
+    void crearRKey();
+    void crearPuertaSecreta();
+    void crearPelotaDeJuegoDePelota();
+    void crearArbol(const std::string& tipoArbol = "A", 
+                    const glm::vec3& posicion = glm::vec3(0.0f), 
+                    const glm::vec3& rotacion = glm::vec3(0.0f),
+                    const glm::vec3& escala = glm::vec3(1.0f),
+                    const std::string& nombre = "");
+    void crearArbolesAlrededorChinampa();
+    void crearCanoa();
+    void actualizarAnimacionCanoa(float deltaTime);
+    void crearCanchaPelotaMaya();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);

@@ -104,6 +104,10 @@ void SceneRenderer::renderizarFrame(Skybox* skybox,
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    // Habilitar blending para toda la escena (transparencia)
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     // 1. Renderizar skybox primero (usa su propio shader)
     if (skybox != nullptr) {
         glm::mat4 viewMatrix = camera.calculateViewMatrix();
@@ -116,13 +120,12 @@ void SceneRenderer::renderizarFrame(Skybox* skybox,
     // 3. Configurar matrices (view, projection, y eye position)
     configurarMatrices(camera, projectionMatrix);
     
-    // 4. Inicializar color uniforme (blanco por defecto)
     glUniform3f(uniformColor, 1.0f, 1.0f, 1.0f);
     
-    // 5. Configurar luces
+    // 4. Configurar luces
     configurarLuces(directionalLight, pointLights, pointLightCount, spotLights, spotLightCount);
     
-    // 6. Renderizar todas las entidades 
+    // 5. Renderizar todas las entidades 
     renderizar(entidades);
 
 	stopShader();

@@ -6,12 +6,16 @@ Entidad::Entidad(const std::string& nombreObj,
                  glm::vec3 rot, 
                  glm::vec3 escala)
     : nombreObjeto(nombreObj), nombreModelo(""), nombreMesh(""), nombreTextura(""), nombreMaterial(""),
-      posicionLocal(pos), rotacionLocal(rot), 
+      posicionLocal(pos), rotacionLocal(glm::vec3(0.0f)), 
       escalaLocal(escala), transformacionLocal(glm::mat4(1.0f)),
-      posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),  // Guardar valores iniciales (estado inicial del objeto)
+      posicionInicial(pos), rotacionInicial(rot), escalaInicial(escala),
       TipoObjeto(TipoObjeto::MODELO), modelo(nullptr), mesh(nullptr), 
-      texture(nullptr), material(nullptr)
+      texture(nullptr), material(nullptr), fisica(nullptr), animacion(nullptr)
 {
+    rotacionLocalQuat = glm::angleAxis(glm::radians(rot.z), glm::vec3(0.0f, 0.0f, 1.0f)) * 
+                        glm::angleAxis(glm::radians(rot.y), glm::vec3(0.0f, 1.0f, 0.0f)) * 
+                        glm::angleAxis(glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotacionInicialQuat = rotacionLocalQuat;
     actualizarTransformacion();
 }
 
@@ -22,24 +26,24 @@ Entidad::~Entidad()
 
 void Entidad::actualizarTransformacion() 
 {
+    // Se actualiza la informacion del aquaternion
+    sincronizarRotacion();
+    
     transformacionLocal = glm::mat4(1.0f);
-    
-    // Aplicar traslación
+	// Se traslada adecuadamente
     transformacionLocal = glm::translate(transformacionLocal, posicionLocal);
-    
-    // Aplicar rotaciones (en orden Z, Y, X)
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.z), 
-                                     glm::vec3(0.0f, 0.0f, 1.0f));
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.y), 
-                                     glm::vec3(0.0f, 1.0f, 0.0f));
-    transformacionLocal = glm::rotate(transformacionLocal, 
-                                     glm::radians(rotacionLocal.x), 
-                                     glm::vec3(1.0f, 0.0f, 0.0f));
-    
-    // Aplicar escala
+	// Se rota adecuadamente
+    transformacionLocal *= glm::mat4_cast(rotacionLocalQuat);
+	// Se escala adecuadamente
     transformacionLocal = glm::scale(transformacionLocal, escalaLocal);
+}
+
+
+// Sincroniza la rotacion con el quaternion
+void Entidad::sincronizarRotacion() {
+    rotacionLocalQuat = rotacionLocalQuat * glm::quat(glm::radians(rotacionLocal));
+	rotacionLocalQuat = glm::normalize(rotacionLocalQuat);
+    rotacionLocal = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 void Entidad::agregarHijo(Entidad* hijo) 
@@ -92,6 +96,12 @@ void Entidad::limpiarTextura()
     this->nombreTextura = "";
     this->texture = nullptr;
 }
+
+
+
+
+
+
 
 
 
