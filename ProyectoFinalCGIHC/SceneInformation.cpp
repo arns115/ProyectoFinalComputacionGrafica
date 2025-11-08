@@ -94,6 +94,7 @@ void SceneInformation::inicializarEntidades()
     creaEscenarioAzteca();
 	creaCarpa();
     crearLamparasCalles();
+    crearLamparasRing();
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
     // Segundo Isaac
@@ -105,7 +106,7 @@ void SceneInformation::inicializarEntidades()
 
 }
 
-// Funcion para actualizar cada frame con las cosas que no dependen del input del usuario
+// Funcion para actualizar cada frame with las cosas que no dependen del input del usuario
 void SceneInformation::actualizarFrame(float deltaTime)
 {
     // Actualizar el ciclo dia/noche
@@ -177,10 +178,47 @@ void SceneInformation::actualizarFrame(float deltaTime)
                             1.0f, 0.9f, 0.7f,  // Color amarillo cálido
                             0.3f, 0.8f,         // Intensidad ambiental y difusa
                             posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
-                            0.3f, 0.1f, 0.05f   // Atenuación constante, lineal, exponencial
+                            0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
                         );
                         agregarLuzPuntualActual(pointLightActual);
                         break; // Solo necesitamos procesar una luz por lámpara
+                    }
+                }
+            }
+            
+            // Procesar lámparas del ring (base_light) y sus spotlights
+            if (entidad->nombreObjeto.find("base_light_") == 0) {
+                // Esta es una base de lámpara del ring
+                // Buscar el lamp_ring hijo y su spotlight
+                for (auto* lampRing : entidad->hijos) {
+                    if (lampRing != nullptr && lampRing->nombreObjeto.find("lamp_ring_") == 0) {
+                        // Encontramos el lamp_ring, ahora buscar el spotlight
+                        for (auto* spotlight : lampRing->hijos) {
+                            if (spotlight != nullptr && spotlight->nombreObjeto == "spotlight_ring") {
+                                // Calcular la posición mundial del spotlight usando las matrices de transformación
+                                glm::vec3 posicionMundialSpotlight = glm::vec3(
+                                    entidad->transformacionLocal * lampRing->transformacionLocal * glm::vec4(spotlight->posicionLocal, 1.0f)
+                                );
+                                
+                                // La dirección es hacia abajo y hacia el ring
+                                // El ring está aproximadamente en (2.0f, 32.2f, -149.5f)
+                                glm::vec3 posicionRing(2.0f, 32.2f, -149.5f);
+                                glm::vec3 direccionSpotlight = glm::normalize(posicionRing - posicionMundialSpotlight);
+                                
+                                // Crear spotlight blanco apuntando al ring
+                                spotLightActual = SpotLight(
+                                    1.0f, 1.0f, 1.0f,  // Color blanco
+                                    0.3f, 1.0f,         // Intensidad ambiental y difusa
+                                    posicionMundialSpotlight.x, posicionMundialSpotlight.y, posicionMundialSpotlight.z,
+                                    direccionSpotlight.x, direccionSpotlight.y, direccionSpotlight.z,
+                                    1.0f, 0.05f, 0.01f, // Atenuación constante, lineal, exponencial
+                                    30.0f               // Ángulo de apertura (edge)
+                                );
+                                agregarSpotLightActual(spotLightActual);
+                                break;
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -899,7 +937,6 @@ void SceneInformation::crearIslas()
                         glm::vec3(xAleatorio, 0.0f, zAleatorio),  // Posición aleatoria relativa al prisma
                         glm::vec3(-90.0f, 0.0f, 0.0f),            // Rotación que ajustaste
                         glm::vec3(0.009f, 0.009f, 0.009f));       // Escala que ajustaste
-                    
                     maiz->setTipoObjeto(TipoObjeto::MODELO);
                     maiz->nombreModelo = AssetConstants::ModelNames::MAIZ;
                     maiz->nombreMaterial = AssetConstants::MaterialNames::OPACO;
@@ -1656,7 +1693,7 @@ void SceneInformation::crearObjetosGeometricos()
     Entidad* esfera2 = new Entidad("esfera2",
         glm::vec3(-5.0f, 1.0f, 5.0f),     // Posición: a la izquierda
         glm::vec3(0.0f, 45.0f, 0.0f),      // Rotación de 45 grados
-        glm::vec3(1.5f, 1.5f, 1.5f));      // Escala 1.5x
+        glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
     esfera2->setTipoObjeto(TipoObjeto::MESH);
     esfera2->nombreMesh = AssetConstants::MeshNames::ESFERA;
@@ -1736,7 +1773,7 @@ void SceneInformation::crearLamparasCalles()
         lamparaIzq->setModelo(AssetConstants::ModelNames::STREET_LAMP, 
                              modelManager.getModel(AssetConstants::ModelNames::STREET_LAMP));
         lamparaIzq->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
-                               materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
         
         // Crear luz puntual como hijo de la lámpara
         // Posición relativa: encima de la lámpara (altura ajustada)
@@ -1745,8 +1782,6 @@ void SceneInformation::crearLamparasCalles()
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(1.0f, 1.0f, 1.0f));
         
-        // La luz no necesita geometría, solo almacenamos su posición
-        // Se manejará en actualizarFrame para agregar las luces puntuales
         luzIzq->nombreObjeto = "punto_luz";
         
         lamparaIzq->agregarHijo(luzIzq);
@@ -1764,7 +1799,7 @@ void SceneInformation::crearLamparasCalles()
         lamparaDer->setModelo(AssetConstants::ModelNames::STREET_LAMP,
                              modelManager.getModel(AssetConstants::ModelNames::STREET_LAMP));
         lamparaDer->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
-                               materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
         
         // Crear luz puntual como hijo de la lámpara
         Entidad* luzDer = new Entidad(nombreDer + "_luz",
@@ -1780,6 +1815,104 @@ void SceneInformation::crearLamparasCalles()
         
         contadorLampara++;
     }
+}
+
+// Crear lámparas sobre la pirámide iluminando el ring
+void SceneInformation::crearLamparasRing()
+{
+    // La pirámide está en (0.0f, -4.0f, -150.0f)
+    // El ring está en la cima de la pirámide en posición relativa (2.0f, 36.2f, 0.5f)
+    // Posición mundial del ring: (2.0f, 32.2f, -149.5f)
+    
+    glm::vec3 posicionPiramide(0.0f, -4.0f, -150.0f);
+    glm::vec3 posicionRelativaRing(2.0f, 36.2f, 0.5f);
+    glm::vec3 posicionRing = posicionPiramide + posicionRelativaRing;
+    
+    // Altura de las lámparas sobre el ring
+    float alturaLampara = 10.0f;
+    
+    // Distancia lateral desde el centro del ring
+    float distanciaLateral = 6.0f;
+    
+    // Escala de la base (cilindro)
+    glm::vec3 escalaCilindro(1.0f, 2.0f, 1.0f);
+    
+    // Escala del lamp_ring
+    glm::vec3 escalaLampRing(1.5f, 1.5f, 1.5f);
+    
+    // Crear lámpara 1 (lado izquierdo del ring)
+    Entidad* baseLamp1 = new Entidad("base_light_1",
+        glm::vec3(posicionRing.x - distanciaLateral, posicionRing.y + alturaLampara, posicionRing.z),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        escalaCilindro);
+    
+    baseLamp1->setTipoObjeto(TipoObjeto::MESH);
+    baseLamp1->setMesh(AssetConstants::MeshNames::CILINDRO,
+                       meshManager.getMesh(AssetConstants::MeshNames::CILINDRO));
+    baseLamp1->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Crear lamp_ring como hijo
+    Entidad* lampRing1 = new Entidad("lamp_ring_1",
+        glm::vec3(0.0f, 2.5f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        escalaLampRing);
+    
+    lampRing1->setTipoObjeto(TipoObjeto::MODELO);
+    lampRing1->setModelo(AssetConstants::ModelNames::LAMP_RING,
+                        modelManager.getModel(AssetConstants::ModelNames::LAMP_RING));
+    lampRing1->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Crear spotlight como hijo de lamp_ring
+    Entidad* spotlight1 = new Entidad("spotlight_ring_1",
+        glm::vec3(0.0f, 0.0f, 0.0f), // En el centro del lamp_ring
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    spotlight1->nombreObjeto = "spotlight_ring";
+    
+    lampRing1->agregarHijo(spotlight1);
+    baseLamp1->agregarHijo(lampRing1);
+    baseLamp1->actualizarTransformacion();
+    agregarEntidad(baseLamp1);
+    
+    // Crear lámpara 2 (lado derecho del ring)
+    Entidad* baseLamp2 = new Entidad("base_light_2",
+        glm::vec3(posicionRing.x + distanciaLateral, posicionRing.y + alturaLampara, posicionRing.z),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        escalaCilindro);
+    
+    baseLamp2->setTipoObjeto(TipoObjeto::MESH);
+    baseLamp2->setMesh(AssetConstants::MeshNames::CILINDRO,
+                       meshManager.getMesh(AssetConstants::MeshNames::CILINDRO));
+    baseLamp2->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Crear lamp_ring como hijo
+    Entidad* lampRing2 = new Entidad("lamp_ring_2",
+        glm::vec3(0.0f, 2.5f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        escalaLampRing);
+    
+    lampRing2->setTipoObjeto(TipoObjeto::MODELO);
+    lampRing2->setModelo(AssetConstants::ModelNames::LAMP_RING,
+                        modelManager.getModel(AssetConstants::ModelNames::LAMP_RING));
+    lampRing2->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                          materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    
+    // Crear spotlight como hijo de lamp_ring
+    Entidad* spotlight2 = new Entidad("spotlight_ring_2",
+        glm::vec3(0.0f, 0.0f, 0.0f), // En el centro del lamp_ring
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    spotlight2->nombreObjeto = "spotlight_ring";
+    
+    lampRing2->agregarHijo(spotlight2);
+    baseLamp2->agregarHijo(lampRing2);
+    baseLamp2->actualizarTransformacion();
+    agregarEntidad(baseLamp2);
 }
 
 void SceneInformation::agregarEntidad(Entidad* entidad)

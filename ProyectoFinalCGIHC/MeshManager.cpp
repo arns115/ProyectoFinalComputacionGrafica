@@ -15,6 +15,7 @@ MeshManager::MeshManager()
 	createCanchaParedMesh();
 	createCanchaTechoMesh();
 	createToroideMesh();
+	createCilindroMesh();
 }
 
 // Carga un mesh en el manager
@@ -600,6 +601,117 @@ void MeshManager::createToroideMesh()
 	Mesh* toroideMesh = new Mesh();
 	toroideMesh->CreateMesh(vertices.data(), indices.data(), vertices.size(), indices.size());
 	loadMesh(AssetConstants::MeshNames::TOROIDE, toroideMesh);
+}
+
+// Crear mesh de cilindro para base de lámpara
+void MeshManager::createCilindroMesh()
+{
+	// Parámetros del cilindro
+	float radius = 0.5f;    // Radio del cilindro
+	float height = 2.0f;    // Altura del cilindro
+	int segments = 32;      // Número de segmentos alrededor del cilindro
+	
+	std::vector<GLfloat> vertices;
+	std::vector<unsigned int> indices;
+	
+	// Generar vértices del cilindro
+	for (int i = 0; i <= segments; i++)
+	{
+		float theta = (float)i / segments * 2.0f * 3.14159265f;
+		float cosTheta = cos(theta);
+		float sinTheta = sin(theta);
+		
+		// Vértice superior
+		float x = radius * cosTheta;
+		float y = height / 2.0f;
+		float z = radius * sinTheta;
+		float u = (float)i / segments;
+		float v = 1.0f;
+		
+		vertices.push_back(x);
+		vertices.push_back(y);
+		vertices.push_back(z);
+		vertices.push_back(u);
+		vertices.push_back(v);
+		vertices.push_back(cosTheta); // nx
+		vertices.push_back(0.0f);     // ny
+		vertices.push_back(sinTheta); // nz
+		
+		// Vértice inferior
+		y = -height / 2.0f;
+		v = 0.0f;
+		
+		vertices.push_back(x);
+		vertices.push_back(y);
+		vertices.push_back(z);
+		vertices.push_back(u);
+		vertices.push_back(v);
+		vertices.push_back(cosTheta); // nx
+		vertices.push_back(0.0f);     // ny
+		vertices.push_back(sinTheta); // nz
+	}
+	
+	// Generar índices para la superficie lateral
+	for (int i = 0; i < segments; i++)
+	{
+		int topCurrent = i * 2;
+		int bottomCurrent = i * 2 + 1;
+		int topNext = (i + 1) * 2;
+		int bottomNext = (i + 1) * 2 + 1;
+		
+		// Primer triángulo
+		indices.push_back(topCurrent);
+		indices.push_back(bottomCurrent);
+		indices.push_back(topNext);
+		
+		// Segundo triángulo
+		indices.push_back(topNext);
+		indices.push_back(bottomCurrent);
+		indices.push_back(bottomNext);
+	}
+	
+	// Agregar vértices para las tapas (centro + borde)
+	int centerTopIndex = vertices.size() / 8;
+	int centerBottomIndex = centerTopIndex + 1;
+	
+	// Centro de la tapa superior
+	vertices.push_back(0.0f);
+	vertices.push_back(height / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(0.5f);
+	vertices.push_back(0.5f);
+	vertices.push_back(0.0f);
+	vertices.push_back(1.0f);
+	vertices.push_back(0.0f);
+	
+	// Centro de la tapa inferior
+	vertices.push_back(0.0f);
+	vertices.push_back(-height / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(0.5f);
+	vertices.push_back(0.5f);
+	vertices.push_back(0.0f);
+	vertices.push_back(-1.0f);
+	vertices.push_back(0.0f);
+	
+	// Generar índices para las tapas
+	for (int i = 0; i < segments; i++)
+	{
+		// Tapa superior
+		indices.push_back(centerTopIndex);
+		indices.push_back(i * 2);
+		indices.push_back((i + 1) * 2);
+		
+		// Tapa inferior
+		indices.push_back(centerBottomIndex);
+		indices.push_back((i + 1) * 2 + 1);
+		indices.push_back(i * 2 + 1);
+	}
+	
+	// Crear el mesh
+	Mesh* cilindroMesh = new Mesh();
+	cilindroMesh->CreateMesh(vertices.data(), indices.data(), vertices.size(), indices.size());
+	loadMesh(AssetConstants::MeshNames::CILINDRO, cilindroMesh);
 }
 
 MeshManager::~MeshManager() 

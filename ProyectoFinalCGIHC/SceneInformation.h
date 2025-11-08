@@ -186,6 +186,7 @@ private:
     void crearPuertaSecreta();
     void crearPelotaDeJuegoDePelota();
     void crearLamparasCalles();
+    void crearLamparasRing();
     void crearArbol(const std::string& tipoArbol = "A", 
                     const glm::vec3& posicion = glm::vec3(0.0f), 
                     const glm::vec3& rotacion = glm::vec3(0.0f),

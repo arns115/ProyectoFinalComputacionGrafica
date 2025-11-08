@@ -14,6 +14,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::MAYA_CANOA, AssetConstants::ModelPaths::MAYA_CANOA);
 	loadModel(AssetConstants::ModelNames::PRIMO, AssetConstants::ModelPaths::PRIMO);
 	loadModel(AssetConstants::ModelNames::STREET_LAMP, AssetConstants::ModelPaths::STREET_LAMP);
+	loadModel(AssetConstants::ModelNames::LAMP_RING, AssetConstants::ModelPaths::LAMP_RING);
 
 	loadModel(AssetConstants::ModelNames::CABEZA_HOLLOW, AssetConstants::ModelPaths::CABEZA_HOLLOW);
 	loadModel(AssetConstants::ModelNames::CUERPO1_HOLLOW, AssetConstants::ModelPaths::CUERPO1_HOLLOW);

@@ -1,4 +1,4 @@
-#pragma once
+# pragma once
 #include <string>
 #include <vector>
 
@@ -33,6 +33,7 @@ namespace AssetConstants {
 		const std::string MAYA_CANOA = "maya_canoa";
 		const std::string PRIMO = "primo";
 		const std::string STREET_LAMP = "street_lamp";
+		const std::string LAMP_RING = "lamp_ring";
 
 		const std::string CUPHEAD = "cuphead";
 
@@ -120,6 +121,7 @@ namespace AssetConstants {
 		const std::string CANCHA_PARED = "cancha_pared";
 		const std::string CANCHA_TECHO = "cancha_techo";
 		const std::string TOROIDE = "toroide";
+		const std::string CILINDRO = "cilindro";
 	}
 
 	// Nombres de materiales
@@ -173,6 +175,7 @@ namespace AssetConstants {
 		const std::string MAYA_CANOA = MODEL_PATH + "maya_canoa.obj";
 		const std::string PRIMO = MODEL_PATH + "primo.obj";
 		const std::string STREET_LAMP = MODEL_PATH + "street_lamp.obj";
+		const std::string LAMP_RING = MODEL_PATH + "lamp_ring.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 
