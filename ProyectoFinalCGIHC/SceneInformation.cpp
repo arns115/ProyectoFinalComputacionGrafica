@@ -88,11 +88,12 @@ void SceneInformation::inicializarEntidades()
     crearArbolesAlrededorChinampa();
     crearCanoa();
     crearCanchaPelotaMaya();
-	  crearPelotaDeJuegoDePelota();
+	crearPelotaDeJuegoDePelota();
     crearPrimo();               
     crearLuchador();   
     creaEscenarioAzteca();
 	creaCarpa();
+    crearLamparasCalles();
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
     // Segundo Isaac
@@ -159,6 +160,30 @@ void SceneInformation::actualizarFrame(float deltaTime)
             if(entidad->nombreObjeto == "pelota") {
                 entidad->animacion->animateKeyframes();
 			}
+            
+            // Procesar lámparas de calle y sus luces
+            if (entidad->nombreObjeto.find("lampara_") == 0) {
+                // Esta es una lámpara de calle
+                // Buscar su hijo que es la luz
+                for (auto* hijo : entidad->hijos) {
+                    if (hijo != nullptr && hijo->nombreObjeto == "punto_luz") {
+                        // Calcular la posición mundial de la luz
+                        glm::vec3 posicionMundialLuz = glm::vec3(
+                            entidad->transformacionLocal * glm::vec4(hijo->posicionLocal, 1.0f)
+                        );
+                        
+                        // Crear luz puntual con color amarillo cálido
+                        pointLightActual = PointLight(
+                            1.0f, 0.9f, 0.7f,  // Color amarillo cálido
+                            0.3f, 0.8f,         // Intensidad ambiental y difusa
+                            posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
+                            0.3f, 0.1f, 0.05f   // Atenuación constante, lineal, exponencial
+                        );
+                        agregarLuzPuntualActual(pointLightActual);
+                        break; // Solo necesitamos procesar una luz por lámpara
+                    }
+                }
+            }
         }
     }
 
@@ -482,7 +507,7 @@ void SceneInformation::crearLuchador()
     Entidad* luchador_torso = new Entidad("luchador_torso",
         glm::vec3(-25.0f, -1.0f, -150.0f),    // Posición cerca de la pirámide
         glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
-        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala 2x
+        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala
     
     luchador_torso->setTipoObjeto(TipoObjeto::MODELO);
     luchador_torso->setModelo(AssetConstants::ModelNames::LUCHADOR_TORSO, 
@@ -1325,7 +1350,6 @@ void SceneInformation::crearCanchaPelotaMaya()
         glm::vec3(2.0f, 3.5f, 0.0f),   
         glm::vec3(90.0f, 0.0f, 0.0f), 
         glm::vec3(0.5f, 0.5f, 0.5f));  
-    
     aroCancha->setTipoObjeto(TipoObjeto::MESH);
     aroCancha->nombreMesh = AssetConstants::MeshNames::TOROIDE;
     aroCancha->nombreTextura = AssetConstants::TextureNames::MAYAN_BRICKS;
@@ -1670,6 +1694,92 @@ void SceneInformation::crearPrimo()
     primo->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     primo->actualizarTransformacion();
     agregarEntidad(primo);
+}
+
+// Crear lámparas de calle a lo largo del camino empedrado
+void SceneInformation::crearLamparasCalles()
+{
+    // Posición inicial: 20 unidades desde las cabezas olmecas (Z=200)
+    // Las cabezas olmecas están en Z=200, entonces empezamos en Z=180
+    float zInicio = 180.0f;
+    
+    // Posición final: la pirámide está en Z=-150
+    float zFin = -150.0f;
+    
+    // Separación entre lámparas
+    float separacion = 40.0f;
+    
+    // El camino está centrado aproximadamente en X=2.0f
+    // Colocar lámparas a ambos lados del camino
+    float xCamino = 2.0f;
+    float distanciaLateral = 12.0f; // Distancia desde el centro del camino
+    
+    // Altura de la lámpara sobre el suelo
+    float yLampara = -1.0f;
+    
+    // Escala de las lámparas
+    glm::vec3 escalaLampara(1.5f, 1.5f, 1.5f);
+    
+    // Contador de lámparas
+    int contadorLampara = 0;
+    
+    // Generar lámparas cada 40 unidades desde zInicio hasta zFin
+    for (float z = zInicio; z >= zFin; z -= separacion) {
+        // Lámpara lado izquierdo (X negativo)
+        std::string nombreIzq = "lampara_izq_" + std::to_string(contadorLampara);
+        Entidad* lamparaIzq = new Entidad(nombreIzq,
+            glm::vec3(xCamino - distanciaLateral, yLampara, z),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            escalaLampara);
+        
+        lamparaIzq->setTipoObjeto(TipoObjeto::MODELO);
+        lamparaIzq->setModelo(AssetConstants::ModelNames::STREET_LAMP, 
+                             modelManager.getModel(AssetConstants::ModelNames::STREET_LAMP));
+        lamparaIzq->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                               materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+        
+        // Crear luz puntual como hijo de la lámpara
+        // Posición relativa: encima de la lámpara (altura ajustada)
+        Entidad* luzIzq = new Entidad(nombreIzq + "_luz",
+            glm::vec3(0.0f, 5.0f, 0.0f), // Posición relativa respecto a la lámpara
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f, 1.0f, 1.0f));
+        
+        // La luz no necesita geometría, solo almacenamos su posición
+        // Se manejará en actualizarFrame para agregar las luces puntuales
+        luzIzq->nombreObjeto = "punto_luz";
+        
+        lamparaIzq->agregarHijo(luzIzq);
+        lamparaIzq->actualizarTransformacion();
+        agregarEntidad(lamparaIzq);
+        
+        // Lámpara lado derecho (X positivo)
+        std::string nombreDer = "lampara_der_" + std::to_string(contadorLampara);
+        Entidad* lamparaDer = new Entidad(nombreDer,
+            glm::vec3(xCamino + distanciaLateral, yLampara, z),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            escalaLampara);
+        
+        lamparaDer->setTipoObjeto(TipoObjeto::MODELO);
+        lamparaDer->setModelo(AssetConstants::ModelNames::STREET_LAMP,
+                             modelManager.getModel(AssetConstants::ModelNames::STREET_LAMP));
+        lamparaDer->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+                               materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+        
+        // Crear luz puntual como hijo de la lámpara
+        Entidad* luzDer = new Entidad(nombreDer + "_luz",
+            glm::vec3(0.0f, 5.0f, 0.0f), // Posición relativa respecto a la lámpara
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f, 1.0f, 1.0f));
+        
+        luzDer->nombreObjeto = "punto_luz";
+        
+        lamparaDer->agregarHijo(luzDer);
+        lamparaDer->actualizarTransformacion();
+        agregarEntidad(lamparaDer);
+        
+        contadorLampara++;
+    }
 }
 
 void SceneInformation::agregarEntidad(Entidad* entidad)

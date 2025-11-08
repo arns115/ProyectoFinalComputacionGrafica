@@ -32,6 +32,7 @@ namespace AssetConstants {
 		const std::string CANOA = "canoa";
 		const std::string MAYA_CANOA = "maya_canoa";
 		const std::string PRIMO = "primo";
+		const std::string STREET_LAMP = "street_lamp";
 
 		const std::string CUPHEAD = "cuphead";
 
@@ -171,6 +172,7 @@ namespace AssetConstants {
 		const std::string CANOA = MODEL_PATH + "canoa.obj";
 		const std::string MAYA_CANOA = MODEL_PATH + "maya_canoa.obj";
 		const std::string PRIMO = MODEL_PATH + "primo.obj";
+		const std::string STREET_LAMP = MODEL_PATH + "street_lamp.obj";
 
 		const std::string CUPHEAD = MODEL_PATH + "cuphead.dae";
 
