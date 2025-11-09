@@ -73,8 +73,9 @@ namespace AssetConstants {
 		const std::string GOJO_RODILLA_IZQ = "gojorodillaizq";
 		const std::string GOJO_RODILLA_DER = "gojorodillader";
 
-		//ESCENARIO AZTECA
-		const std::string ESCENARIOAZTECA = "escenarioazteca";
+		//EXTRA GOJO
+		const std::string BLACKHOLE = "blackhole";
+		const std::string PYRAMIDEMUSEO = "pyramidemuseo";
 
 		//Modelos para el mercado
 		const std::string CARPAVACIA = "carpavacia";
@@ -218,8 +219,9 @@ namespace AssetConstants {
 		const std::string GOJORODILLAIZQ = MODEL_PATH + "gojorodillaizq.obj";
 		const std::string GOJORODILLADER = MODEL_PATH + "gojorodillader.obj";
 
-		//ESCENARIO AZTECA
-		const std::string ESCENARIOAZTECA = MODEL_PATH + "escenarioazteca.obj";
+		//EXTRA GOJO
+		const std::string BLACKHOLE = MODEL_PATH + "blackhole.obj";
+		const std::string PYRAMIDEMUSEO = MODEL_PATH + "pyramidemuseo.obj";
 
 		//Modelos para el mercado
 		const std::string CARPAVACIA = MODEL_PATH + "carpavacia.obj";

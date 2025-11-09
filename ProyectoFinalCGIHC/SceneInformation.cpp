@@ -93,7 +93,8 @@ void SceneInformation::inicializarEntidades()
 	crearPelotaDeJuegoDePelota();
     crearPrimo();               
     crearLuchador();   
-    creaEscenarioAzteca();
+    crearBlackHole();
+	crearPyramideMuseo();
 	creaCarpa();
     crearLamparasCalles();
     crearLamparasRing();
@@ -1626,93 +1627,385 @@ void SceneInformation::crearGojo()
     agregarEntidad(gojo_cuerpo);
 }
 
-// Escenario azteca
-void SceneInformation::creaEscenarioAzteca()
+// BLACKHOLE
+void SceneInformation::crearBlackHole()
 {
-    Entidad* escenarioazteca = new Entidad("escenarioazteca",
+    Entidad* blackhole = new Entidad("blackhole",
+        glm::vec3(-160.0f, 30.0f, 70.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(10.0f, 10.0f, 10.0f));
+        glm::vec3(0.6f, 0.6f, 0.6f));
 
     
-    escenarioazteca->setTipoObjeto(TipoObjeto::MODELO);
-    escenarioazteca->setModelo(AssetConstants::ModelNames::ESCENARIOAZTECA, modelManager.getModel(AssetConstants::ModelNames::ESCENARIOAZTECA));
-    escenarioazteca->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    escenarioazteca->actualizarTransformacion();
+    blackhole->setTipoObjeto(TipoObjeto::MODELO);
+    blackhole->setModelo(AssetConstants::ModelNames::BLACKHOLE, modelManager.getModel(AssetConstants::ModelNames::BLACKHOLE));
+    blackhole->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    blackhole->actualizarTransformacion();
 
-    //agregarEntidad(escenarioazteca); 
+    agregarEntidad(blackhole); 
+}
+
+void SceneInformation::crearPyramideMuseo()
+{
+    Entidad* pyramidemuseo = new Entidad("pyramidemuseo",
+        glm::vec3(-160.0f, -1.0f, 150.0f),
+        glm::vec3(0.0f, 270.0f, 0.0f),
+        glm::vec3(9.0f, 9.0f, 9.0f));
+
+    Entidad* pyramidemuseo1 = new Entidad("pyramidemuseo",
+        glm::vec3(-160.0f, -1.0f, 70.0f),
+        glm::vec3(0.0f, 270.0f, 0.0f),
+        glm::vec3(9.0f, 9.0f, 9.0f));
+
+    pyramidemuseo->setTipoObjeto(TipoObjeto::MODELO);
+    pyramidemuseo->setModelo(AssetConstants::ModelNames::PYRAMIDEMUSEO, modelManager.getModel(AssetConstants::ModelNames::PYRAMIDEMUSEO));
+    pyramidemuseo->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    pyramidemuseo->actualizarTransformacion();
+
+    pyramidemuseo1->setTipoObjeto(TipoObjeto::MODELO);
+    pyramidemuseo1->setModelo(AssetConstants::ModelNames::PYRAMIDEMUSEO, modelManager.getModel(AssetConstants::ModelNames::PYRAMIDEMUSEO));
+    pyramidemuseo1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    pyramidemuseo1->actualizarTransformacion();
+
+    agregarEntidad(pyramidemuseo); 
+	agregarEntidad(pyramidemuseo1);
 }
 
 // Mercado
 void SceneInformation::creaCarpa()
 {
-    Entidad* carpavacia = new Entidad("carpavacia",
-        glm::vec3(8.0f, -1.0f, 8.0f),
+    //Primera fila 
+    Entidad* puestokekas1 = new Entidad("puestokekas",
+        glm::vec3(-33.0f, -1.0f, 23.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.7f, 3.7f, 3.7f));
+
+    Entidad* carpaymesa1 = new Entidad("carpaymesa",
+        glm::vec3(-33.0f, -1.0f, 39.0f),
         glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpavacia = new Entidad("carpavacia",
+        glm::vec3(-34.0f, -1.0f, 53.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
 
     Entidad* carpaymesa = new Entidad("carpaymesa",
-        glm::vec3(16.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(-33.0f, -1.0f, 67.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
 
     Entidad* carpabuena = new Entidad("carpabuena",
-        glm::vec3(8.0f, -1.0f, 0.0f),
+        glm::vec3(-32.0f, -1.0f, 84.0f),
         glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(4.0f, 4.0f, 4.0f));
 
     Entidad* puestopescados = new Entidad("puestopescados",
-        glm::vec3(20.0f, -1.0f, 5.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(-20.0f, -1.0f, 81.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(3.5f, 3.5f, 3.5f));
+
+    Entidad* puestopescados1 = new Entidad("puestopescados",
+        glm::vec3(-20.0f, -1.0f, 85.5f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.5f, 3.5f, 3.5f));
 
     Entidad* puestokekas = new Entidad("puestokekas",
-        glm::vec3(17.0f, -1.0f, 5.0f),
+        glm::vec3(-32.0f, -1.0f, 98.0f),
         glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(3.5f, 3.5f, 3.5f));
+
+    Entidad* carpavacia1 = new Entidad("carpavacia",
+        glm::vec3(-34.0f, -1.0f, 110.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpabuena1 = new Entidad("carpabuena",
+        glm::vec3(-32.0f, -1.0f, 124.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    //Segunda Fila
+    Entidad* carpavacia2 = new Entidad("carpavacia",
+        glm::vec3(-54.0f, -1.0f, 23.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpabuena2 = new Entidad("carpabuena",
+        glm::vec3(-52.0f, -1.0f, 37.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* puestopescados2 = new Entidad("puestopescados",
+        glm::vec3(-33.0f, -1.0f, 37.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
 
     Entidad* puestokekas2 = new Entidad("puestokekas",
-        glm::vec3(-17.0f, -1.0f, 5.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(2.5f, 2.5f, 2.5f));
+        glm::vec3(-53.0f, -1.0f, 50.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.7f, 3.7f, 3.7f));
 
+    Entidad* carpavacia3 = new Entidad("carpavacia",
+        glm::vec3(-54.0f, -1.0f, 63.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpaymesa2 = new Entidad("carpaymesa",
+        glm::vec3(-53.0f, -1.0f, 80.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* puestokekas3 = new Entidad("puestokekas",
+        glm::vec3(-52.0f, -1.0f, 93.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.5f, 3.5f, 3.5f));
+
+    Entidad* carpabuena3 = new Entidad("carpabuena",
+        glm::vec3(-52.0f, -1.0f, 105.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* puestopescados3 = new Entidad("puestopescados",
+        glm::vec3(-35.0f, -1.0f, 105.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* carpaymesa3 = new Entidad("carpaymesa",
+        glm::vec3(-53.0f, -1.0f, 125.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+	//Tercer Fila
+    Entidad* carpaymesa4 = new Entidad("carpaymesa",
+        glm::vec3(-73.0f, -1.0f, 23.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpavacia4 = new Entidad("carpavacia",
+        glm::vec3(-74.0f, -1.0f, 38.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* puestokekas4 = new Entidad("puestokekas",
+        glm::vec3(-73.0f, -1.0f, 50.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.7f, 3.7f, 3.7f));
+
+    Entidad* carpabuena4 = new Entidad("carpabuena",
+        glm::vec3(-72.0f, -1.0f, 65.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* carpaymesa5 = new Entidad("carpaymesa",
+        glm::vec3(-73.0f, -1.0f, 80.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* carpavacia5 = new Entidad("carpavacia",
+        glm::vec3(-74.0f, -1.0f, 95.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(3.0f, 3.0f, 3.0f));
+
+    Entidad* puestopescados4 = new Entidad("puestopescados",
+        glm::vec3(-55.0f, -1.0f, 105.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* puestopescados5 = new Entidad("puestopescados",
+        glm::vec3(-55.0f, -1.0f, 110.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* puestopescados6 = new Entidad("puestopescados",
+        glm::vec3(-55.0f, -1.0f, 115.0f),
+        glm::vec3(0.0f, .0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+
+    Entidad* carpabuena5 = new Entidad("carpabuena",
+        glm::vec3(-72.0f, -1.0f, 126.0f),
+        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(4.0f, 4.0f, 4.0f));
+    
     carpavacia->setTipoObjeto(TipoObjeto::MODELO);
     carpavacia->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
     carpavacia->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     carpavacia->actualizarTransformacion();
+
+    carpavacia1->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia1->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia1->actualizarTransformacion();
+
+    carpavacia2->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia2->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia2->actualizarTransformacion();
+
+    carpavacia3->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia3->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia3->actualizarTransformacion();
+
+    carpavacia4->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia4->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia4->actualizarTransformacion();
+
+    carpavacia5->setTipoObjeto(TipoObjeto::MODELO);
+    carpavacia5->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+    carpavacia5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpavacia5->actualizarTransformacion();
 
     carpaymesa->setTipoObjeto(TipoObjeto::MODELO);
     carpaymesa->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
     carpaymesa->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     carpaymesa->actualizarTransformacion();
 
+    carpaymesa1->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa1->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa1->actualizarTransformacion();
+
+    carpaymesa2->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa2->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa2->actualizarTransformacion();
+
+    carpaymesa3->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa3->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa3->actualizarTransformacion();
+
+    carpaymesa4->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa4->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa4->actualizarTransformacion();
+
+    carpaymesa5->setTipoObjeto(TipoObjeto::MODELO);
+    carpaymesa5->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+    carpaymesa5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpaymesa5->actualizarTransformacion();
+
     carpabuena->setTipoObjeto(TipoObjeto::MODELO);
     carpabuena->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
     carpabuena->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     carpabuena->actualizarTransformacion();
 
+    carpabuena1->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena1->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena1->actualizarTransformacion();
+
+    carpabuena2->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena2->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena2->actualizarTransformacion();
+
+    carpabuena3->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena3->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena3->actualizarTransformacion();
+
+    carpabuena4->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena4->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena4->actualizarTransformacion();
+
+    carpabuena5->setTipoObjeto(TipoObjeto::MODELO);
+    carpabuena5->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+    carpabuena5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    carpabuena5->actualizarTransformacion();
+    
     puestopescados->setTipoObjeto(TipoObjeto::MODELO);
     puestopescados->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
     puestopescados->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     puestopescados->actualizarTransformacion();
+
+    puestopescados1->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados1->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados1->actualizarTransformacion();
+
+    puestopescados2->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados2->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados2->actualizarTransformacion();
+
+    puestopescados3->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados3->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados3->actualizarTransformacion();
+
+    puestopescados4->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados4->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados4->actualizarTransformacion();
+
+    puestopescados5->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados5->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados5->actualizarTransformacion();
+
+    puestopescados6->setTipoObjeto(TipoObjeto::MODELO);
+    puestopescados6->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+    puestopescados6->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestopescados6->actualizarTransformacion();
 
     puestokekas->setTipoObjeto(TipoObjeto::MODELO);
     puestokekas->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
     puestokekas->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     puestokekas->actualizarTransformacion();
 
+    puestokekas1->setTipoObjeto(TipoObjeto::MODELO);
+    puestokekas1->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+    puestokekas1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestokekas1->actualizarTransformacion();
+
     puestokekas2->setTipoObjeto(TipoObjeto::MODELO);
     puestokekas2->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
     puestokekas2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     puestokekas2->actualizarTransformacion();
 
+    puestokekas3->setTipoObjeto(TipoObjeto::MODELO);
+    puestokekas3->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+    puestokekas3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestokekas3->actualizarTransformacion();
+
+    puestokekas4->setTipoObjeto(TipoObjeto::MODELO);
+    puestokekas4->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+    puestokekas4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    puestokekas4->actualizarTransformacion();
 
     agregarEntidad(carpavacia); 
-	agregarEntidad(carpaymesa); 
+    agregarEntidad(carpavacia1);
+    agregarEntidad(carpavacia2);
+    agregarEntidad(carpavacia3);
+	agregarEntidad(carpavacia4);
+	agregarEntidad(carpavacia5);
+	agregarEntidad(carpaymesa);
+    agregarEntidad(carpaymesa1);
+    agregarEntidad(carpaymesa2);
+    agregarEntidad(carpaymesa3);
+	agregarEntidad(carpaymesa4);
+	agregarEntidad(carpaymesa5);
 	agregarEntidad(carpabuena);
+    agregarEntidad(carpabuena1);
+    agregarEntidad(carpabuena2);
+    agregarEntidad(carpabuena3);
+	agregarEntidad(carpabuena4);
+	agregarEntidad(carpabuena5);
 	agregarEntidad(puestopescados);
+    agregarEntidad(puestopescados1);
+    agregarEntidad(puestopescados2);
+	agregarEntidad(puestopescados3);
+	agregarEntidad(puestopescados4);
+	agregarEntidad(puestopescados5);
+	agregarEntidad(puestopescados6);
 	agregarEntidad(puestokekas);
+    agregarEntidad(puestokekas1);
 	agregarEntidad(puestokekas2);
+    agregarEntidad(puestokekas3);
+	agregarEntidad(puestokekas4);
 }
 
 void SceneInformation::crearPiso()
