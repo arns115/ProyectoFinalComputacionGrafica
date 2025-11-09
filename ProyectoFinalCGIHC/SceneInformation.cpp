@@ -3,6 +3,7 @@
 #include "ComponenteAnimacion.h"
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
@@ -140,6 +141,24 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
 	// Actualizar animación de la canoa
 	actualizarAnimacionCanoa(deltaTime);
+    
+    // Obtener posición del personaje activo
+    glm::vec3 posicionPersonajeActivo(0.0f);
+    if (entidades.size() >= 3) {
+        // Los personajes están al final del vector
+        // 1: Cuphead (size - 3), 2: Isaac (size - 2), 3: Gojo (size - 1)
+        int indicePersonaje = static_cast<int>(entidades.size()) - (4 - personajeActual);
+        if (indicePersonaje >= 0 && indicePersonaje < entidades.size() && entidades[indicePersonaje] != nullptr) {
+            posicionPersonajeActivo = entidades[indicePersonaje]->posicionLocal;
+        }
+    }
+    
+    // Vector temporal para almacenar luces puntuales con sus distancias
+    struct LuzConDistancia {
+        PointLight luz;
+        float distancia;
+    };
+    std::vector<LuzConDistancia> lucesTemporales;
 
 	// Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
@@ -152,8 +171,12 @@ void SceneInformation::actualizarFrame(float deltaTime)
             }
             if (entidad->nombreObjeto == "fuego_azul" || entidad->nombreObjeto == "fuego_azul2") {
 				pointLightActual = *lightManager.getPointLight(AssetConstants::LightNames::PUNTUAL_AZUL);
-				pointLightActual.setPosition(entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f));
-				agregarLuzPuntualActual(pointLightActual);
+                glm::vec3 posicionLuz = entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f);
+				pointLightActual.setPosition(posicionLuz);
+                
+                // Calcular distancia al personaje activo
+                float distancia = glm::distance(posicionPersonajeActivo, posicionLuz);
+                lucesTemporales.push_back({pointLightActual, distancia});
             }
             // si esta activa la animacion se llama a la funcion de actualizarala
             if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
@@ -181,7 +204,10 @@ void SceneInformation::actualizarFrame(float deltaTime)
                             posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
                             0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
                         );
-                        agregarLuzPuntualActual(pointLightActual);
+                        
+                        // Calcular distancia al personaje activo
+                        float distancia = glm::distance(posicionPersonajeActivo, posicionMundialLuz);
+                        lucesTemporales.push_back({pointLightActual, distancia});
                         break; // Solo necesitamos procesar una luz por lámpara
                     }
                 }
@@ -189,6 +215,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
             
             // Procesar lámparas del ring (base_light) y sus spotlights
             if (entidad->nombreObjeto.find("base_light_") == 0) {
+                // Solo procesar si las luces del ring están activas
+                if (!lucesRingActivas) continue;
+                
                 // Esta es una base de lámpara del ring
                 // Buscar el lamp_ring hijo y su spotlight
                 for (auto* lampRing : entidad->hijos) {
@@ -224,6 +253,20 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 }
             }
         }
+    }
+    
+    // Ordenar luces por distancia (las más cercanas primero)
+    std::sort(lucesTemporales.begin(), lucesTemporales.end(), 
+        [](const LuzConDistancia& a, const LuzConDistancia& b) {
+            return a.distancia < b.distancia;
+        });
+    
+    // Agregar solo las 4 luces más cercanas
+    int lucesAgregadas = 0;
+    for (const auto& luzConDist : lucesTemporales) {
+        if (lucesAgregadas >= 4) break;
+        agregarLuzPuntualActual(luzConDist.luz);
+        lucesAgregadas++;
     }
 
 	// Actualizar animación de la canoa
@@ -287,6 +330,17 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         }
     } else {
         teclaGPresionada = false;
+    }
+    
+    // O: Activar/Desactivar luces del ring
+    static bool teclaOPresionada = false;
+    if (keys[GLFW_KEY_O]) {
+        if (!teclaOPresionada) {
+            lucesRingActivas = !lucesRingActivas;
+            teclaOPresionada = true;
+        }
+    } else {
+        teclaOPresionada = false;
     }
 }
 
@@ -544,9 +598,9 @@ void SceneInformation::crearLuchador()
     // 1. Crear el torso (raíz)
     // Posicionar cerca de la pirámide
     Entidad* luchador_torso = new Entidad("luchador_torso",
-        glm::vec3(-25.0f, -1.0f, -150.0f),    // Posición cerca de la pirámide
-        glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
-        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala
+        glm::vec3(-3.0f, 41.0f, -155.0f),
+        glm::vec3(0.0f, -135.0f, 0.0f),          
+        glm::vec3(1.2f, 1.2f, 1.2f)); 
     
     luchador_torso->setTipoObjeto(TipoObjeto::MODELO);
     luchador_torso->setModelo(AssetConstants::ModelNames::LUCHADOR_TORSO, 
@@ -688,8 +742,8 @@ void SceneInformation::crearPuertaSecreta() {
 void SceneInformation::crearSalaDiablo() {
     // Las chinampas están en (-150.0f, -1.35f, -150.0f)
     // La boss_room está en (150.0f, 17.45f, -125.0f) con escala (10.0f, 10.0f, 10.0f) y rotación 180°
-    // Vamos a posicionar la sala del diablo detrás de las chinampas (Z más negativo)
-    // Ponemos la sala en Z = -230.0f (80 unidades detrás de las chinampas)
+// Vamos a posicionar la sala del diablo detrás de las chinampas (Z más negativo)
+// Ponemos la sala en Z = -230.0f (80 unidades detrás de las chinampas)
     
     Entidad* salaDiablo = new Entidad("sala_diablo",
         glm::vec3(-150.0f, 17.45f, -230.0f),   // Posición detrás de las chinampas
@@ -1194,7 +1248,7 @@ void SceneInformation::crearCanoa()
     canoa = new Entidad("canoa",
         posicionInicial,
         glm::vec3(0.0f, 0.0f, 0.0f),  // Inicialmente mirando al frente
-        glm::vec3(0.5f, 0.5f, 0.5f));  // Escala
+        glm::vec3(1.5f, 1.5f, 1.5f));  // Escala
     
     canoa->setTipoObjeto(TipoObjeto::MODELO);
     canoa->nombreModelo = AssetConstants::ModelNames::CANOA;
@@ -1203,9 +1257,9 @@ void SceneInformation::crearCanoa()
     
     // Crear maya como hijo de la canoa
     Entidad* maya = new Entidad("maya_canoa",
-        glm::vec3(0.0f, 1.0f, 0.0f),  // Posición relativa encima de la canoa
+        glm::vec3(0.0f, 0.3f, 0.0f),  // Posición relativa encima de la canoa
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::vec3(1.0f, 1.0f, 1.0f));    
     
     maya->setTipoObjeto(TipoObjeto::MODELO);
     maya->nombreModelo = AssetConstants::ModelNames::MAYA_CANOA;
@@ -1421,7 +1475,6 @@ void SceneInformation::crearCanchaPelotaMaya()
     // Agregar pared derecha a la escena
     agregarEntidad(paredDerecha);
 }
-
 void SceneInformation::crearHollow() {
     Entidad* cabeza_hollow = new Entidad("hollow",
         glm::vec3(155.0f, 4.0f, -125.0f),      // Posición inicial
@@ -1505,7 +1558,7 @@ void SceneInformation::crearGojo()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
 
-    Entidad* gojo_pierna_izq = new Entidad("gojopiernaizq",
+    Entidad* gojo_pierna_izquierda = new Entidad("gojopiernaizq",
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f));
@@ -1539,9 +1592,9 @@ void SceneInformation::crearGojo()
 	gojo_brazo_der->setModelo(AssetConstants::ModelNames::GOJO_BRAZO_DER, modelManager.getModel(AssetConstants::ModelNames::GOJO_BRAZO_DER));
 	gojo_brazo_der->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));  
 
-    gojo_pierna_izq->setTipoObjeto(TipoObjeto::MODELO);
-    gojo_pierna_izq->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ));
-    gojo_pierna_izq->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    gojo_pierna_izquierda->setTipoObjeto(TipoObjeto::MODELO);
+    gojo_pierna_izquierda->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_IZQ, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_IZQ));
+    gojo_pierna_izquierda->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
 
     gojo_pierna_der->setTipoObjeto(TipoObjeto::MODELO);
     gojo_pierna_der->setModelo(AssetConstants::ModelNames::GOJO_PIERNA_DER, modelManager.getModel(AssetConstants::ModelNames::GOJO_PIERNA_DER));
@@ -1556,9 +1609,9 @@ void SceneInformation::crearGojo()
     gojo_rodilla_der->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
 
     // Armar jerarquía
-    gojo_pierna_izq->agregarHijo(gojo_rodilla_izq);
+    gojo_pierna_izquierda->agregarHijo(gojo_rodilla_izq);
     gojo_pierna_der->agregarHijo(gojo_rodilla_der);
-    gojo_cuerpo->agregarHijo(gojo_pierna_izq);
+    gojo_cuerpo->agregarHijo(gojo_pierna_izquierda);
     gojo_cuerpo->agregarHijo(gojo_pierna_der);
 	gojo_cuerpo->agregarHijo(gojo_brazo_izq);
 	gojo_cuerpo->agregarHijo(gojo_brazo_der);
@@ -1713,7 +1766,7 @@ void SceneInformation::crearObjetosGeometricos()
     // Crear esfera de prueba 2 - En el suelo
     Entidad* esfera2 = new Entidad("esfera2",
         glm::vec3(-5.0f, 1.0f, 5.0f),     // Posición: a la izquierda
-        glm::vec3(0.0f, 45.0f, 0.0f),      // Rotación de 45 grados
+        glm::vec3(0.0f, 0.0f, 0.0f),      // Rotación de 45 grados
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
     
     esfera2->setTipoObjeto(TipoObjeto::MESH);
@@ -1743,9 +1796,9 @@ void SceneInformation::crearPrimo()
     // La pirámide está en (0.0f, -4.0f, -150.0f)
     // Colocar a Primo al lado derecho de la pirámide
     Entidad* primo = new Entidad("primo",
-        glm::vec3(25.0f, -1.0f, -150.0f),      // Posición cerca de la pirámide
+        glm::vec3(3.0f, 39.0f, -152.0f),      // Posición cerca de la pirámide
         glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
-        glm::vec3(2.0f, 2.0f, 2.0f));          // Escala
+        glm::vec3(1.5f, 1.5f, 1.5f));          // Escala
     
     primo->setTipoObjeto(TipoObjeto::MODELO);
     primo->nombreModelo = AssetConstants::ModelNames::PRIMO;
@@ -1850,20 +1903,20 @@ void SceneInformation::crearLamparasRing()
     glm::vec3 posicionRing = posicionPiramide + posicionRelativaRing;
     
     // Altura de las lámparas sobre el ring
-    float alturaLampara = 10.0f;
+    float alturaLampara = 12.0f;
     
     // Distancia lateral desde el centro del ring
     float distanciaLateral = 6.0f;
     
     // Escala de la base (cilindro)
-    glm::vec3 escalaCilindro(1.0f, 2.0f, 1.0f);
+    glm::vec3 escalaCilindro(1.0f, 3.0f, 1.0f);
     
     // Escala del lamp_ring
     glm::vec3 escalaLampRing(1.5f, 1.5f, 1.5f);
     
     // Crear lámpara 1 (lado izquierdo del ring)
     Entidad* baseLamp1 = new Entidad("base_light_1",
-        glm::vec3(posicionRing.x - distanciaLateral, posicionRing.y + alturaLampara, posicionRing.z),
+        glm::vec3(posicionRing.x - distanciaLateral, posicionRing.y + alturaLampara -2.0, posicionRing.z-6.0),
         glm::vec3(0.0f, 0.0f, 0.0f),
         escalaCilindro);
     
@@ -1875,7 +1928,7 @@ void SceneInformation::crearLamparasRing()
     
     // Crear lamp_ring como hijo
     Entidad* lampRing1 = new Entidad("lamp_ring_1",
-        glm::vec3(0.0f, 2.5f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 1.5f, 0.0f), // Arriba del cilindro
         glm::vec3(0.0f, 0.0f, 0.0f),
         escalaLampRing);
     
@@ -1900,7 +1953,7 @@ void SceneInformation::crearLamparasRing()
     
     // Crear lámpara 2 (lado derecho del ring)
     Entidad* baseLamp2 = new Entidad("base_light_2",
-        glm::vec3(posicionRing.x + distanciaLateral, posicionRing.y + alturaLampara, posicionRing.z),
+        glm::vec3(posicionRing.x + distanciaLateral, posicionRing.y + alturaLampara-2.0, posicionRing.z+6.0),
         glm::vec3(0.0f, 0.0f, 0.0f),
         escalaCilindro);
     
@@ -1912,8 +1965,8 @@ void SceneInformation::crearLamparasRing()
     
     // Crear lamp_ring como hijo
     Entidad* lampRing2 = new Entidad("lamp_ring_2",
-        glm::vec3(0.0f, 2.5f, 0.0f), // Arriba del cilindro
-        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.5f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 180.0f, 0.0f),
         escalaLampRing);
     
     lampRing2->setTipoObjeto(TipoObjeto::MODELO);
@@ -1935,7 +1988,6 @@ void SceneInformation::crearLamparasRing()
     baseLamp2->actualizarTransformacion();
     agregarEntidad(baseLamp2);
 }
-
 void SceneInformation::agregarEntidad(Entidad* entidad)
 {
     if (entidad != nullptr) {
