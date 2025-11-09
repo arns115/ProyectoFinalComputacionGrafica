@@ -137,6 +137,8 @@ private:
     // Entero para saber que personaje es actualmente
 	int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
     
+    // Control para activar/desactivar luces del ring
+    bool lucesRingActivas = true;
 
     // Variables para animación de la canoa
     Entidad* canoa = nullptr;
