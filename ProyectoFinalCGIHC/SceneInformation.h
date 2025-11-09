@@ -180,6 +180,7 @@ private:
     void crearChinampaAgua();
     void crearIslas();
     void crearSecretRoom();
+    void crearSalaDiablo();
     void crearFogatas();
 	void crearComidaPerro();
     void crearRKey();

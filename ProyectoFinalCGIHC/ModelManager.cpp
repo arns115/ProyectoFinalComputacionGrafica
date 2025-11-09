@@ -78,7 +78,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::SECRET_ROOM, AssetConstants::ModelPaths::SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::PUERTA_SECRET_ROOM, AssetConstants::ModelPaths::PUERTA_SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
-
+	loadModel(AssetConstants::ModelNames::SALA_DIABLO, AssetConstants::ModelPaths::SALA_DIABLO);
 
 	// Fogatas
 	loadModel(AssetConstants::ModelNames::FUEGO_ROJO, AssetConstants::ModelPaths::FUEGO_ROJO);

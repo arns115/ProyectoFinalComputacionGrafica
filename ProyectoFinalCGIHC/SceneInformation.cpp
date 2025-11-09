@@ -81,6 +81,7 @@ void SceneInformation::inicializarEntidades()
     crearPiramide();
     crearHollow();
     crearBossRoom();
+    crearSalaDiablo();
     crearSecretRoom();
     crearFogatas();
     crearComidaPerro();
@@ -486,7 +487,7 @@ void SceneInformation::crearIsaac()
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
 
-    Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierdo",
+    Entidad* isaac_pierna_izquierda = new Entidad("isaac_pierna_izquierda",
         glm::vec3(-0.48f, 0.7f, 0.0f),      // Posición inicial
         glm::vec3(0.0f, 0.0f, 0.0f),     // Rotación
         glm::vec3(1.0f, 1.0f, 1.0f));      // Escala
@@ -681,6 +682,26 @@ void SceneInformation::crearPuertaSecreta() {
     puerta->animacion = new ComponenteAnimacion(puerta);
 
 	agregarEntidad(puerta);
+}
+
+// Crear sala del diablo
+void SceneInformation::crearSalaDiablo() {
+    // Las chinampas están en (-150.0f, -1.35f, -150.0f)
+    // La boss_room está en (150.0f, 17.45f, -125.0f) con escala (10.0f, 10.0f, 10.0f) y rotación 180°
+    // Vamos a posicionar la sala del diablo detrás de las chinampas (Z más negativo)
+    // Ponemos la sala en Z = -230.0f (80 unidades detrás de las chinampas)
+    
+    Entidad* salaDiablo = new Entidad("sala_diablo",
+        glm::vec3(-150.0f, 17.45f, -230.0f),   // Posición detrás de las chinampas
+        glm::vec3(0.0f, 0.0f, 0.0f),           // Sin rotación (mirando al frente)
+        glm::vec3(10.0f, 10.0f, 10.0f));       // Mismas dimensiones que boss_room
+
+    salaDiablo->setTipoObjeto(TipoObjeto::MODELO);
+    salaDiablo->nombreModelo = AssetConstants::ModelNames::SALA_DIABLO;
+    salaDiablo->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    salaDiablo->actualizarTransformacion();
+
+    agregarEntidad(salaDiablo);
 }
 
 // Crear fogatas en la escena
@@ -1219,9 +1240,9 @@ void SceneInformation::actualizarAnimacionCanoa(float deltaTime)
     // Posición y dimensiones de la chinampa
     glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
     float escalaChinampa = 8.0f;
-    float anchoChinampa = 10.0f * escalaChinampa;
+    float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
     float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
-    float margen = 10.0f;
+    float margen = 10.0f; // Margen desde los bordes
     
     // Estados:
     // 0: Mover de esquina superior izquierda a inferior izquierda

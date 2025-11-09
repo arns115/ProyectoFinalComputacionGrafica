@@ -95,6 +95,7 @@ namespace AssetConstants {
 		const std::string SECRET_ROOM = "secret_room";
 		const std::string PUERTA_SECRET_ROOM = "puerta_secret_room";
 		const std::string R_KEY = "r_key";
+		const std::string SALA_DIABLO = "sala_diablo";
 
 
 		// Fogatas
@@ -246,6 +247,7 @@ namespace AssetConstants {
 		const std::string PUERTA_SECRET_ROOM = MODEL_PATH + "puerta_secret_room.obj";
 
 		const std::string R_KEY = MODEL_PATH + "r_key.obj";
+		const std::string SALA_DIABLO = MODEL_PATH + "saladiablo.obj";
 
 		// Item de comida de perro (Binding of Isaac)
 		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
