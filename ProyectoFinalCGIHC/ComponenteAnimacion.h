@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-#define MAX_FRAMES 100 //Número de cuadros máximos
+#define MAX_FRAMES 100 // Número de cuadros máximos para keyframes
 
 
 class Entidad;
@@ -69,4 +69,6 @@ private:
     void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animación de salto
 	void animarComidaPerro(int indiceAnimacion, float deltaTime); // Animacion de comida de perro(item del juego de isaac)
 	void animarPuerta(int indiceAnimacion, float deltaTime); // Animacion de la puerta secreta
+	//void animarLuchador(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+	//void animarLuchador2(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
 };

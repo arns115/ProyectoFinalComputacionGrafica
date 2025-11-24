@@ -9,6 +9,7 @@
 #include "SkyboxManager.h"
 #include "MaterialManager.h"
 #include "LightManager.h"
+#include "AudioManager.h"
 #include "Skybox.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -109,6 +110,7 @@ private:
     SkyboxManager skyboxManager;
     MaterialManager materialManager;
     LightManager lightManager;
+    AudioManager audioManager;
     
     // Skybox actual de la escena
     Skybox* skyboxActual;
@@ -161,6 +163,9 @@ private:
     // Inicializar luces de la escena
     void inicializarLuces();
     
+    // Inicializar audio de la escena
+    void inicializarAudio();
+    
     // Inicializar entidades de la escena
     void inicializarEntidades();
     
@@ -169,10 +174,10 @@ private:
     void crearPiso();
     void crearObjetosGeometricos(); 
     void crearIsaac();
-    void crearGojo(); // Nueva función para crear Gojo jerárquico
+    void crearGojo();
 	void crearBlackHole();
 	void crearPyramideMuseo();
-	void creaCarpa ();
+    void creaCarpa ();
     void crearLuchador();
     void crearCabezaOlmeca();
     void crearHollow();

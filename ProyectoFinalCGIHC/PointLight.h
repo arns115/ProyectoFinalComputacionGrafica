@@ -1,8 +1,9 @@
 #pragma once
 #include "Light.h"
 
+// Clase para representar una luz puntual
 class PointLight :
-	public Light
+	public Light // Hereda de la clase Light
 {
 public:
 	PointLight();
@@ -11,6 +12,7 @@ public:
 		GLfloat xPos, GLfloat yPos, GLfloat zPos,
 		GLfloat con, GLfloat lin, GLfloat exp);
 
+	// Método para usar la luz puntual en shaders
 	void UseLight(GLfloat ambientIntensityLocation, GLfloat ambientcolorLocation,
 		GLfloat diffuseIntensityLocation, GLfloat positionLocation,
 		GLfloat constantLocation, GLfloat linearLocation, GLfloat exponentLocation);

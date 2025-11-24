@@ -9,6 +9,7 @@ SceneInformation::SceneInformation()
     : skyboxActual(nullptr), pointLightCountActual(0), spotLightCountActual(0)
 {
     // Llamar a las funciones de inicialización separadas
+    inicializarAudio();   // Inicializar Audio (primero para que empiece la música)
     inicializarSkybox();  // Inicializar Skybox
     inicializarLuces();   // Inicializar luces 
     inicializarCamara();  // Inicializar cámara con valores por defecto
@@ -26,6 +27,9 @@ SceneInformation::~SceneInformation()
     
     // Limpiar referencia al skybox
     skyboxActual = nullptr;
+    
+    // Limpiar audio
+    audioManager.limpiar();
     
 }
 
@@ -312,6 +316,7 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
             // Z: Se abre o cierra la puerta secreta
             if (keys[GLFW_KEY_Z]) {
 				entidad->animacion->activarAnimacion(0); // Activar animacion de abrir puerta
+				audioManager.reproducirSonidoAmbiental("abrir_puerta", glm::vec3(180.0f, 8.25f, 200.0f), 0.5f, false);
             }
         }
 		// P: Lanza la pelota del juego de pelota maya
@@ -1232,7 +1237,10 @@ void SceneInformation::crearCanoa()
     // Posición y escala de la chinampa de agua
     glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
     float escalaChinampa = 8.0f;
+    
+    // Dimensiones de la chinampa escalada (el mesh base es 10x10)
     float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
+    float altoChinampa = 10.0f * escalaChinampa;  // 80 unidades
     
     // Altura del agua (encima del prisma de agua)
     float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
@@ -1825,7 +1833,7 @@ void SceneInformation::creaCarpa()
         glm::vec3(-72.0f, -1.0f, 126.0f),
         glm::vec3(0.0f, 180.0f, 0.0f),
         glm::vec3(4.0f, 4.0f, 4.0f));
-    
+
     carpavacia->setTipoObjeto(TipoObjeto::MODELO);
     carpavacia->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
     carpavacia->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
@@ -2377,6 +2385,35 @@ bool SceneInformation::agregarSpotLightActual(const SpotLight& light)
     spotLightCountActual++;
     
     return true;
+}
+
+// Funcion para inicializar el audio de la escena
+void SceneInformation::inicializarAudio()
+{
+    // Inicializar el motor de audio
+    if (!audioManager.inicializar()) {
+        std::cerr << "[SceneInformation] Error al inicializar AudioManager" << std::endl;
+        return;
+    }
+
+    std::cout << "[SceneInformation] AudioManager inicializado correctamente" << std::endl;
+
+    // Cargar el soundtrack principal
+    audioManager.cargarSoundtrack("cuphead_song", "Audio/Soundtrack/cuphead_song.wav");
+    audioManager.cargarSonidoAmbiental("abrir_puerta", "Audio/SFX/door_open.mp3");
+
+    // Reproducir el soundtrack en loop con volumen tenue (30% del máximo)
+    if (!audioManager.reproducirSoundtrack("cuphead_song", 0.1f)) {
+        std::cerr << "[SceneInformation] Advertencia: No se pudo reproducir el soundtrack" << std::endl;
+        std::cerr << "[SceneInformation] Verifica que el archivo existe en: Audio/Soundtrack/cuphead_song.wav" << std::endl;
+    }
+    else {
+        std::cout << "[SceneInformation] Soundtrack reproduciéndose en loop (volumen: 30%)" << std::endl;
+    }
+
+    // Establecer volumen maestro también bajo para no interferir con efectos futuros
+    audioManager.setVolumenMaestro(0.4f); // 80% del volumen maestro
+	audioManager.setVolumenSoundtrack(0.1f); // 30% del volumen del soundtrack
 }
 
 

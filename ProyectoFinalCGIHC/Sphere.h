@@ -23,7 +23,7 @@ public:
 	void load();
 	void render();
 	
-	// NUEVO: Métodos para obtener datos de la esfera
+	// Obtener datos de la esfera
 	std::vector<GLfloat> getVertices() const;
 	std::vector<GLuint> getIndices() const { return index; }
 	int getVertexCount() const { return vertices.size(); }
