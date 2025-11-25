@@ -200,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="AUDIOMANAGER_README.md" />
+    <None Include="INSTRUCCIONES_ANIMACION.md" />
     <None Include="INTEGRACION_AUDIO_INSTRUCCIONES.md" />
     <None Include="shaders\shader_light.frag" />
     <None Include="shaders\shader_light.vert" />

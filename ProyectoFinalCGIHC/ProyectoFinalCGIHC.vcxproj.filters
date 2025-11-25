@@ -193,6 +193,7 @@
     <None Include="shaders\skybox.vert" />
     <None Include="AUDIOMANAGER_README.md" />
     <None Include="INTEGRACION_AUDIO_INSTRUCCIONES.md" />
+    <None Include="INSTRUCCIONES_ANIMACION.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="InicializarAudio_Function.txt" />

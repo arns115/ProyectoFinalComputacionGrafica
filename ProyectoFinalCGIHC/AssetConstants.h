@@ -109,6 +109,10 @@ namespace AssetConstants {
 		const std::string PEDESTAL_PIEDRA = "pedestal_piedra";
 	
 		const std::string RING_PELEA = "ring_pelea";
+		// NPCS Mayas
+		const std::string TRADER = "trader";
+		const std::string MERCHANT = "merchant";
+		const std::string PIPILA = "pipila";
 	}
 
 	// Nombres de meshes
@@ -257,6 +261,11 @@ namespace AssetConstants {
 
 		// Ring de pelea
 		const std::string RING_PELEA = MODEL_PATH + "ring_pelea.obj";
+
+		// NPCS Mayas
+		const std::string TRADER = MODEL_PATH + "trader.obj";
+		const std::string MERCHANT = MODEL_PATH + "merchant.obj";
+		const std::string PIPILA = MODEL_PATH + "pipila.obj";
 	}
 
 	// Nombres de shaders

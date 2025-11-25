@@ -109,6 +109,7 @@ void SceneInformation::inicializarEntidades()
     crearPersonajePrincipal();
     crearIsaac();
     crearGojo(); 
+    crearPoblacionMaya();
 
 
 }
@@ -276,6 +277,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
 	// Actualizar animación de la canoa
 	actualizarAnimacionCanoa(deltaTime);
+
+    // Actualizar animación del luchador
+    actualizarAnimacionLuchador(deltaTime);
 }
 
 
@@ -693,6 +697,10 @@ void SceneInformation::crearLuchador()
     
     // Actualizar transformaciones
     luchador_torso->actualizarTransformacion();
+
+    // Guardar referencia al luchador y posición inicial
+    luchador = luchador_torso;
+    posicionInicialLuchador = luchador_torso->posicionLocal;
     
     // Agregar a la escena (solo el padre, los hijos se renderizarán automáticamente)
     agregarEntidad(luchador_torso);
@@ -2094,18 +2102,302 @@ void SceneInformation::crearObjetosGeometricos()
 // Crear entidad de Primo cerca de la pirámide
 void SceneInformation::crearPrimo()
 {
-    // La pirámide está en (0.0f, -4.0f, -150.0f)
-    // Colocar a Primo al lado derecho de la pirámide
-    Entidad* primo = new Entidad("primo",
-        glm::vec3(3.0f, 39.0f, -152.0f),      // Posición cerca de la pirámide
-        glm::vec3(0.0f, 45.0f, 0.0f),          // Rotación de 45 grados
-        glm::vec3(1.5f, 1.5f, 1.5f));          // Escala
-    
-    primo->setTipoObjeto(TipoObjeto::MODELO);
-    primo->nombreModelo = AssetConstants::ModelNames::PRIMO;
-    primo->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
-    primo->actualizarTransformacion();
-    agregarEntidad(primo);
+    Entidad* primoEntidad = new Entidad("primo",
+        glm::vec3(3.0f, 39.0f, -152.0f),
+        glm::vec3(0.0f, 45.0f, 0.0f),
+        glm::vec3(1.5f, 1.5f, 1.5f));
+
+    primoEntidad->setTipoObjeto(TipoObjeto::MODELO);
+    primoEntidad->nombreModelo = AssetConstants::ModelNames::PRIMO;
+    primoEntidad->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
+    primoEntidad->actualizarTransformacion();
+
+    // Guardar referencia a primo y posición/rotación iniciales
+    primo = primoEntidad;
+    posicionInicialPrimo = primoEntidad->posicionLocal;
+    rotacionInicialPrimo = primoEntidad->rotacionLocal;
+
+    agregarEntidad(primoEntidad);
+}
+
+
+void SceneInformation::crearPoblacionMaya() {
+    // Definir área del mercado basándose en las posiciones de los puestos
+    float xMin = -80.0f;
+    float xMax = -25.0f;
+    float zMin = 20.0f;
+    float zMax = 130.0f;
+    float y = -1.0f;
+
+    // Crear 3 traders en posiciones aleatorias
+    for (int i = 0; i < 3; i++) {
+        // Generar posición aleatoria dentro del área del mercado
+        float xAleatorio = xMin + (std::rand() % 100) / 100.0f * (xMax - xMin);
+        float zAleatorio = zMin + (std::rand() % 100) / 100.0f * (zMax - zMin);
+
+        // Generar rotación aleatoria en Y (0-360 grados)
+        float rotYAleatorio = static_cast<float>(std::rand() % 360);
+
+        // Generar escala con ligera variación 
+        float variacionEscala = 2.3f + (std::rand() % 20) / 100.0f;
+        float escalaFinal = 1.0f * variacionEscala;
+
+        // Crear entidad trader
+        std::string nombreTrader = "trader_" + std::to_string(i);
+        Entidad* trader = new Entidad(nombreTrader,
+            glm::vec3(xAleatorio, y, zAleatorio),
+            glm::vec3(0.0f, rotYAleatorio, 0.0f),
+            glm::vec3(escalaFinal, escalaFinal, escalaFinal));
+
+        trader->setTipoObjeto(TipoObjeto::MODELO);
+        trader->setModelo(AssetConstants::ModelNames::TRADER,
+            modelManager.getModel(AssetConstants::ModelNames::TRADER));
+        trader->setMaterial(AssetConstants::MaterialNames::OPACO,
+            materialManager.getMaterial(AssetConstants::MaterialNames::OPACO));
+        trader->actualizarTransformacion();
+
+        agregarEntidad(trader);
+    }
+
+    // Crear 3 mayas de canoa en posiciones aleatorias
+    for (int i = 0; i < 3; i++) {
+        // Generar posición aleatoria dentro del área del mercado
+        float xAleatorio = xMin + (std::rand() % 100) / 100.0f * (xMax - xMin);
+        float zAleatorio = zMin + (std::rand() % 100) / 100.0f * (zMax - zMin);
+
+        // Generar rotación aleatoria en Y (0-360 grados)
+        float rotYAleatorio = static_cast<float>(std::rand() % 360);
+
+        // Generar escala con ligera variación
+        float variacionEscala = 2.3f + (std::rand() % 20) / 100.0f;
+        float escalaFinal = 1.0f * variacionEscala;
+
+        // Crear entidad trader
+        std::string nombreCanoa = "mayacanoa_" + std::to_string(i);
+        Entidad* canoa = new Entidad(nombreCanoa,
+            glm::vec3(xAleatorio, y, zAleatorio),
+            glm::vec3(0.0f, rotYAleatorio, 0.0f),
+            glm::vec3(escalaFinal, escalaFinal, escalaFinal));
+
+        canoa->setTipoObjeto(TipoObjeto::MODELO);
+        canoa->setModelo(AssetConstants::ModelNames::MAYA_CANOA,
+            modelManager.getModel(AssetConstants::ModelNames::MAYA_CANOA));
+        canoa->setMaterial(AssetConstants::MaterialNames::OPACO,
+            materialManager.getMaterial(AssetConstants::MaterialNames::OPACO));
+        canoa->actualizarTransformacion();
+
+        agregarEntidad(canoa);
+    }
+
+    // Crear 3 mayas merchant en posiciones aleatorias
+    for (int i = 0; i < 3; i++) {
+        // Generar posición aleatoria dentro del área del mercado
+        float xAleatorio = xMin + (std::rand() % 100) / 100.0f * (xMax - xMin);
+        float zAleatorio = zMin + (std::rand() % 100) / 100.0f * (zMax - zMin);
+
+        // Generar rotación aleatoria en Y (0-360 grados)
+        float rotYAleatorio = static_cast<float>(std::rand() % 360);
+
+        // Generar escala con ligera variación
+        float variacionEscala = 2.3f + (std::rand() % 20) / 100.0f;
+        float escalaFinal = 1.0f * variacionEscala;
+
+        // Crear entidad trader
+        std::string nombreMerchant = "merchant_" + std::to_string(i);
+        Entidad* merchant = new Entidad(nombreMerchant,
+            glm::vec3(xAleatorio, y, zAleatorio),
+            glm::vec3(0.0f, rotYAleatorio, 0.0f),
+            glm::vec3(escalaFinal, escalaFinal, escalaFinal));
+
+        merchant->setTipoObjeto(TipoObjeto::MODELO);
+        merchant->setModelo(AssetConstants::ModelNames::MERCHANT,
+            modelManager.getModel(AssetConstants::ModelNames::MERCHANT));
+        merchant->setMaterial(AssetConstants::MaterialNames::OPACO,
+            materialManager.getMaterial(AssetConstants::MaterialNames::OPACO));
+        merchant->actualizarTransformacion();
+
+        agregarEntidad(merchant);
+    }
+
+    // Crear 3 pipilas en posiciones aleatorias
+    for (int i = 0; i < 3; i++) {
+        // Generar posición aleatoria dentro del área del mercado
+        float xAleatorio = xMin + (std::rand() % 100) / 100.0f * (xMax - xMin);
+        float zAleatorio = zMin + (std::rand() % 100) / 100.0f * (zMax - zMin);
+
+        // Generar rotación aleatoria en Y (0-360 grados)
+        float rotYAleatorio = static_cast<float>(std::rand() % 360);
+
+        // Generar escala con ligera variación
+        float variacionEscala = 2.3f + (std::rand() % 20) / 100.0f;
+        float escalaFinal = 1.0f * variacionEscala;
+
+        // Crear entidad trader
+        std::string nombrePipila = "pipila_" + std::to_string(i);
+        Entidad* pipila = new Entidad(nombrePipila,
+            glm::vec3(xAleatorio, y, zAleatorio),
+            glm::vec3(0.0f, rotYAleatorio, 0.0f),
+            glm::vec3(escalaFinal, escalaFinal, escalaFinal));
+
+        pipila->setTipoObjeto(TipoObjeto::MODELO);
+        pipila->setModelo(AssetConstants::ModelNames::PIPILA,
+            modelManager.getModel(AssetConstants::ModelNames::PIPILA));
+        pipila->setMaterial(AssetConstants::MaterialNames::OPACO,
+            materialManager.getMaterial(AssetConstants::MaterialNames::OPACO));
+        pipila->actualizarTransformacion();
+
+        agregarEntidad(pipila);
+    }
+}
+void SceneInformation::actualizarAnimacionLuchador(float deltaTime)
+{
+    if (luchador == nullptr || primo == nullptr || !animacionLuchadorActiva) return;
+
+    // Estados de la animación:
+    // 0: Luchador salta hacia arriba desde su posición inicial
+    // 1: Luchador cae en parábola hacia primo (simulando gravedad)
+    // 2: Primo cae al suelo al ser golpeado
+    // 3: Primo permanece tirado en el suelo (espera)
+    // 4: Primo se levanta gradualmente y luchador vuelve
+
+    switch (estadoAnimacionLuchador) {
+    case 0: { // Luchador salta hacia arriba
+        tiempoAnimacionLuchador += deltaTime;
+
+        // Calcular dirección hacia primo (en el plano XZ)
+        glm::vec3 direccionAPrimo = primo->posicionLocal - posicionInicialLuchador;
+        direccionAPrimo.y = 0.0f; // Ignorar componente Y
+        direccionAPrimo = glm::normalize(direccionAPrimo);
+
+        // Inicializar velocidad si es el primer frame
+        if (tiempoAnimacionLuchador <= deltaTime) {
+            velocidadLuchador = glm::vec3(
+                direccionAPrimo.x * 1.5f,  // Velocidad horizontal hacia primo (muy reducida)
+                velocidadSaltoLuchador,     // Velocidad vertical inicial (4.0f)
+                direccionAPrimo.z * 1.5f   // Velocidad horizontal hacia primo (muy reducida)
+            );
+        }
+
+        // Actualizar posición del luchador
+        luchador->posicionLocal += velocidadLuchador * deltaTime;
+
+        // Aplicar gravedad
+        velocidadLuchador.y += gravedadLuchador * deltaTime;
+
+        // Rotar al luchador en el aire (efecto de voltereta muy lento)
+        luchador->rotacionLocal.x += 90.0f * deltaTime; // 90 grados por segundo (muy lento)
+
+        // Si el luchador alcanza la altura de primo o empieza a bajar significativamente
+        if (velocidadLuchador.y < -2.0f || luchador->posicionLocal.y <= primo->posicionLocal.y + 2.0f) {
+            estadoAnimacionLuchador = 1;
+            tiempoAnimacionLuchador = 0.0f;
+        }
+
+        luchador->actualizarTransformacion();
+        break;
+    }
+
+    case 1: { // Luchador cae sobre primo
+        tiempoAnimacionLuchador += deltaTime;
+
+        // Continuar aplicando gravedad
+        luchador->posicionLocal += velocidadLuchador * deltaTime;
+        velocidadLuchador.y += gravedadLuchador * deltaTime;
+
+        // Continuar rotación (muy lenta)
+        luchador->rotacionLocal.x += 90.0f * deltaTime;
+
+        // Verificar colisión con primo
+        float distancia = glm::length(luchador->posicionLocal - primo->posicionLocal);
+        if (distancia < 3.0f || luchador->posicionLocal.y <= primo->posicionLocal.y) {
+            // Impacto! Posicionar luchador sobre primo
+            luchador->posicionLocal = primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f);
+            luchador->rotacionLocal.x = 0.0f; // Resetear rotación
+
+            estadoAnimacionLuchador = 2;
+            tiempoAnimacionLuchador = 0.0f;
+        }
+
+        luchador->actualizarTransformacion();
+        break;
+    }
+
+    case 2: { // Primo cae al suelo
+        tiempoAnimacionLuchador += deltaTime;
+
+        float duracionCaida = 1.5f; // 1.5 segundos para caer (muy lento)
+        float progreso = glm::min(tiempoAnimacionLuchador / duracionCaida, 1.0f);
+
+        // Interpolar rotación de primo (cae hacia atrás)
+        primo->rotacionLocal.x = glm::mix(0.0f, -90.0f, progreso);
+
+        // Interpolar posición de primo (baja un poco)
+        float alturaFinal = posicionInicialPrimo.y - 1.5f;
+        primo->posicionLocal.y = glm::mix(posicionInicialPrimo.y, alturaFinal, progreso);
+
+        // Luchador permanece sobre primo
+        luchador->posicionLocal = primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f);
+
+        if (progreso >= 1.0f) {
+            estadoAnimacionLuchador = 3;
+            tiempoAnimacionLuchador = 0.0f;
+            tiempoEsperaLevantada = 0.0f;
+        }
+
+        primo->actualizarTransformacion();
+        luchador->actualizarTransformacion();
+        break;
+    }
+
+    case 3: { // Primo permanece tirado (espera)
+        tiempoEsperaLevantada += deltaTime;
+
+        // Luchador salta del primo y vuelve al ring
+        if (tiempoEsperaLevantada >= TIEMPO_ESPERA_PRIMO) {
+            estadoAnimacionLuchador = 4;
+            tiempoAnimacionLuchador = 0.0f;
+        }
+        break;
+    }
+
+    case 4: { // Primo se levanta y luchador vuelve
+        tiempoAnimacionLuchador += deltaTime;
+
+        float duracionLevantada = 4.0f; // 4 segundos para levantarse (muy lento)
+        float progreso = glm::min(tiempoAnimacionLuchador / duracionLevantada, 1.0f);
+
+        // Interpolar rotación de primo (vuelve a estar de pie)
+        primo->rotacionLocal.x = glm::mix(-90.0f, 0.0f, progreso);
+
+        // Interpolar posición de primo (sube)
+        primo->posicionLocal.y = glm::mix(posicionInicialPrimo.y - 1.5f, posicionInicialPrimo.y, progreso);
+
+        // Luchador vuelve a su posición inicial
+        luchador->posicionLocal = glm::mix(
+            primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f),
+            posicionInicialLuchador,
+            progreso
+        );
+
+        // Resetear rotación del luchador gradualmente
+        luchador->rotacionLocal.x = glm::mix(luchador->rotacionLocal.x, 0.0f, progreso);
+
+        if (progreso >= 1.0f) {
+            // Resetear todo para el próximo ciclo
+            luchador->posicionLocal = posicionInicialLuchador;
+            luchador->rotacionLocal = glm::vec3(0.0f, -135.0f, 0.0f);
+            primo->posicionLocal = posicionInicialPrimo;
+            primo->rotacionLocal = rotacionInicialPrimo;
+
+            estadoAnimacionLuchador = 0;
+            tiempoAnimacionLuchador = 0.0f;
+        }
+
+        primo->actualizarTransformacion();
+        luchador->actualizarTransformacion();
+        break;
+    }
+    }
 }
 
 // Crear lámparas de calle a lo largo del camino empedrado
