@@ -142,33 +142,6 @@ private:
     // Control para activar/desactivar luces del ring
     bool lucesRingActivas = true;
 
-    // Variables para animación de la canoa
-    Entidad* canoa = nullptr;
-    int estadoAnimacionCanoa = 0; // 0-7: diferentes estados del ciclo
-    float tiempoAnimacionCanoa = 0.0f;
-    float velocidadCanoa = 0.2f; // Unidades por segundo (reducido de 5.0f)
-    float velocidadRotacionCanoa = 45.0f; // Grados por segundo (reducido de 90.0f)
-    glm::vec3 posicionInicioCanoa;
-    glm::vec3 posicionDestinoCanoa;
-    float rotacionObjetivoCanoa = 0.0f;
-    bool animacionCanoaActiva = false; // Control para activar/desactivar animación
-
-    // Variables para animación del luchador y primo
-    Entidad* luchador = nullptr;
-    Entidad* primo = nullptr;
-    int estadoAnimacionLuchador = 0; // 0-5: diferentes fases de la animación
-    float tiempoAnimacionLuchador = 0.0f;
-    glm::vec3 posicionInicialLuchador;
-    glm::vec3 posicionInicialPrimo;
-    glm::vec3 rotacionInicialPrimo;
-    float velocidadSaltoLuchador = 8.0f; // Velocidad inicial del salto (más lento)
-    float gravedadLuchador = -16.0f;      // Gravedad simulada (muy suave)
-    glm::vec3 velocidadLuchador;          // Velocidad actual del luchador
-    bool animacionLuchadorActiva = true;  // Control para activar/desactivar animación
-    float tiempoEsperaLevantada = 0.0f;   // Tiempo que primo espera tirado antes de levantarse
-    const float TIEMPO_ESPERA_PRIMO = 8.0f; // 4 segundos tirado
-
-
     //Funciones para inicializar componentes de la escena
 
 
@@ -218,8 +191,6 @@ private:
         const std::string& nombre = "");
     void crearArbolesAlrededorChinampa();
     void crearCanoa();
-    void actualizarAnimacionCanoa(float deltaTime);
-    void actualizarAnimacionLuchador(float deltaTime);
     void crearCanchaPelotaMaya();
     void crearPoblacionMaya();
 

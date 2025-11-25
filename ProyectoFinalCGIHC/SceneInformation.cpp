@@ -146,7 +146,11 @@ void SceneInformation::actualizarFrame(float deltaTime)
     agregarSpotLightActual(spotLightActual);
 
     // Actualizar animación de la canoa
-    actualizarAnimacionCanoa(deltaTime);
+    for (auto* entidad : entidades) {
+        if (entidad != nullptr && entidad->nombreObjeto == "canoa" && entidad->animacion != nullptr) {
+            entidad->animacion->animarCanoa(0, deltaTime);
+        }
+    }
 
     // Obtener posición del personaje activo
     glm::vec3 posicionPersonajeActivo(0.0f);
@@ -275,13 +279,19 @@ void SceneInformation::actualizarFrame(float deltaTime)
         lucesAgregadas++;
     }
 
-    // Actualizar animación de la canoa
-    actualizarAnimacionCanoa(deltaTime);
-
     // Actualizar animación del luchador
-    actualizarAnimacionLuchador(deltaTime);
+    Entidad* luchadorEntidad = nullptr;
+    Entidad* primoEntidad = nullptr;
+    for (auto* entidad : entidades) {
+        if (entidad != nullptr) {
+            if (entidad->nombreObjeto == "luchador_torso") luchadorEntidad = entidad;
+            if (entidad->nombreObjeto == "primo") primoEntidad = entidad;
+        }
+    }
+    if (luchadorEntidad != nullptr && primoEntidad != nullptr && luchadorEntidad->animacion != nullptr) {
+        luchadorEntidad->animacion->animarLuchador(0, deltaTime, primoEntidad);
+    }
 }
-
 
 // Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
@@ -332,10 +342,20 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     }
 
     // G: Activar/Desactivar animación de la canoa
+    // G: Activar/Desactivar animación de la canoa
     static bool teclaGPresionada = false;
     if (keys[GLFW_KEY_G]) {
         if (!teclaGPresionada) {
-            animacionCanoaActiva = !animacionCanoaActiva;
+            for (auto* entidad : entidades) {
+                if (entidad != nullptr && entidad->nombreObjeto == "canoa" && entidad->animacion != nullptr) {
+                    if (entidad->animacion->estaActiva(0)) {
+                        entidad->animacion->desactivarAnimacion(0);
+                    }
+                    else {
+                        entidad->animacion->activarAnimacion(0);
+                    }
+                }
+            }
             teclaGPresionada = true;
         }
     }
@@ -619,6 +639,8 @@ void SceneInformation::crearLuchador()
         modelManager.getModel(AssetConstants::ModelNames::LUCHADOR_TORSO));
     luchador_torso->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
         materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    luchador_torso->animacion = new ComponenteAnimacion(luchador_torso);
+    luchador_torso->animacion->activarAnimacion(0);  // Activate luchador animation
 
     // No necesita física ni animación ya que es estático
 
@@ -700,9 +722,7 @@ void SceneInformation::crearLuchador()
     // Actualizar transformaciones
     luchador_torso->actualizarTransformacion();
 
-    // Guardar referencia al luchador y posición inicial
-    luchador = luchador_torso;
-    posicionInicialLuchador = luchador_torso->posicionLocal;
+
 
     // Agregar a la escena (solo el padre, los hijos se renderizarán automáticamente)
     agregarEntidad(luchador_torso);
@@ -1270,7 +1290,7 @@ void SceneInformation::crearCanoa()
     );
 
     // Crear entidad de la canoa (padre)
-    canoa = new Entidad("canoa",
+    Entidad* canoa = new Entidad("canoa",
         posicionInicial,
         glm::vec3(0.0f, 0.0f, 0.0f),  // Inicialmente mirando al frente
         glm::vec3(1.5f, 1.5f, 1.5f));  // Escala
@@ -1278,6 +1298,8 @@ void SceneInformation::crearCanoa()
     canoa->setTipoObjeto(TipoObjeto::MODELO);
     canoa->nombreModelo = AssetConstants::ModelNames::CANOA;
     canoa->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    canoa->animacion = new ComponenteAnimacion(canoa);
+    canoa->animacion->activarAnimacion(0);  // Activate canoa animation
     canoa->actualizarTransformacion();
 
     // Crear maya como hijo de la canoa
@@ -1297,127 +1319,7 @@ void SceneInformation::crearCanoa()
     // Agregar canoa a la escena
     agregarEntidad(canoa);
 
-    // Inicializar variables de animación
-    estadoAnimacionCanoa = 0;
-    tiempoAnimacionCanoa = 0.0f;
-    posicionInicioCanoa = posicionInicial;
-
-    // Calcular primera posición destino (esquina inferior izquierda)
-    posicionDestinoCanoa = glm::vec3(
-        posicionChinampa.x - anchoChinampa / 2.0f + margen,
-        alturaAgua,
-        posicionChinampa.z + anchoChinampa / 2.0f - margen
-    );
-    rotacionObjetivoCanoa = 0.0f;
-}
-
-// Actualizar animación cíclica de la canoa
-void SceneInformation::actualizarAnimacionCanoa(float deltaTime)
-{
-    if (canoa == nullptr || !animacionCanoaActiva) return;
-
-    // Posición y dimensiones de la chinampa
-    glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
-    float escalaChinampa = 8.0f;
-    float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
-    float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
-    float margen = 10.0f; // Margen desde los bordes
-
-    // Estados:
-    // 0: Mover de esquina superior izquierda a inferior izquierda
-    // 1: Girar 90 grados (hacia la derecha)
-    // 2: Mover de esquina inferior izquierda a inferior derecha
-    // 3: Girar 90 grados
-    // 4: Mover de esquina inferior derecha a superior derecha
-    // 5: Girar 90 grados
-    // 6: Mover de esquina superior derecha a superior izquierda
-    // 7: Girar 90 grados
-
-    bool estadoPar = (estadoAnimacionCanoa % 2 == 0);
-
-    if (estadoPar) {
-        // Estados de movimiento (0, 2, 4, 6)
-        glm::vec3 direccion = glm::normalize(posicionDestinoCanoa - posicionInicioCanoa);
-        float distancia = glm::length(posicionDestinoCanoa - posicionInicioCanoa);
-        float distanciaRecorrida = velocidadCanoa * tiempoAnimacionCanoa;
-
-        if (distanciaRecorrida >= distancia) {
-            // Llegó al destino, cambiar al siguiente estado (girar)
-            canoa->posicionLocal = posicionDestinoCanoa;
-            estadoAnimacionCanoa++;
-            tiempoAnimacionCanoa = 0.0f;
-
-            // Calcular nueva rotación objetivo
-            rotacionObjetivoCanoa = canoa->rotacionLocal.y + 90.0f;
-        }
-        else {
-            // Mover hacia el destino
-            canoa->posicionLocal = posicionInicioCanoa + direccion * distanciaRecorrida;
-            tiempoAnimacionCanoa += deltaTime;
-        }
-    }
-    else {
-        // Estados de rotación (1, 3, 5, 7)
-        float rotacionInicial = rotacionObjetivoCanoa - 90.0f;
-        float anguloRecorrido = velocidadRotacionCanoa * tiempoAnimacionCanoa;
-
-        if (anguloRecorrido >= 90.0f) {
-            // Completó el giro, cambiar al siguiente estado (mover)
-            canoa->rotacionLocal.y = rotacionObjetivoCanoa;
-            if (rotacionObjetivoCanoa >= 360.0f) {
-                canoa->rotacionLocal.y -= 360.0f;
-                rotacionObjetivoCanoa -= 360.0f;
-            }
-
-            estadoAnimacionCanoa++;
-            if (estadoAnimacionCanoa >= 8) {
-                estadoAnimacionCanoa = 0; // Reiniciar ciclo
-            }
-            tiempoAnimacionCanoa = 0.0f;
-
-            // Configurar nuevo movimiento según el estado
-            posicionInicioCanoa = canoa->posicionLocal;
-
-            switch (estadoAnimacionCanoa) {
-            case 0: // Esquina superior izquierda a inferior izquierda
-                posicionDestinoCanoa = glm::vec3(
-                    posicionChinampa.x - anchoChinampa / 2.0f + margen,
-                    alturaAgua,
-                    posicionChinampa.z + anchoChinampa / 2.0f - margen
-                );
-                break;
-            case 2: // Esquina inferior izquierda a inferior derecha
-                posicionDestinoCanoa = glm::vec3(
-                    posicionChinampa.x + anchoChinampa / 2.0f - margen,
-                    alturaAgua,
-                    posicionChinampa.z + anchoChinampa / 2.0f - margen
-                );
-                break;
-            case 4: // Esquina inferior derecha a superior derecha
-                posicionDestinoCanoa = glm::vec3(
-                    posicionChinampa.x + anchoChinampa / 2.0f - margen,
-                    alturaAgua,
-                    posicionChinampa.z - anchoChinampa / 2.0f + margen
-                );
-                break;
-            case 6: // Esquina superior derecha a superior izquierda
-                posicionDestinoCanoa = glm::vec3(
-                    posicionChinampa.x - anchoChinampa / 2.0f + margen,
-                    alturaAgua,
-                    posicionChinampa.z - anchoChinampa / 2.0f + margen
-                );
-                break;
-            }
-        }
-        else {
-            // Girar gradualmente
-            canoa->rotacionLocal.y = rotacionInicial + anguloRecorrido;
-            tiempoAnimacionCanoa += deltaTime;
-        }
-    }
-
-    // Actualizar transformación de la canoa
-    canoa->actualizarTransformacion();
+   
 }
 
 // Crear cancha de juego de pelota Maya con jerarquía
@@ -2123,11 +2025,6 @@ void SceneInformation::crearPrimo()
     primoEntidad->nombreMaterial = AssetConstants::MaterialNames::BRILLANTE;
     primoEntidad->actualizarTransformacion();
 
-    // Guardar referencia a primo y posición/rotación iniciales
-    primo = primoEntidad;
-    posicionInicialPrimo = primoEntidad->posicionLocal;
-    rotacionInicialPrimo = primoEntidad->rotacionLocal;
-
     agregarEntidad(primoEntidad);
 }
 
@@ -2258,156 +2155,6 @@ void SceneInformation::crearPoblacionMaya() {
         pipila->actualizarTransformacion();
 
         agregarEntidad(pipila);
-    }
-}
-void SceneInformation::actualizarAnimacionLuchador(float deltaTime)
-{
-    if (luchador == nullptr || primo == nullptr || !animacionLuchadorActiva) return;
-
-    // Estados de la animación:
-    // 0: Luchador salta hacia arriba desde su posición inicial
-    // 1: Luchador cae en parábola hacia primo (simulando gravedad)
-    // 2: Primo cae al suelo al ser golpeado
-    // 3: Primo permanece tirado en el suelo (espera)
-    // 4: Primo se levanta gradualmente y luchador vuelve
-
-    switch (estadoAnimacionLuchador) {
-    case 0: { // Luchador salta hacia arriba
-        tiempoAnimacionLuchador += deltaTime;
-
-        // Calcular dirección hacia primo (en el plano XZ)
-        glm::vec3 direccionAPrimo = primo->posicionLocal - posicionInicialLuchador;
-        direccionAPrimo.y = 0.0f; // Ignorar componente Y
-        direccionAPrimo = glm::normalize(direccionAPrimo);
-
-        // Inicializar velocidad si es el primer frame
-        if (tiempoAnimacionLuchador <= deltaTime) {
-            velocidadLuchador = glm::vec3(
-                direccionAPrimo.x * 1.5f,  // Velocidad horizontal hacia primo (muy reducida)
-                velocidadSaltoLuchador,     // Velocidad vertical inicial (4.0f)
-                direccionAPrimo.z * 1.5f   // Velocidad horizontal hacia primo (muy reducida)
-            );
-        }
-
-        // Actualizar posición del luchador
-        luchador->posicionLocal += velocidadLuchador * deltaTime;
-
-        // Aplicar gravedad
-        velocidadLuchador.y += gravedadLuchador * deltaTime;
-
-        // Rotar al luchador en el aire (efecto de voltereta muy lento)
-        luchador->rotacionLocal.x += 90.0f * deltaTime; // 90 grados por segundo (muy lento)
-
-        // Si el luchador alcanza la altura de primo o empieza a bajar significativamente
-        if (velocidadLuchador.y < -2.0f || luchador->posicionLocal.y <= primo->posicionLocal.y + 2.0f) {
-            estadoAnimacionLuchador = 1;
-            tiempoAnimacionLuchador = 0.0f;
-        }
-
-        luchador->actualizarTransformacion();
-        break;
-    }
-
-    case 1: { // Luchador cae sobre primo
-        tiempoAnimacionLuchador += deltaTime;
-
-        // Continuar aplicando gravedad
-        luchador->posicionLocal += velocidadLuchador * deltaTime;
-        velocidadLuchador.y += gravedadLuchador * deltaTime;
-
-        // Continuar rotación (muy lenta)
-        luchador->rotacionLocal.x += 90.0f * deltaTime;
-
-        // Verificar colisión con primo
-        float distancia = glm::length(luchador->posicionLocal - primo->posicionLocal);
-        if (distancia < 3.0f || luchador->posicionLocal.y <= primo->posicionLocal.y) {
-            // Impacto! Posicionar luchador sobre primo
-            luchador->posicionLocal = primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f);
-            luchador->rotacionLocal.x = 0.0f; // Resetear rotación
-
-            estadoAnimacionLuchador = 2;
-            tiempoAnimacionLuchador = 0.0f;
-        }
-
-        luchador->actualizarTransformacion();
-        break;
-    }
-
-    case 2: { // Primo cae al suelo
-        tiempoAnimacionLuchador += deltaTime;
-
-        float duracionCaida = 1.5f; // 1.5 segundos para caer (muy lento)
-        float progreso = glm::min(tiempoAnimacionLuchador / duracionCaida, 1.0f);
-
-        // Interpolar rotación de primo (cae hacia atrás)
-        primo->rotacionLocal.x = glm::mix(0.0f, -90.0f, progreso);
-
-        // Interpolar posición de primo (baja un poco)
-        float alturaFinal = posicionInicialPrimo.y - 1.5f;
-        primo->posicionLocal.y = glm::mix(posicionInicialPrimo.y, alturaFinal, progreso);
-
-        // Luchador permanece sobre primo
-        luchador->posicionLocal = primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f);
-
-        if (progreso >= 1.0f) {
-            estadoAnimacionLuchador = 3;
-            tiempoAnimacionLuchador = 0.0f;
-            tiempoEsperaLevantada = 0.0f;
-        }
-
-        primo->actualizarTransformacion();
-        luchador->actualizarTransformacion();
-        break;
-    }
-
-    case 3: { // Primo permanece tirado (espera)
-        tiempoEsperaLevantada += deltaTime;
-
-        // Luchador salta del primo y vuelve al ring
-        if (tiempoEsperaLevantada >= TIEMPO_ESPERA_PRIMO) {
-            estadoAnimacionLuchador = 4;
-            tiempoAnimacionLuchador = 0.0f;
-        }
-        break;
-    }
-
-    case 4: { // Primo se levanta y luchador vuelve
-        tiempoAnimacionLuchador += deltaTime;
-
-        float duracionLevantada = 4.0f; // 4 segundos para levantarse (muy lento)
-        float progreso = glm::min(tiempoAnimacionLuchador / duracionLevantada, 1.0f);
-
-        // Interpolar rotación de primo (vuelve a estar de pie)
-        primo->rotacionLocal.x = glm::mix(-90.0f, 0.0f, progreso);
-
-        // Interpolar posición de primo (sube)
-        primo->posicionLocal.y = glm::mix(posicionInicialPrimo.y - 1.5f, posicionInicialPrimo.y, progreso);
-
-        // Luchador vuelve a su posición inicial
-        luchador->posicionLocal = glm::mix(
-            primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f),
-            posicionInicialLuchador,
-            progreso
-        );
-
-        // Resetear rotación del luchador gradualmente
-        luchador->rotacionLocal.x = glm::mix(luchador->rotacionLocal.x, 0.0f, progreso);
-
-        if (progreso >= 1.0f) {
-            // Resetear todo para el próximo ciclo
-            luchador->posicionLocal = posicionInicialLuchador;
-            luchador->rotacionLocal = glm::vec3(0.0f, -135.0f, 0.0f);
-            primo->posicionLocal = posicionInicialPrimo;
-            primo->rotacionLocal = rotacionInicialPrimo;
-
-            estadoAnimacionLuchador = 0;
-            tiempoAnimacionLuchador = 0.0f;
-        }
-
-        primo->actualizarTransformacion();
-        luchador->actualizarTransformacion();
-        break;
-    }
     }
 }
 

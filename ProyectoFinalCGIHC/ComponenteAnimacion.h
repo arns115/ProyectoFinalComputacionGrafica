@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <glm.hpp>
+#include <gtc/quaternion.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -58,9 +59,16 @@ public:
     void cargarKeyframes(void);
     void interpolation(void);
     void animateKeyframes(void);
+    
+    // New animation methods for scene objects
+    void animarCanoa(int indiceAnimacion, float deltaTime);
+    void animarLuchador(int indiceAnimacion, float deltaTime, Entidad* primo);
 
 private:
 	Entidad* entidad;  // Referencia a la entidad que tiene esta informacion de animacion
+    
+    // Variable para guardar rotación pre-salto de Cuphead (específica de cada instancia)
+    glm::quat rotacionPreSaltoQuat;
     
     // Funciones de animación específicas por entidad
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
