@@ -167,7 +167,7 @@ void Window::ManejaScroll(GLFWwindow* window, double xOffset, double yOffset) {
 
 GLfloat Window::getScrollChange() {
 	GLfloat change = scrollChange;
-	scrollChange = 0.0f;  // Resetear scrollChange, no change
+	scrollChange = 0.0f;  // Resetear scrollChange
 	return change;
 }
 

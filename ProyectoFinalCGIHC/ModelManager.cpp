@@ -92,8 +92,12 @@ ModelManager::ModelManager()
 
 	// Ring de pelea
 	loadModel(AssetConstants::ModelNames::RING_PELEA, AssetConstants::ModelPaths::RING_PELEA);
-}
 
+	// NPCs Mayas
+	loadModel(AssetConstants::ModelNames::TRADER, AssetConstants::ModelPaths::TRADER);
+	loadModel(AssetConstants::ModelNames::MERCHANT, AssetConstants::ModelPaths::MERCHANT);
+	loadModel(AssetConstants::ModelNames::PIPILA, AssetConstants::ModelPaths::PIPILA);
+}
 
 // Carga un modelo en el manager
 void ModelManager::loadModel(const std::string& modelName, const std::string& modelPath)

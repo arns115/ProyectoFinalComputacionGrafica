@@ -152,6 +152,22 @@ private:
     glm::vec3 posicionDestinoCanoa;
     float rotacionObjetivoCanoa = 0.0f;
     bool animacionCanoaActiva = false; // Control para activar/desactivar animación
+    
+    // Variables para animación del luchador y primo
+    Entidad* luchador = nullptr;
+    Entidad* primo = nullptr;
+    int estadoAnimacionLuchador = 0; // 0-5: diferentes fases de la animación
+    float tiempoAnimacionLuchador = 0.0f;
+    glm::vec3 posicionInicialLuchador;
+    glm::vec3 posicionInicialPrimo;
+    glm::vec3 rotacionInicialPrimo;
+    float velocidadSaltoLuchador = 4.0f;  // Velocidad inicial del salto (aún más lento que 8.0f)
+    float gravedadLuchador = -8.0f;       // Gravedad simulada (aún más suave que -16.0f)
+    glm::vec3 velocidadLuchador;          // Velocidad actual del luchador
+    bool animacionLuchadorActiva = true;  // Control para activar/desactivar animación
+    float tiempoEsperaLevantada = 0.0f;   // Tiempo que primo espera tirado antes de levantarse
+    const float TIEMPO_ESPERA_PRIMO = 48.0f; // 12 segundos tirado (aumentado de 32.0f para mayor delay)
+    const float TIEMPO_DELAY_POST_IMPACTO = 4.0f; // 4 segundos de pausa después del impacto
 
 
     //Funciones para inicializar componentes de la escena
@@ -204,7 +220,9 @@ private:
     void crearArbolesAlrededorChinampa();
     void crearCanoa();
     void actualizarAnimacionCanoa(float deltaTime);
+	void actualizarAnimacionLuchador(float deltaTime);
     void crearCanchaPelotaMaya();
+	void crearPoblacionMaya();
     
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
