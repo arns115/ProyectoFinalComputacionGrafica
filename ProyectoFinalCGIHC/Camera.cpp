@@ -213,26 +213,34 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 	glm::vec3 forwardFlat = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
 	glm::vec3 rightFlat = glm::normalize(glm::vec3(right.x, 0.0f, right.z));
 
+	bool movingForward = false;
+	bool movingBackward = false;
+	bool movingSideways = false;
+
 	// Movimiento adelante/atrás
 	if (keys[GLFW_KEY_W])
 	{
 		movement += forwardFlat * velocity;
+		movingForward = true;
 	}
 
 	if (keys[GLFW_KEY_S])
 	{
 		movement -= forwardFlat * velocity;
+		movingBackward = true;
 	}
 
 	// Movimiento lateral
 	if (keys[GLFW_KEY_A])
 	{
 		movement -= rightFlat * velocity;
+		movingSideways = true;
 	}
 
 	if (keys[GLFW_KEY_D])
 	{
 		movement += rightFlat * velocity;
+		movingSideways = true;
 	}
 
 	// Salto con Space
@@ -266,15 +274,28 @@ void Camera::moveThirdPersonTarget(bool* keys, GLfloat deltaTime)
 		float horizontalLength = glm::length(horizontalMovement);
 		
 		if (horizontalLength > 0.001f) {  // Umbral pequeño para evitar divisiones por cero
-			glm::vec3 moveDir = glm::normalize(horizontalMovement);
-			float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
-			// Actualizar rotación Y del personaje para que mire en la dirección de movimiento
-			thirdPersonTarget->rotacionLocalQuat = glm::quat(1, 0, 0, 0);
-			thirdPersonTarget->rotacionLocal = glm::vec3(
-				thirdPersonTarget->rotacionInicial.x,
-				thirdPersonTarget->rotacionInicial.y + targetYaw, 
-				thirdPersonTarget->rotacionInicial.z
-			);
+			// Solo rotar el personaje si se mueve hacia adelante (W) o a los lados (A/D)
+			// Si solo presiona S (retroceder), el personaje NO rota, camina hacia atrás
+			if (movingForward || (movingSideways && !movingBackward)) {
+				glm::vec3 moveDir = glm::normalize(horizontalMovement);
+				float targetYaw = glm::degrees(atan2(moveDir.x, moveDir.z));
+				
+				// Actualizar rotación Y del personaje para que mire en la dirección de movimiento
+				thirdPersonTarget->rotacionLocalQuat = glm::quat(1, 0, 0, 0);
+				thirdPersonTarget->rotacionLocal = glm::vec3(
+					thirdPersonTarget->rotacionInicial.x,
+					thirdPersonTarget->rotacionInicial.y + targetYaw, 
+					thirdPersonTarget->rotacionInicial.z
+				);
+			}
+			// Si solo presiona S sin A/D, el personaje mantiene su rotación actual
+			// y camina hacia atrás en reversa
+			
+			// Ajustar la cámara para que quede detrás cuando se mueve hacia atrás solo
+			if (movingBackward && !movingForward && !movingSideways) {
+				// Hacer que el yaw de la cámara coincida con la dirección del personaje
+				yaw = thirdPersonTarget->rotacionLocal.y;
+			}
 		}
 	}
 	
@@ -338,6 +359,31 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 
 	yaw += xChange;
 	pitch += yChange;
+
+	// En modo tercera persona, limitar el yaw para evitar ver de frente al personaje
+	if (thirdPersonMode && thirdPersonTarget != nullptr) {
+		// Obtener la rotación Y del personaje
+		float targetYaw = thirdPersonTarget->rotacionLocal.y;
+		
+		// Calcular el yaw relativo a la dirección del personaje
+		float relativeYaw = yaw - targetYaw;
+		
+		// Normalizar el ángulo relativo entre -180 y 180
+		while (relativeYaw > 180.0f) relativeYaw -= 360.0f;
+		while (relativeYaw < -180.0f) relativeYaw += 360.0f;
+		
+		// Limitar el yaw relativo para evitar ver el frente del personaje
+		// Permitir rotación de -135 a 135 grados (270 grados totales)
+		// Esto bloquea los 90 grados frontales
+		if (relativeYaw > 135.0f) {
+			relativeYaw = 135.0f;
+			yaw = targetYaw + relativeYaw;
+		}
+		if (relativeYaw < -135.0f) {
+			relativeYaw = -135.0f;
+			yaw = targetYaw + relativeYaw;
+		}
+	}
 
 	if (pitch > 89.0f)
 	{

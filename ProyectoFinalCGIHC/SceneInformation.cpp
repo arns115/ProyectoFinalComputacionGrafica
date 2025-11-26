@@ -203,8 +203,8 @@ void SceneInformation::actualizarFrame(float deltaTime)
             if (entidad->nombreObjeto == "pelota") {
                 entidad->animacion->animateKeyframes();
             }
-            // Procesar animación de keyframes del pez
-            if (entidad->nombreObjeto == "pez") {
+            // En actualizarFrame(), la línea que procesa la animación del pez debe tener verificación de nullptr
+            if (entidad->nombreObjeto == "pez" && entidad->animacion != nullptr) {
                 entidad->animacion->animateKeyframes();
             }
 
@@ -359,7 +359,7 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
             }
         }
         // B: Activa la animación del pez por keyframes
-        if (entidad->nombreObjeto == "pez") {
+        if (entidad->nombreObjeto == "pez" && entidad->animacion != nullptr) {
             if (keys[GLFW_KEY_B]) {
                 entidad->animacion->play = true;
             }
@@ -1643,389 +1643,137 @@ void SceneInformation::crearPyramideMuseo()
     agregarEntidad(pyramidemuseo);
     agregarEntidad(pyramidemuseo1);
 }
-
-// Crear objetos peces en el agua
-void SceneInformation::crearPez(){
-for (int i = 0; i < 10; i++) {
-    // Posición base del prisma de agua (sin cambios)
+// Crear un pez en el agua con animación por keyframes
+void SceneInformation::crearPez() {
+    // Posición base del prisma de agua
     glm::vec3 posicionBase(-150.0f, -1.35f, -150.0f);
     float escalaBase = 8.0f;
+
     // Calcular altura sobre el prisma de agua
-            // El prisma de agua tiene altura 0.1 * escala = 0.8
-            // Los peces deben estar un poco por encima de la superficie del agua
     float alturaAguaEscalada = 0.1f * escalaBase;
-    float yPez = posicionBase.y + alturaAguaEscalada + 0.3f; // 0.3f para elevar sobre el agua
-    // Generar posición aleatoria dentro del prisma de agua
-           // Limitar el rango para que no salgan demasiado lejos de la chinampa
-    float xAleatorio = posicionBase.x + ((std::rand() % 100) / 100.0f - 0.5f) * 6.0f;
-    float zAleatorio = posicionBase.z + ((std::rand() % 100) / 100.0f - 0.5f) * 6.0f;
+    float yPez = posicionBase.y + alturaAguaEscalada - 0.3;
+
+    // Posición inicial del pez (centro del agua)
+    glm::vec3 posicionInicial(posicionBase.x  +8.5f, yPez, posicionBase.z-13.0f);
+
+    // Crear entidad del pez
     Entidad* pez = new Entidad("pez",
-        glm::vec3(xAleatorio, yPez, zAleatorio),
+        posicionInicial,
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.5f, 0.5f, 0.5f)); // Escala ajustada para los peces
+        glm::vec3(0.5f, 0.5f, 0.5f));
+
     pez->setTipoObjeto(TipoObjeto::MODELO);
     pez->setModelo(AssetConstants::ModelNames::PEZ,
         modelManager.getModel(AssetConstants::ModelNames::PEZ));
     pez->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
         materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
     pez->actualizarTransformacion();
+
+    // Crear y configurar componente de animación
     pez->animacion = new ComponenteAnimacion(pez);
+
+    // Cargar keyframes para la animación del pez (similar a la pelota)
+    pez->animacion->cargarKeyframes();
+
     agregarEntidad(pez);
-}
 }
 
 // Mercado
+// Mercado
 void SceneInformation::creaCarpa()
 {
-    //Primera fila 
-    Entidad* puestokekas1 = new Entidad("puestokekas",
-        glm::vec3(-33.0f, -1.0f, 23.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.7f, 3.7f, 3.7f));
+    // Estructura para almacenar datos de configuración de cada entidad del mercado
+    struct ConfigEntidadMercado {
+        std::string tipo;           // "puestokekas", "carpaymesa", "carpavacia", "carpabuena", "puestopescados"
+        glm::vec3 posicion;
+        glm::vec3 rotacion;
+        glm::vec3 escala;
+    };
 
-    Entidad* carpaymesa1 = new Entidad("carpaymesa",
-        glm::vec3(-33.0f, -1.0f, 39.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
+    // Definir todas las entidades del mercado en un vector
+    std::vector<ConfigEntidadMercado> configuraciones = {
+        // Primera fila
+        {"puestokekas", glm::vec3(-33.0f, -1.0f, 23.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.7f, 3.7f, 3.7f)},
+        {"carpaymesa", glm::vec3(-33.0f, -1.0f, 39.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpavacia", glm::vec3(-34.0f, -1.0f, 53.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpaymesa", glm::vec3(-33.0f, -1.0f, 67.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpabuena", glm::vec3(-32.0f, -1.0f, 84.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestopescados", glm::vec3(-20.0f, -1.0f, 81.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.5f, 3.5f, 3.5f)},
+        {"puestopescados", glm::vec3(-20.0f, -1.0f, 85.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.5f, 3.5f, 3.5f)},
+        {"puestokekas", glm::vec3(-32.0f, -1.0f, 98.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.5f, 3.5f, 3.5f)},
+        {"carpavacia", glm::vec3(-34.0f, -1.0f, 110.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpabuena", glm::vec3(-32.0f, -1.0f, 124.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
 
-    Entidad* carpavacia = new Entidad("carpavacia",
-        glm::vec3(-34.0f, -1.0f, 53.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
+        // Segunda fila
+        {"carpavacia", glm::vec3(-54.0f, -1.0f, 23.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpabuena", glm::vec3(-52.0f, -1.0f, 37.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestopescados", glm::vec3(-33.0f, -1.0f, 37.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestokekas", glm::vec3(-53.0f, -1.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.7f, 3.7f, 3.7f)},
+        {"carpavacia", glm::vec3(-54.0f, -1.0f, 63.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpaymesa", glm::vec3(-53.0f, -1.0f, 80.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"puestokekas", glm::vec3(-52.0f, -1.0f, 93.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.5f, 3.5f, 3.5f)},
+        {"carpabuena", glm::vec3(-52.0f, -1.0f, 105.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestopescados", glm::vec3(-35.0f, -1.0f, 105.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"carpaymesa", glm::vec3(-53.0f, -1.0f, 125.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
 
-    Entidad* carpaymesa = new Entidad("carpaymesa",
-        glm::vec3(-33.0f, -1.0f, 67.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
+        // Tercera fila
+        {"carpaymesa", glm::vec3(-73.0f, -1.0f, 23.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpavacia", glm::vec3(-74.0f, -1.0f, 38.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"puestokekas", glm::vec3(-73.0f, -1.0f, 50.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.7f, 3.7f, 3.7f)},
+        {"carpabuena", glm::vec3(-72.0f, -1.0f, 65.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"carpaymesa", glm::vec3(-73.0f, -1.0f, 80.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"carpavacia", glm::vec3(-74.0f, -1.0f, 95.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(3.0f, 3.0f, 3.0f)},
+        {"puestopescados", glm::vec3(-55.0f, -1.0f, 105.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestopescados", glm::vec3(-55.0f, -1.0f, 110.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"puestopescados", glm::vec3(-55.0f, -1.0f, 115.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)},
+        {"carpabuena", glm::vec3(-72.0f, -1.0f, 126.0f), glm::vec3(0.0f, 180.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)}
+    };
 
-    Entidad* carpabuena = new Entidad("carpabuena",
-        glm::vec3(-32.0f, -1.0f, 84.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
+    // Función auxiliar para crear y configurar una entidad
+    auto crearEntidadMercado = [this](const std::string& tipo, const glm::vec3& pos, const glm::vec3& rot, const glm::vec3& esc, int indice) {
+        // Generar nombre único para la entidad
+        std::string nombreEntidad = tipo + "_" + std::to_string(indice);
 
-    Entidad* puestopescados = new Entidad("puestopescados",
-        glm::vec3(-20.0f, -1.0f, 81.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(3.5f, 3.5f, 3.5f));
+        // Crear la entidad
+        Entidad* entidad = new Entidad(nombreEntidad, pos, rot, esc);
+        entidad->setTipoObjeto(TipoObjeto::MODELO);
 
-    Entidad* puestopescados1 = new Entidad("puestopescados",
-        glm::vec3(-20.0f, -1.0f, 85.5f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.5f, 3.5f, 3.5f));
+        // Asignar el modelo correspondiente según el tipo
+        if (tipo == "carpavacia") {
+            entidad->setModelo(AssetConstants::ModelNames::CARPAVACIA,
+                modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
+        }
+        else if (tipo == "carpaymesa") {
+            entidad->setModelo(AssetConstants::ModelNames::CARPAYMESA,
+                modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
+        }
+        else if (tipo == "carpabuena") {
+            entidad->setModelo(AssetConstants::ModelNames::CARPABUENA,
+                modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
+        }
+        else if (tipo == "puestopescados") {
+            entidad->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS,
+                modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
+        }
+        else if (tipo == "puestokekas") {
+            entidad->setModelo(AssetConstants::ModelNames::PUESTOKEKAS,
+                modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
+        }
 
-    Entidad* puestokekas = new Entidad("puestokekas",
-        glm::vec3(-32.0f, -1.0f, 98.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.5f, 3.5f, 3.5f));
+        entidad->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+            materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+        entidad->actualizarTransformacion();
 
-    Entidad* carpavacia1 = new Entidad("carpavacia",
-        glm::vec3(-34.0f, -1.0f, 110.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
+        return entidad;
+        };
 
-    Entidad* carpabuena1 = new Entidad("carpabuena",
-        glm::vec3(-32.0f, -1.0f, 124.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    //Segunda Fila
-    Entidad* carpavacia2 = new Entidad("carpavacia",
-        glm::vec3(-54.0f, -1.0f, 23.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* carpabuena2 = new Entidad("carpabuena",
-        glm::vec3(-52.0f, -1.0f, 37.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* puestopescados2 = new Entidad("puestopescados",
-        glm::vec3(-33.0f, -1.0f, 37.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* puestokekas2 = new Entidad("puestokekas",
-        glm::vec3(-53.0f, -1.0f, 50.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.7f, 3.7f, 3.7f));
-
-    Entidad* carpavacia3 = new Entidad("carpavacia",
-        glm::vec3(-54.0f, -1.0f, 63.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* carpaymesa2 = new Entidad("carpaymesa",
-        glm::vec3(-53.0f, -1.0f, 80.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* puestokekas3 = new Entidad("puestokekas",
-        glm::vec3(-52.0f, -1.0f, 93.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.5f, 3.5f, 3.5f));
-
-    Entidad* carpabuena3 = new Entidad("carpabuena",
-        glm::vec3(-52.0f, -1.0f, 105.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* puestopescados3 = new Entidad("puestopescados",
-        glm::vec3(-35.0f, -1.0f, 105.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* carpaymesa3 = new Entidad("carpaymesa",
-        glm::vec3(-53.0f, -1.0f, 125.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    //Tercer Fila
-    Entidad* carpaymesa4 = new Entidad("carpaymesa",
-        glm::vec3(-73.0f, -1.0f, 23.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* carpavacia4 = new Entidad("carpavacia",
-        glm::vec3(-74.0f, -1.0f, 38.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* puestokekas4 = new Entidad("puestokekas",
-        glm::vec3(-73.0f, -1.0f, 50.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.7f, 3.7f, 3.7f));
-
-    Entidad* carpabuena4 = new Entidad("carpabuena",
-        glm::vec3(-72.0f, -1.0f, 65.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* carpaymesa5 = new Entidad("carpaymesa",
-        glm::vec3(-73.0f, -1.0f, 80.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* carpavacia5 = new Entidad("carpavacia",
-        glm::vec3(-74.0f, -1.0f, 95.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(3.0f, 3.0f, 3.0f));
-
-    Entidad* puestopescados4 = new Entidad("puestopescados",
-        glm::vec3(-55.0f, -1.0f, 105.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* puestopescados5 = new Entidad("puestopescados",
-        glm::vec3(-55.0f, -1.0f, 110.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* puestopescados6 = new Entidad("puestopescados",
-        glm::vec3(-55.0f, -1.0f, 115.0f),
-        glm::vec3(0.0f, .0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    Entidad* carpabuena5 = new Entidad("carpabuena",
-        glm::vec3(-72.0f, -1.0f, 126.0f),
-        glm::vec3(0.0f, 180.0f, 0.0f),
-        glm::vec3(4.0f, 4.0f, 4.0f));
-
-    carpavacia->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia->actualizarTransformacion();
-
-    carpavacia1->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia1->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia1->actualizarTransformacion();
-
-    carpavacia2->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia2->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia2->actualizarTransformacion();
-
-    carpavacia3->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia3->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia3->actualizarTransformacion();
-
-    carpavacia4->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia4->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia4->actualizarTransformacion();
-
-    carpavacia5->setTipoObjeto(TipoObjeto::MODELO);
-    carpavacia5->setModelo(AssetConstants::ModelNames::CARPAVACIA, modelManager.getModel(AssetConstants::ModelNames::CARPAVACIA));
-    carpavacia5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpavacia5->actualizarTransformacion();
-
-    carpaymesa->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa->actualizarTransformacion();
-
-    carpaymesa1->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa1->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa1->actualizarTransformacion();
-
-    carpaymesa2->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa2->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa2->actualizarTransformacion();
-
-    carpaymesa3->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa3->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa3->actualizarTransformacion();
-
-    carpaymesa4->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa4->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa4->actualizarTransformacion();
-
-    carpaymesa5->setTipoObjeto(TipoObjeto::MODELO);
-    carpaymesa5->setModelo(AssetConstants::ModelNames::CARPAYMESA, modelManager.getModel(AssetConstants::ModelNames::CARPAYMESA));
-    carpaymesa5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpaymesa5->actualizarTransformacion();
-
-    carpabuena->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena->actualizarTransformacion();
-
-    carpabuena1->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena1->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena1->actualizarTransformacion();
-
-    carpabuena2->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena2->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena2->actualizarTransformacion();
-
-    carpabuena3->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena3->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena3->actualizarTransformacion();
-
-    carpabuena4->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena4->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena4->actualizarTransformacion();
-
-    carpabuena5->setTipoObjeto(TipoObjeto::MODELO);
-    carpabuena5->setModelo(AssetConstants::ModelNames::CARPABUENA, modelManager.getModel(AssetConstants::ModelNames::CARPABUENA));
-    carpabuena5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    carpabuena5->actualizarTransformacion();
-
-    puestopescados->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados->actualizarTransformacion();
-
-    puestopescados1->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados1->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados1->actualizarTransformacion();
-
-    puestopescados2->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados2->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados2->actualizarTransformacion();
-
-    puestopescados3->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados3->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados3->actualizarTransformacion();
-
-    puestopescados4->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados4->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados4->actualizarTransformacion();
-
-    puestopescados5->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados5->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados5->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados5->actualizarTransformacion();
-
-    puestopescados6->setTipoObjeto(TipoObjeto::MODELO);
-    puestopescados6->setModelo(AssetConstants::ModelNames::PUESTOPESCADOS, modelManager.getModel(AssetConstants::ModelNames::PUESTOPESCADOS));
-    puestopescados6->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestopescados6->actualizarTransformacion();
-
-    puestokekas->setTipoObjeto(TipoObjeto::MODELO);
-    puestokekas->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
-    puestokekas->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestokekas->actualizarTransformacion();
-
-    puestokekas1->setTipoObjeto(TipoObjeto::MODELO);
-    puestokekas1->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
-    puestokekas1->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestokekas1->actualizarTransformacion();
-
-    puestokekas2->setTipoObjeto(TipoObjeto::MODELO);
-    puestokekas2->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
-    puestokekas2->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestokekas2->actualizarTransformacion();
-
-    puestokekas3->setTipoObjeto(TipoObjeto::MODELO);
-    puestokekas3->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
-    puestokekas3->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestokekas3->actualizarTransformacion();
-
-    puestokekas4->setTipoObjeto(TipoObjeto::MODELO);
-    puestokekas4->setModelo(AssetConstants::ModelNames::PUESTOKEKAS, modelManager.getModel(AssetConstants::ModelNames::PUESTOKEKAS));
-    puestokekas4->setMaterial(AssetConstants::MaterialNames::BRILLANTE, materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
-    puestokekas4->actualizarTransformacion();
-
-    agregarEntidad(carpavacia);
-    agregarEntidad(carpavacia1);
-    agregarEntidad(carpavacia2);
-    agregarEntidad(carpavacia3);
-    agregarEntidad(carpavacia4);
-    agregarEntidad(carpavacia5);
-    agregarEntidad(carpaymesa);
-    agregarEntidad(carpaymesa1);
-    agregarEntidad(carpaymesa2);
-    agregarEntidad(carpaymesa3);
-    agregarEntidad(carpaymesa4);
-    agregarEntidad(carpaymesa5);
-    agregarEntidad(carpabuena);
-    agregarEntidad(carpabuena1);
-    agregarEntidad(carpabuena2);
-    agregarEntidad(carpabuena3);
-    agregarEntidad(carpabuena4);
-    agregarEntidad(carpabuena5);
-    agregarEntidad(puestopescados);
-    agregarEntidad(puestopescados1);
-    agregarEntidad(puestopescados2);
-    agregarEntidad(puestopescados3);
-    agregarEntidad(puestopescados4);
-    agregarEntidad(puestopescados5);
-    agregarEntidad(puestopescados6);
-    agregarEntidad(puestokekas);
-    agregarEntidad(puestokekas1);
-    agregarEntidad(puestokekas2);
-    agregarEntidad(puestokekas3);
-    agregarEntidad(puestokekas4);
+    // Crear todas las entidades usando un ciclo
+    for (size_t i = 0; i < configuraciones.size(); i++) {
+        const auto& config = configuraciones[i];
+        Entidad* entidad = crearEntidadMercado(config.tipo, config.posicion, config.rotacion, config.escala, i);
+        agregarEntidad(entidad);
+    }
 }
-
-void SceneInformation::crearPiso()
-{
-    // Crear el piso
-    Entidad* piso = new Entidad("piso");
-    piso->setTipoObjeto(TipoObjeto::MESH);
-    piso->nombreMesh = AssetConstants::MeshNames::PISO;
-    piso->nombreTextura = AssetConstants::TextureNames::PASTO;
-    piso->nombreMaterial = AssetConstants::MaterialNames::OPACO;
-    piso->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
-    piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
-    piso->actualizarTransformacion();
-    agregarEntidad(piso);
-}
-
 // Crear pelota del juego de pelota
 void SceneInformation::crearPelotaDeJuegoDePelota() {
 
@@ -2595,4 +2343,18 @@ void SceneInformation::vincularRecursos(Entidad* entidad)
     for (auto* hijo : entidad->hijos) {
         vincularRecursos(hijo);
     }
+}
+
+void SceneInformation::crearPiso()
+{
+    // Crear el piso
+    Entidad* piso = new Entidad("piso");
+    piso->setTipoObjeto(TipoObjeto::MESH);
+    piso->nombreMesh = AssetConstants::MeshNames::PISO;
+    piso->nombreTextura = AssetConstants::TextureNames::PASTO;
+    piso->nombreMaterial = AssetConstants::MaterialNames::OPACO;
+    piso->posicionLocal = glm::vec3(0.0f, -1.0f, 0.0f);
+    piso->escalaLocal = glm::vec3(30.0f, 1.0f, 30.0f);
+    piso->actualizarTransformacion();
+    agregarEntidad(piso);
 }
