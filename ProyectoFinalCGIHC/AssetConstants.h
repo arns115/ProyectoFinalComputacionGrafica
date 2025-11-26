@@ -65,7 +65,7 @@ namespace AssetConstants {
 		const std::string ISAAC_PIERNA_DERECHA = "isaac_pierna_derecha";
 
 		// Modelos para Gojo (jerarquia)
-		const std::string GOJO = "gojo"; // modelo principal
+		const std::string GOJO = "gojo";
 		const std::string GOJO_BRAZO_IZQ = "gojobrazoizq";
 		const std::string GOJO_BRAZO_DER = "gojobrazoder";
 		const std::string GOJO_PIERNA_IZQ = "gojopiernaizq";
@@ -109,6 +109,10 @@ namespace AssetConstants {
 		const std::string PEDESTAL_PIEDRA = "pedestal_piedra";
 	
 		const std::string RING_PELEA = "ring_pelea";
+		// NPCS Mayas
+		const std::string TRADER = "trader";
+		const std::string MERCHANT = "merchant";
+		const std::string PIPILA = "pipila";
 	}
 
 	// Nombres de meshes
@@ -188,7 +192,7 @@ namespace AssetConstants {
 
 
 		
-		// Cuphead - modelo jerárquico en formato .dae
+		// Cuphead - modelo jerárquico
 		const std::string CUPHEAD_TORSO = MODEL_PATH + "cuphead_torso.dae";
 		const std::string CUPHEAD_CABEZA = MODEL_PATH + "cuphead_cabeza.dae";
 		const std::string CUPHEAD_LECHE = MODEL_PATH + "cuphead_leche.dae";
@@ -210,7 +214,7 @@ namespace AssetConstants {
 		const std::string ISAAC_PIERNA_IZQUIERDA = MODEL_PATH + "isaac_pierna_izquierda.obj";
 		const std::string ISAAC_PIERNA_DERECHA = MODEL_PATH +"isaac_pierna_derecha.obj";
 
-		// Rutas para modelos de Gojo (jerarquia)
+		// Rutas para modelos de Gojo
 		const std::string GOJO = MODEL_PATH + "gojo.obj";
 		const std::string GOJOBRAZOIZQ = MODEL_PATH + "gojobrazoizq.obj";
 		const std::string GOJOBRAZODER = MODEL_PATH + "gojobrazoder.obj";
@@ -257,6 +261,11 @@ namespace AssetConstants {
 
 		// Ring de pelea
 		const std::string RING_PELEA = MODEL_PATH + "ring_pelea.obj";
+
+		// NPCS Mayas
+		const std::string TRADER = MODEL_PATH + "trader.obj";
+		const std::string MERCHANT = MODEL_PATH + "merchant.obj";
+		const std::string PIPILA = MODEL_PATH + "pipila.obj";
 	}
 
 	// Nombres de shaders

@@ -67,13 +67,19 @@ private:
 	// Variable para detectar pulsación de tecla Q
 	bool qKeyPressed;
 
-	// NUEVO: Nivel del suelo para física
+	// Nivel del suelo para física
 	float groundLevel;
 	
 	// Variables para detección de teclas de cambio de modo
 	bool key8Pressed;  // Tecla 8 para cámara libre
 	bool key9Pressed;  // Tecla 9 para tercera persona
 	bool key0Pressed;  // Tecla 0 para vista aérea (renombrado)
+
+	// Variables para detección de teclas de teletransportación
+	bool keyHPressed;  // Tecla H para teletransporte a pirámide
+	bool keyJPressed;  // Tecla J para teletransporte a cancha
+	bool keyKPressed;  // Tecla K para teletransporte a chinampas
+	bool keyLPressed;  // Tecla L para teletransporte a boss room
 
 	// Variables para vista aérea
 	bool aerialViewMode;
@@ -100,5 +106,6 @@ private:
 	void saveCurrentState();
 	void restoreState();
 	void moveThirdPersonTarget(bool* keys, GLfloat deltaTime);
+	void teleportToLocation(glm::vec3 position, GLfloat yaw, GLfloat pitch);
 };
 

@@ -1,7 +1,9 @@
 #pragma once
 #include "PointLight.h"
+
+// Clase para representar una luz spot (foco)
 class SpotLight :
-	public PointLight
+	public PointLight // Hereda de la clase PointLight
 {
 public:
 	SpotLight();
@@ -13,6 +15,7 @@ public:
 		GLfloat con, GLfloat lin, GLfloat exp,
 		GLfloat edg);
 
+	// Método para usar la luz spot en shaders
 	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
 		GLuint diffuseIntensityLocation, GLuint positionLocation, GLuint directionLocation,
 		GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation,

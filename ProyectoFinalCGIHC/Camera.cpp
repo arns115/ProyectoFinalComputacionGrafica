@@ -36,6 +36,12 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	key9Pressed = false;
 	key0Pressed = false;
 
+	// Inicializar detección de teclas de teletransportación
+	keyHPressed = false;
+	keyJPressed = false;
+	keyKPressed = false;
+	keyLPressed = false;
+
 	// Inicializar modo vista aérea
 	aerialViewMode = false;
 	aerialViewHeight = 100.0f;  // Altura más alta para mejor vista del escenario
@@ -82,6 +88,49 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		}
 	} else {
 		key0Pressed = false;
+	}
+
+	// Teclas de teletransportación
+	if (isFreeCameraMode()) {
+		// Tecla H: Teletransporte a la pirámide
+		if (keys[GLFW_KEY_H]) {
+			if (!keyHPressed) {
+				teleportToLocation(glm::vec3(0.0f, 5.0f, -70.0f), -90.0f, 0.0f);
+				keyHPressed = true;
+			}
+		} else {
+			keyHPressed = false;
+		}
+
+		// Tecla J: Teletransporte a la cancha de juego de pelota
+		if (keys[GLFW_KEY_J]) {
+			if (!keyJPressed) {
+				teleportToLocation(glm::vec3(80.0f, 5.0f, 90.0f), 0.0f, 0.0f);
+				keyJPressed = true;
+			}
+		} else {
+			keyJPressed = false;
+		}
+
+		// Tecla K: Teletransporte a las chinampas
+		if (keys[GLFW_KEY_K]) {
+			if (!keyKPressed) {
+				teleportToLocation(glm::vec3(-130.0f, 5.0f, -130.0f), 180.0f, 0.0f);
+				keyKPressed = true;
+			}
+		} else {
+			keyKPressed = false;
+		}
+
+		// Tecla L: Teletransporte a la boss room
+		if (keys[GLFW_KEY_L]) {
+			if (!keyLPressed) {
+				teleportToLocation(glm::vec3(160.0f, 5.0f, -150.0f), 90.0f, 0.0f);
+				keyLPressed = true;
+			}
+		} else {
+			keyLPressed = false;
+		}
 	}
 
 	// Si está en vista aérea, permitir movimiento limitado
@@ -525,6 +574,24 @@ void Camera::update()
 
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
+}
+
+void Camera::teleportToLocation(glm::vec3 newPosition, GLfloat newYaw, GLfloat newPitch)
+{
+	// Solo funciona en modo cámara libre
+	if (!isFreeCameraMode()) {
+		return;
+	}
+
+	// Actualizar posición
+	position = newPosition;
+
+	// Actualizar ángulos de rotación
+	yaw = newYaw;
+	pitch = newPitch;
+
+	// Recalcular vectores de dirección
+	update();
 }
 
 Camera::~Camera()

@@ -3,10 +3,11 @@
 #include <vector>
 #include <string>
 #include <glm.hpp>
+#include <gtc/quaternion.hpp>
 #include <iostream>
 #include <fstream>
 
-#define MAX_FRAMES 100 //Número de cuadros máximos
+#define MAX_FRAMES 100 // Número de cuadros máximos para keyframes
 
 
 class Entidad;
@@ -58,9 +59,16 @@ public:
     void cargarKeyframes(void);
     void interpolation(void);
     void animateKeyframes(void);
+    
+    // New animation methods for scene objects
+    void animarCanoa(int indiceAnimacion, float deltaTime);
+    void animarLuchador(int indiceAnimacion, float deltaTime, Entidad* primo);
 
 private:
 	Entidad* entidad;  // Referencia a la entidad que tiene esta informacion de animacion
+    
+    // Variable para guardar rotación pre-salto de Cuphead (específica de cada instancia)
+    glm::quat rotacionPreSaltoQuat;
     
     // Funciones de animación específicas por entidad
     void animarIsaac(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
@@ -69,4 +77,6 @@ private:
     void animarCupheadSalto(int indiceAnimacion, float deltaTime);  // Animación de salto
 	void animarComidaPerro(int indiceAnimacion, float deltaTime); // Animacion de comida de perro(item del juego de isaac)
 	void animarPuerta(int indiceAnimacion, float deltaTime); // Animacion de la puerta secreta
+	//void animarLuchador(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
+	//void animarLuchador2(int indiceAnimacion, float deltaTime, float velocidadMovimiento);
 };
