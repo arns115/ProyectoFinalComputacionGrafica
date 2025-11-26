@@ -1087,7 +1087,19 @@ void ComponenteAnimacion::animarLuchador(int indiceAnimacion, float deltaTime, E
         float duracionCaida = 4.0f;
         float progreso = std::fmin(luchadorTiempo / duracionCaida, 1.0f);
         
-        primo->rotacionLocal.x = glm::mix(0.0f, -90.0f, progreso);
+        // Interpolar rotación absoluta desde la rotación inicial hasta -90 grados
+        float rotacionObjetivo = primoRotacionInicial.x - 90.0f;
+        float rotacionActual = glm::mix(primoRotacionInicial.x, rotacionObjetivo, progreso);
+        
+        // Crear quaternion de rotación directamente
+        glm::quat rotacionX = glm::angleAxis(glm::radians(rotacionActual), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::quat rotacionY = glm::angleAxis(glm::radians(primoRotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::quat rotacionZ = glm::angleAxis(glm::radians(primoRotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        // Aplicar la rotación completa
+        primo->rotacionLocalQuat = rotacionZ * rotacionY * rotacionX;
+        primo->rotacionLocal = glm::vec3(0.0f); // Limpiar rotación incremental
+        
         float alturaFinal = primoPosicionInicial.y - 0.5f;
         primo->posicionLocal.y = glm::mix(primoPosicionInicial.y, alturaFinal, progreso);
         entidad->posicionLocal = primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f);
@@ -1116,7 +1128,19 @@ void ComponenteAnimacion::animarLuchador(int indiceAnimacion, float deltaTime, E
         float duracionLevantada = 24.0f; // 24 segundos (3x8)
         float progreso = std::fmin(luchadorTiempo / duracionLevantada, 1.0f);
         
-        primo->rotacionLocal.x = glm::mix(-90.0f, 0.0f, progreso);
+        // Interpolar rotación absoluta desde -90 grados de vuelta a la rotación inicial
+        float rotacionInicio = primoRotacionInicial.x - 90.0f;
+        float rotacionActual = glm::mix(rotacionInicio, primoRotacionInicial.x, progreso);
+        
+        // Crear quaternion de rotación directamente
+        glm::quat rotacionX = glm::angleAxis(glm::radians(rotacionActual), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::quat rotacionY = glm::angleAxis(glm::radians(primoRotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::quat rotacionZ = glm::angleAxis(glm::radians(primoRotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        // Aplicar la rotación completa
+        primo->rotacionLocalQuat = rotacionZ * rotacionY * rotacionX;
+        primo->rotacionLocal = glm::vec3(0.0f); // Limpiar rotación incremental
+        
         primo->posicionLocal.y = glm::mix(primoPosicionInicial.y - 0.5f, primoPosicionInicial.y, progreso);
         entidad->posicionLocal = glm::mix(
             primo->posicionLocal + glm::vec3(0.0f, 2.0f, 0.0f),
@@ -1130,6 +1154,9 @@ void ComponenteAnimacion::animarLuchador(int indiceAnimacion, float deltaTime, E
             entidad->rotacionLocal = glm::vec3(0.0f, -135.0f, 0.0f);
             primo->posicionLocal = primoPosicionInicial;
             primo->rotacionLocal = primoRotacionInicial;
+            primo->rotacionLocalQuat = glm::angleAxis(glm::radians(primoRotacionInicial.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
+                                       glm::angleAxis(glm::radians(primoRotacionInicial.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                                       glm::angleAxis(glm::radians(primoRotacionInicial.x), glm::vec3(1.0f, 0.0f, 0.0f));
             luchadorEstado = 0;
             luchadorTiempo = 0.0f;
         }
