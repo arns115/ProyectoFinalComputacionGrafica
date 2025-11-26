@@ -47,7 +47,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_IZQUIERDA, AssetConstants::ModelPaths::ISAAC_PIERNA_IZQUIERDA);
 	loadModel(AssetConstants::ModelNames::ISAAC_PIERNA_DERECHA, AssetConstants::ModelPaths::ISAAC_PIERNA_DERECHA);
 
-	// Cargar modelos de Gojo (jerarqu�a)
+	// Cargar modelos de Gojo (jerarquía)
 	loadModel(AssetConstants::ModelNames::GOJO, AssetConstants::ModelPaths::GOJO);
 	loadModel(AssetConstants::ModelNames::GOJO_BRAZO_IZQ, AssetConstants::ModelPaths::GOJOBRAZOIZQ);
 	loadModel(AssetConstants::ModelNames::GOJO_BRAZO_DER, AssetConstants::ModelPaths::GOJOBRAZODER);
@@ -80,6 +80,7 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::PUERTA_SECRET_ROOM, AssetConstants::ModelPaths::PUERTA_SECRET_ROOM);
 	loadModel(AssetConstants::ModelNames::R_KEY, AssetConstants::ModelPaths::R_KEY);
 	loadModel(AssetConstants::ModelNames::SALA_DIABLO, AssetConstants::ModelPaths::SALA_DIABLO);
+	loadModel(AssetConstants::ModelNames::DIABLO, AssetConstants::ModelPaths::DIABLO);
 
 	// Fogatas
 	loadModel(AssetConstants::ModelNames::FUEGO_ROJO, AssetConstants::ModelPaths::FUEGO_ROJO);
@@ -97,6 +98,9 @@ ModelManager::ModelManager()
 	loadModel(AssetConstants::ModelNames::TRADER, AssetConstants::ModelPaths::TRADER);
 	loadModel(AssetConstants::ModelNames::MERCHANT, AssetConstants::ModelPaths::MERCHANT);
 	loadModel(AssetConstants::ModelNames::PIPILA, AssetConstants::ModelPaths::PIPILA);
+
+	// Pez
+	loadModel(AssetConstants::ModelNames::PEZ, AssetConstants::ModelPaths::PEZ);
 }
 
 // Carga un modelo en el manager

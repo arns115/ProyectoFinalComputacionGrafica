@@ -87,6 +87,7 @@ void SceneInformation::inicializarEntidades()
     crearHollow();
     crearBossRoom();
     crearSalaDiablo();
+    crearDiablo();
     crearSecretRoom();
     crearFogatas();
     crearComidaPerro();
@@ -102,6 +103,7 @@ void SceneInformation::inicializarEntidades()
     creaCarpa();
     crearLamparasCalles();
     crearLamparasRing();
+    crearPez();  // Crear el pez en el agua
     // Los personajes deben ser los ultimos en crearse para que la camara facilmente los pueda seguir (estaran en orden al final del vector de entidades)
     // Primero Cuphead
     // Segundo Isaac
@@ -154,13 +156,19 @@ void SceneInformation::actualizarFrame(float deltaTime)
 
     // Obtener posición del personaje activo
     glm::vec3 posicionPersonajeActivo(0.0f);
-    if (entidades.size() >= 3) {
-        // Los personajes están al final del vector
-        // 1: Cuphead (size - 3), 2: Isaac (size - 2), 3: Gojo (size - 1)
-        int indicePersonaje = static_cast<int>(entidades.size()) - (4 - personajeActual);
-        if (indicePersonaje >= 0 && indicePersonaje < entidades.size() && entidades[indicePersonaje] != nullptr) {
-            posicionPersonajeActivo = entidades[indicePersonaje]->posicionLocal;
-        }
+    Entidad* personajeActivoEntidad = nullptr;
+    
+    // Buscar el personaje activo por nombre según personajeActual
+    if (personajeActual == 1) {
+        personajeActivoEntidad = buscarEntidad("cuphead_torso");
+    } else if (personajeActual == 2) {
+        personajeActivoEntidad = buscarEntidad("isaac_cuerpo");
+    } else if (personajeActual == 3) {
+        personajeActivoEntidad = buscarEntidad("gojo");
+    }
+    
+    if (personajeActivoEntidad != nullptr) {
+        posicionPersonajeActivo = personajeActivoEntidad->posicionLocal;
     }
 
     // Vector temporal para almacenar luces puntuales con sus distancias
@@ -193,6 +201,10 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 entidad->animacion->actualizarAnimacion(0, deltaTime, 1.0);
             }
             if (entidad->nombreObjeto == "pelota") {
+                entidad->animacion->animateKeyframes();
+            }
+            // Procesar animación de keyframes del pez
+            if (entidad->nombreObjeto == "pez") {
                 entidad->animacion->animateKeyframes();
             }
 
@@ -309,20 +321,27 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     // Se maneja todo lo del teclado que no tenga que ver con la camara
     // 1: Cambia el modo tercera persona a cuphead
     if (keys[GLFW_KEY_1]) {
-        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 3]);
-        personajeActual = 1;
+        Entidad* cuphead = buscarEntidad("cuphead_torso");
+        if (cuphead != nullptr) {
+            camera.setThirdPersonTarget(cuphead);
+            personajeActual = 1;
+        }
     }
     // 2: Cambia el modo tercera persona a Isaac
     if (keys[GLFW_KEY_2]) {
-        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 2]);
-        personajeActual = 2;
-
+        Entidad* isaac = buscarEntidad("isaac_cuerpo");
+        if (isaac != nullptr) {
+            camera.setThirdPersonTarget(isaac);
+            personajeActual = 2;
+        }
     }
-    // 3: Cambia el modo tercera persona a Luchador
+    // 3: Cambia el modo tercera persona a Gojo
     if (keys[GLFW_KEY_3]) {
-        camera.setThirdPersonTarget(entidades[(int)entidades.size() - 1]);
-        personajeActual = 3;
-
+        Entidad* gojo = buscarEntidad("gojo");
+        if (gojo != nullptr) {
+            camera.setThirdPersonTarget(gojo);
+            personajeActual = 3;
+        }
     }
     // Se itera sobre las entidades para hacer acciones especificas
     for (auto* entidad : entidades) {
@@ -336,6 +355,12 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         // P: Lanza la pelota del juego de pelota maya
         if (entidad->nombreObjeto == "pelota") {
             if (keys[GLFW_KEY_P]) {
+                entidad->animacion->play = true;
+            }
+        }
+        // B: Activa la animación del pez por keyframes
+        if (entidad->nombreObjeto == "pez") {
+            if (keys[GLFW_KEY_B]) {
                 entidad->animacion->play = true;
             }
         }
@@ -794,7 +819,27 @@ void SceneInformation::crearSalaDiablo() {
     agregarEntidad(salaDiablo);
 }
 
-// Crear fogatas en la escena
+// Funcion para crear el diablo
+void SceneInformation::crearDiablo()
+{
+    // La sala del diablo está en (-150.0f, 17.45f, -230.0f) con escala (10.0f, 10.0f, 10.0f)
+    // Posicionamos al diablo en el centro de la sala, flotando un poco
+    
+    Entidad* diablo = new Entidad("diablo",
+        glm::vec3(-150.0f,-0.5f, -230.0f),    // Centro de la sala, elevado
+        glm::vec3(0.0f, 180.0f, 0.0f),         // Rotación para que mire hacia el frente
+        glm::vec3(0.2f, 0.2f, 0.2f));          // Escala para que sea imponente
+
+    diablo->setTipoObjeto(TipoObjeto::MODELO);
+    diablo->setModelo(AssetConstants::ModelNames::DIABLO, 
+        modelManager.getModel(AssetConstants::ModelNames::DIABLO));
+    diablo->setMaterial(AssetConstants::MaterialNames::OPACO, 
+        materialManager.getMaterial(AssetConstants::MaterialNames::OPACO));
+    diablo->actualizarTransformacion();
+
+    agregarEntidad(diablo);
+}
+
 void SceneInformation::crearFogatas() {
     Entidad* fogata1 = new Entidad("fuego_rojo",
         glm::vec3(-50.0f, -1.0f, 50.0f),      // Posición inicial
@@ -1599,6 +1644,36 @@ void SceneInformation::crearPyramideMuseo()
     agregarEntidad(pyramidemuseo1);
 }
 
+// Crear objetos peces en el agua
+void SceneInformation::crearPez(){
+for (int i = 0; i < 10; i++) {
+    // Posición base del prisma de agua (sin cambios)
+    glm::vec3 posicionBase(-150.0f, -1.35f, -150.0f);
+    float escalaBase = 8.0f;
+    // Calcular altura sobre el prisma de agua
+            // El prisma de agua tiene altura 0.1 * escala = 0.8
+            // Los peces deben estar un poco por encima de la superficie del agua
+    float alturaAguaEscalada = 0.1f * escalaBase;
+    float yPez = posicionBase.y + alturaAguaEscalada + 0.3f; // 0.3f para elevar sobre el agua
+    // Generar posición aleatoria dentro del prisma de agua
+           // Limitar el rango para que no salgan demasiado lejos de la chinampa
+    float xAleatorio = posicionBase.x + ((std::rand() % 100) / 100.0f - 0.5f) * 6.0f;
+    float zAleatorio = posicionBase.z + ((std::rand() % 100) / 100.0f - 0.5f) * 6.0f;
+    Entidad* pez = new Entidad("pez",
+        glm::vec3(xAleatorio, yPez, zAleatorio),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.5f, 0.5f, 0.5f)); // Escala ajustada para los peces
+    pez->setTipoObjeto(TipoObjeto::MODELO);
+    pez->setModelo(AssetConstants::ModelNames::PEZ,
+        modelManager.getModel(AssetConstants::ModelNames::PEZ));
+    pez->setMaterial(AssetConstants::MaterialNames::BRILLANTE,
+        materialManager.getMaterial(AssetConstants::MaterialNames::BRILLANTE));
+    pez->actualizarTransformacion();
+    pez->animacion = new ComponenteAnimacion(pez);
+    agregarEntidad(pez);
+}
+}
+
 // Mercado
 void SceneInformation::creaCarpa()
 {
@@ -1988,7 +2063,7 @@ void SceneInformation::crearObjetosGeometricos()
     // Crear esfera de prueba 2 - En el suelo
     Entidad* esfera2 = new Entidad("esfera2",
         glm::vec3(-5.0f, 1.0f, 5.0f),     // Posición: a la izquierda
-        glm::vec3(0.0f, 0.0f, 0.0f),      // Rotación de 45 grados
+        glm::vec3(0.0f, 0.0f, 0.0f),      // Rotación
         glm::vec3(1.5f, 1.5f, 1.5f));      // Escala
 
     esfera2->setTipoObjeto(TipoObjeto::MESH);

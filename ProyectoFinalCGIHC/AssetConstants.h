@@ -97,6 +97,7 @@ namespace AssetConstants {
 		const std::string PUERTA_SECRET_ROOM = "puerta_secret_room";
 		const std::string R_KEY = "r_key";
 		const std::string SALA_DIABLO = "sala_diablo";
+		const std::string DIABLO = "diablo";
 
 
 		// Fogatas
@@ -113,6 +114,9 @@ namespace AssetConstants {
 		const std::string TRADER = "trader";
 		const std::string MERCHANT = "merchant";
 		const std::string PIPILA = "pipila";
+
+		// Pez
+		const std::string PEZ = "pez";
 	}
 
 	// Nombres de meshes
@@ -254,6 +258,7 @@ namespace AssetConstants {
 
 		const std::string R_KEY = MODEL_PATH + "r_key.obj";
 		const std::string SALA_DIABLO = MODEL_PATH + "saladiablo.obj";
+		const std::string DIABLO = MODEL_PATH + "diablo.obj";
 
 		// Item de comida de perro (Binding of Isaac)
 		const std::string COMIDA_PERRO = MODEL_PATH + "comida_perro.obj";
@@ -266,6 +271,9 @@ namespace AssetConstants {
 		const std::string TRADER = MODEL_PATH + "trader.obj";
 		const std::string MERCHANT = MODEL_PATH + "merchant.obj";
 		const std::string PIPILA = MODEL_PATH + "pipila.obj";
+
+		// Pez
+		const std::string PEZ = MODEL_PATH + "pez1.obj";
 	}
 
 	// Nombres de shaders
