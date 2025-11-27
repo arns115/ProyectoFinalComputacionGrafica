@@ -935,8 +935,8 @@ void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
             canoaEstado = 1;
             canoaTiempo = 0.0f;
             // Girar hacia X positivo (90 grados)
-            entidad->rotacionLocal.y = 90.0f;
-            canoaRotacionActual = 90.0f;
+			entidad->rotacionLocal.y += 90.0f;
+            canoaRotacionActual = entidad->rotacionLocal.y;
         }
         break;
     }
@@ -958,8 +958,8 @@ void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
             canoaEstado = 3;
             canoaTiempo = 0.0f;
             // Girar hacia Z negativo (180 grados)
-            entidad->rotacionLocal.y = 180.0f;
-            canoaRotacionActual = 180.0f;
+            entidad->rotacionLocal.y += 90.0f;
+            canoaRotacionActual = entidad->rotacionLocal.y;
         }
         break;
     }
@@ -980,9 +980,9 @@ void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
         if (progreso >= 1.0f) {
             canoaEstado = 5;
             canoaTiempo = 0.0f;
-            // Girar hacia X negativo (270 grados)
-            entidad->rotacionLocal.y = 270.0f;
-            canoaRotacionActual = 270.0f;
+            // Girar hacia X negativo (270 grados / -90 grados)
+            entidad->rotacionLocal.y += 90.0f;
+            canoaRotacionActual = entidad->rotacionLocal.y;
         }
         break;
     }
@@ -1004,8 +1004,8 @@ void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
             canoaEstado = 7;
             canoaTiempo = 0.0f;
             // Girar hacia Z positivo para completar el ciclo (0 grados)
-            entidad->rotacionLocal.y = 0.0f;
-            canoaRotacionActual = 0.0f;
+            entidad->rotacionLocal.y += 90.0f;
+            canoaRotacionActual = entidad->rotacionLocal.y;
         }
         break;
     }
