@@ -140,6 +140,9 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
 
+    anguloLuzDireccional = (acumuladorTiempoDesdeCambio / (30.0f / LIMIT_FPS)) * glm::pi<float>();
+    luzDireccional.SetDirection(0.0f, -sin(anguloLuzDireccional), -cos(anguloLuzDireccional)); 
+
     // Se posiciona linterna en la posicion y direccion de la camara
     spotLightActual = *lightManager.getSpotLight(AssetConstants::LightNames::LINTERNA);
     posicionLuzActual = camera.getCameraPosition();
@@ -171,12 +174,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
         posicionPersonajeActivo = personajeActivoEntidad->posicionLocal;
     }
 
-    // Vector temporal para almacenar luces puntuales con sus distancias
-    struct LuzConDistancia {
-        PointLight luz;
-        float distancia;
-    };
-    std::vector<LuzConDistancia> lucesTemporales;
 
     // Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
@@ -192,9 +189,7 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 glm::vec3 posicionLuz = entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f);
                 pointLightActual.setPosition(posicionLuz);
 
-                // Calcular distancia al personaje activo
-                float distancia = glm::distance(posicionPersonajeActivo, posicionLuz);
-                lucesTemporales.push_back({ pointLightActual, distancia });
+				agregarLuzPuntualActual(pointLightActual);
             }
             // si esta activa la animacion se llama a la funcion de actualizarala
             if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
@@ -208,33 +203,33 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 entidad->animacion->animateKeyframes();
             }
 
-            // Procesar lámparas de calle y sus luces
-            if (entidad->nombreObjeto.find("lampara_") == 0) {
-                // Esta es una lámpara de calle
-                // Buscar su hijo que es la luz
-                for (auto* hijo : entidad->hijos) {
-                    if (hijo != nullptr && hijo->nombreObjeto == "punto_luz") {
-                        // Calcular la posición mundial de la luz
-                        glm::vec3 posicionMundialLuz = glm::vec3(
-                            entidad->transformacionLocal * glm::vec4(hijo->posicionLocal, 1.0f)
-                        );
 
-                        // Crear luz puntual con color amarillo cálido
-                        pointLightActual = PointLight(
-                            1.0f, 0.9f, 0.7f,  // Color amarillo cálido
-                            0.3f, 0.8f,         // Intensidad ambiental y difusa
-                            posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
-                            0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
-                        );
+            if (!esDeDia) {
+                // Procesar lámparas de calle y sus luces
+                if (entidad->nombreObjeto.find("lampara_") == 0) {
+                    // Esta es una lámpara de calle
+                    // Buscar su hijo que es la luz
+                    for (auto* hijo : entidad->hijos) {
+                        if (hijo != nullptr && hijo->nombreObjeto == "punto_luz") {
+                            // Calcular la posición mundial de la luz
+                            glm::vec3 posicionMundialLuz = glm::vec3(
+                                entidad->transformacionLocal * glm::vec4(hijo->posicionLocal, 1.0f)
+                            );
 
-                        // Calcular distancia al personaje activo
-                        float distancia = glm::distance(posicionPersonajeActivo, posicionMundialLuz);
-                        lucesTemporales.push_back({ pointLightActual, distancia });
-                        break; // Solo necesitamos procesar una luz por lámpara
+                            // Crear luz puntual con color amarillo cálido
+                            pointLightActual = PointLight(
+                                1.0f, 0.9f, 0.7f,  // Color amarillo cálido
+                                0.3f, 0.8f,         // Intensidad ambiental y difusa
+                                posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
+                                0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
+                            );
+                            agregarLuzPuntualActual(pointLightActual);
+
+                            break; // Solo necesitamos procesar una luz por lámpara
+                        }
                     }
                 }
             }
-
             // Procesar lámparas del ring (base_light) y sus spotlights
             if (entidad->nombreObjeto.find("base_light_") == 0) {
                 // Solo procesar si las luces del ring están activas
@@ -277,19 +272,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
 
-    // Ordenar luces por distancia (las más cercanas primero)
-    std::sort(lucesTemporales.begin(), lucesTemporales.end(),
-        [](const LuzConDistancia& a, const LuzConDistancia& b) {
-            return a.distancia < b.distancia;
-        });
-
-    // Agregar solo las 4 luces más cercanas
-    int lucesAgregadas = 0;
-    for (const auto& luzConDist : lucesTemporales) {
-        if (lucesAgregadas >= 4) break;
-        agregarLuzPuntualActual(luzConDist.luz);
-        lucesAgregadas++;
-    }
 
     // Actualizar animación del luchador
     Entidad* luchadorEntidad = nullptr;

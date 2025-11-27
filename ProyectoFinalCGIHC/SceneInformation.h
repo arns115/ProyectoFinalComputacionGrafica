@@ -32,6 +32,7 @@ public:
     glm::vec3 posicionLuzActual;
     glm::vec3 direccionLuzActual;
 
+    GLfloat anguloLuzDireccional;
 
     // Inicializar la cámara con parámetros personalizados
     void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),

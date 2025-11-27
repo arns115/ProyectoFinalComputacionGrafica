@@ -22,6 +22,11 @@ void DirectionalLight::UseLight(GLfloat ambientIntensityLocation, GLfloat ambien
 	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
 }
 
+void DirectionalLight::SetDirection(GLfloat xDir, GLfloat yDir, GLfloat zDir)
+{
+	direction = glm::vec3(xDir, yDir, zDir);
+}
+
 DirectionalLight::~DirectionalLight()
 {
 }
