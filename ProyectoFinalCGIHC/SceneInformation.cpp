@@ -123,45 +123,48 @@ void SceneInformation::actualizarFrame(float deltaTime)
     acumuladorTiempoDesdeCambio += deltaTime;
     if (acumuladorTiempoDesdeCambio >= 30.0f / LIMIT_FPS) // 30 segundos = 1 minuto
     {
-        bool eraNoche = !esDeDia; // Guardar estado anterior
         esDeDia = !esDeDia; // Cambiar entre dia y noche
         acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
 
+        std::cout << "[SceneInformation] === CAMBIO DE CICLO ===" << std::endl;
+        std::cout << "[SceneInformation] Nuevo estado: " << (esDeDia ? "DÍA" : "NOCHE") << std::endl;
+
         if (esDeDia)
         {
-            // Se pone la skyboxAdecuada y la luz direccional del sol
+            // AHORA ES DE DÍA
             setSkyboxActual(AssetConstants::SkyboxNames::DAY);
             luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
 
-            // Desactivar grillos cuando sale el sol
-            if (eraNoche) {
-                desactivarGrillos();
-            }
+            // Desactivar grillos
+            desactivarGrillos();
+            std::cout << "[SceneInformation]  Grillos desactivados" << std::endl;
 
-            // NUEVO: Activar sonido del tianguis durante el día
-            if (eraNoche) {
-                glm::vec3 posicionMercado(-50.0f, -1.0f, 75.0f); // Centro del área del mercado
-                audioManager.reproducirSonidoAmbiental("tianguis", posicionMercado, 0.9f, true);
-                std::cout << "[SceneInformation] Sonido del tianguis activado (día)" << std::endl;
+            // Activar sonido del tianguis
+            glm::vec3 posicionMercado(-50.0f, -1.0f, 75.0f);
+            bool exitoTianguis = audioManager.reproducirSonidoAmbiental("tianguis", posicionMercado, 0.9f, true);
+            if (exitoTianguis) {
+                std::cout << "[SceneInformation]  Tianguis activado" << std::endl;
+            }
+            else {
+                std::cerr << "[SceneInformation] ERROR: No se pudo activar el tianguis" << std::endl;
             }
         }
         else
         {
-            // Se pone la skyboxAdecuada y la luz direccional de las estrellas
+            // AHORA ES DE NOCHE
             setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
             luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
 
-            // Activar grillos cuando cae la noche
-            if (!eraNoche) {
-                activarGrillos();
-            }
+            // Desactivar tianguis
+            audioManager.detenerSonidoAmbiental("tianguis");
+            std::cout << "[SceneInformation]  Tianguis desactivado" << std::endl;
 
-            // NUEVO: Desactivar sonido del tianguis durante la noche
-            if (!eraNoche) {
-                audioManager.detenerSonidoAmbiental("tianguis");
-                std::cout << "[SceneInformation] Sonido del tianguis desactivado (noche)" << std::endl;
-            }
+            // Activar grillos
+            activarGrillos();
+            std::cout << "[SceneInformation]  Grillos activados" << std::endl;
         }
+
+        std::cout << "[SceneInformation] =======================\n" << std::endl;
     }
 
     anguloLuzDireccional = (acumuladorTiempoDesdeCambio / (30.0f / LIMIT_FPS)) * glm::pi<float>();
@@ -2462,7 +2465,7 @@ void SceneInformation::inicializarAudio()
     // Cargar sonido de grillos 10 veces (una por cada posición)
     for (int i = 0; i < 10; i++) {
         std::string nombreGrillo = "grillo_" + std::to_string(i);
-        audioManager.cargarSonidoAmbiental(nombreGrillo, "Audio/Environmental/grillo.wav");
+        audioManager.cargarSonidoAmbiental(nombreGrillo, "Audio/Environmental/grillos.wav");
     }
 
     // Reproducir el soundtrack en loop con volumen tenue (30% del máximo)
@@ -2484,6 +2487,19 @@ void SceneInformation::inicializarAudio()
 
     // Generar 10 posiciones aleatorias para los grillos en el escenario
     generarPosicionesGrillos();
+
+    // NUEVO: Como el juego inicia de noche, activar los grillos inmediatamente
+    // (El flag esDeDia se inicializa en false por defecto, lo que significa que es de noche)
+    if (!esDeDia) {
+        activarGrillos();
+        std::cout << "[SceneInformation] Grillos activados al inicio (noche inicial)" << std::endl;
+    }
+    else {
+        // Si inicia de día, activar el tianguis
+        glm::vec3 posicionMercado(-50.0f, -1.0f, 75.0f);
+        audioManager.reproducirSonidoAmbiental("tianguis", posicionMercado, 0.9f, true);
+        std::cout << "[SceneInformation] Sonido del tianguis activado al inicio (día inicial)" << std::endl;
+    }
 }
 
 
@@ -2550,7 +2566,7 @@ void SceneInformation::activarGrillos()
 
         // CAMBIADO: Usar el nombre base "grillo" que ya fue cargado en inicializarAudio
         audioManager.reproducirSonidoAmbiental(
-            "grillos",  // ← Usar siempre el mismo nombre base
+            nombreGrillo,  // ← Usar siempre el mismo nombre base
             posicionesGrillos[i],
             0.9f,  // Volumen alto
             true   // Loop activado
