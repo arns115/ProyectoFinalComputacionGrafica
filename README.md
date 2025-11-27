@@ -15,4 +15,4 @@
 
 ## Recursos del Proyecto
 Todos los modelos, texturas y audio se podrán encontrar en el siguiente vínculo:  
-[https://drive.google.com/drive/folders/1ZzLGeELS7yTKtHhuDs0Mm4DD3hLCTZeu?usp=sharing](https://drive.google.com/drive/folders/1ZzLGeELS7yTKtHhuDs0Mm4DD3hLCTZeu?usp=sharing)
+[https://drive.google.com/drive/folders/1bJBthPY6rVxALL0Gcf0igof6-RusCZs9](https://drive.google.com/drive/folders/1bJBthPY6rVxALL0Gcf0igof6-RusCZs9)
