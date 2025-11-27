@@ -1312,39 +1312,45 @@ void SceneInformation::crearArbolesAlrededorChinampa()
     }
 }
 
-// Crear canoa con maya jerárquica que navega por la chinampa de agua
+// Crear canoa con maya jerárquica que navega alrededor de la chinampa del centro
 void SceneInformation::crearCanoa()
 {
     // Posición y escala de la chinampa de agua
     glm::vec3 posicionChinampa(-150.0f, -1.35f, -150.0f);
     float escalaChinampa = 8.0f;
 
-    // Dimensiones de la chinampa escalada (el mesh base es 10x10)
-    float anchoChinampa = 10.0f * escalaChinampa; // 80 unidades
-    float altoChinampa = 10.0f * escalaChinampa;  // 80 unidades
-
+    // Espaciado de las chinampas islas (igual que en crearIslas)
+    float espaciado = 26.67f;
+    float desplazamientoInicial = -espaciado;
+    
+    // Calcular posición de la chinampa del centro (fila 1, columna 1)
+    float xCentro = posicionChinampa.x + desplazamientoInicial + (1 * espaciado);
+    float zCentro = posicionChinampa.z + desplazamientoInicial + (1 * espaciado);
+    
     // Altura del agua (encima del prisma de agua)
     float alturaAgua = posicionChinampa.y + 0.1f * escalaChinampa + 0.2f;
 
-    // Posición inicial: esquina superior izquierda
-    float margen = 10.0f; // Margen desde los bordes
+    // Margen alrededor de la chinampa del centro (radio de la órbita)
+    float radioOrbita = 14.0f; // Distancia desde el centro de la chinampa
+
+    // Posición inicial: esquina norte (mirando hacia Z positivo)
     glm::vec3 posicionInicial(
-        posicionChinampa.x - anchoChinampa / 2.0f + margen,
+        xCentro - radioOrbita,
         alturaAgua,
-        posicionChinampa.z - anchoChinampa / 2.0f + margen
+        zCentro - radioOrbita
     );
 
     // Crear entidad de la canoa (padre)
     Entidad* canoa = new Entidad("canoa",
         posicionInicial,
-        glm::vec3(0.0f, 0.0f, 0.0f),  // Inicialmente mirando al frente
+        glm::vec3(0.0f, 0.0f, 0.0f),  // Inicialmente mirando al frente (hacia Z+)
         glm::vec3(1.5f, 1.5f, 1.5f));  // Escala
 
     canoa->setTipoObjeto(TipoObjeto::MODELO);
     canoa->nombreModelo = AssetConstants::ModelNames::CANOA;
     canoa->nombreMaterial = AssetConstants::MaterialNames::OPACO;
     canoa->animacion = new ComponenteAnimacion(canoa);
-    canoa->animacion->activarAnimacion(0);  // Activate canoa animation
+    canoa->animacion->activarAnimacion(0);  // Activar animación de la canoa
     canoa->actualizarTransformacion();
 
     // Crear maya como hijo de la canoa

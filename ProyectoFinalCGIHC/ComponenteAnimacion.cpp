@@ -86,20 +86,35 @@ namespace {
     bool puertaBajando = true;                           // true = bajando (abriendo), false = subiendo (cerrando)
     
     // Variables para Canoa
-    const float CANOA_VELOCIDAD = 0.2f;                    // Unidades por segundo
-    const float CANOA_VELOCIDAD_ROTACION = 45.0f;          // Grados por segundo
-    int canoaEstado = 0;                                   // Estado actual de la animación (0-7)
-    float canoaTiempo = 0.0f;                              // Tiempo acumulado para la animación
-    glm::vec3 canoaPosicionInicio(0.0f);                   // Posición inicial para el movimiento actual
-    glm::vec3 canoaPosicionDestino(0.0f);                  // Posición destino para el movimiento actual
-    float canoaRotacionObjetivo = 0.0f;                    // Rotación objetivo para el giro actual
-    glm::vec3 canoaPosicionChinampa(-150.0f, -1.35f, -150.0f); // Posición de la chinampa
+    const float CANOA_VELOCIDAD_LINEAL = 0.25f;            // Velocidad de movimiento lineal (4 veces más lenta: 1.0 / 4 = 0.25)
+    const float CANOA_VELOCIDAD_ROTACION = 45.0f;          // Velocidad de rotación (grados por segundo)
+    int canoaEstado = 0;                                   // Estado actual: 0=avanzar Z+, 1=girar hacia X+, 2=avanzar X+, 3=girar hacia Z-, 4=avanzar Z-, 5=girar hacia X-, 6=avanzar X-, 7=girar hacia Z+
+    float canoaTiempo = 0.0f;                              // Tiempo acumulado en el estado actual
+    glm::vec3 canoaPosicionCentroChinampa(-150.0f, -1.35f, -150.0f); // Posición base de la chinampa de agua
     float canoaEscalaChinampa = 8.0f;                      // Escala de la chinampa
-    float canoaAnchoChinampa = 10.0f * canoaEscalaChinampa; // 80 unidades
-    float canoaAltoChinampa = 10.0f * canoaEscalaChinampa;  // 80 unidades
-    float canoaAlturaAgua = canoaPosicionChinampa.y + 0.1f * canoaEscalaChinampa + 0.2f;
-    float canoaMargen = 10.0f;                             // Margen desde los bordes
+    float canoaEspaciado = 26.67f;                         // Espaciado entre chinampas islas
+    float canoaRadioOrbita = 14.0f;                        // Radio de la órbita alrededor de la chinampa centro
+    float canoaAlturaAgua = canoaPosicionCentroChinampa.y + 0.1f * canoaEscalaChinampa + 0.2f;
     
+    // Calcular el centro de la chinampa del centro (fila 1, columna 1)
+    float canoaDesplazamientoInicial = -canoaEspaciado;
+    float canoaXCentro = canoaPosicionCentroChinampa.x + canoaDesplazamientoInicial + (1 * canoaEspaciado);
+    float canoaZCentro = canoaPosicionCentroChinampa.z + canoaDesplazamientoInicial + (1 * canoaEspaciado);
+    
+    // Puntos de las esquinas del rectángulo alrededor de la chinampa
+    // Esquina Norte: X centro, Z más negativo (mirando hacia Z+)
+    glm::vec3 canoaEsquinaNorte(canoaXCentro - canoaRadioOrbita, canoaAlturaAgua, canoaZCentro - canoaRadioOrbita);
+    // Esquina Oeste: X más negativo, Z más positivo (después de avanzar hacia Z+)
+    glm::vec3 canoaEsquinaOeste(canoaXCentro - canoaRadioOrbita, canoaAlturaAgua, canoaZCentro + canoaRadioOrbita);
+    // Esquina Sur: X más positivo, Z más positivo (después de avanzar hacia X+)
+    glm::vec3 canoaEsquinaSur(canoaXCentro + canoaRadioOrbita, canoaAlturaAgua, canoaZCentro + canoaRadioOrbita);
+    // Esquina Este: X más positivo, Z más negativo (después de avanzar hacia Z-)
+    glm::vec3 canoaEsquinaEste(canoaXCentro + canoaRadioOrbita, canoaAlturaAgua, canoaZCentro - canoaRadioOrbita);
+    
+    float canoaRotacionActual = 0.0f;                      // Rotación actual en grados
+    float canoaRotacionObjetivo = 0.0f;                    // Rotación objetivo para el próximo giro
+    
+
     // Variables para Luchador
     const float LUCHADOR_VELOCIDAD_SALTO = 6.0f;           // Velocidad inicial del salto
     const float LUCHADOR_GRAVEDAD = -8.0f;                 // Gravedad simulada
@@ -209,8 +224,8 @@ void ComponenteAnimacion::animarIsaac(int indiceAnimacion, float deltaTime, floa
     else if (animacionActiva) {
         // Continuar hasta completar el ciclo
         tiemposAnimacion[indiceAnimacion] += deltaTime * velocidadesAnimacion[indiceAnimacion];
-
-        // Verificar si ya termino la animacion
+        
+        // Verificar si ya terminó la animación
         if (tiemposAnimacion[indiceAnimacion] >= glm::two_pi<float>()) {
             // Ajustar el tiempo para que se posicionen bien las partes del cuerpo
             tiemposAnimacion[indiceAnimacion] = glm::two_pi<float>();
@@ -885,7 +900,7 @@ void ComponenteAnimacion::animateKeyframes(void)
     }
 }
 
-// Animación cíclica de la canoa navegando por la chinampa
+// Animación de la canoa navegando en rectángulo alrededor de la chinampa del centro
 void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
 {
     if (entidad == nullptr) {
@@ -899,106 +914,107 @@ void ComponenteAnimacion::animarCanoa(int indiceAnimacion, float deltaTime)
         return;
     }
     
-    // Inicializar en el primer frame
+    // Inicializar posición y rotación en el primer frame
     if (canoaTiempo == 0.0f && canoaEstado == 0) {
-        canoaPosicionInicio = entidad->posicionLocal;
-        // Primera posición destino: esquina inferior izquierda
-        canoaPosicionDestino = glm::vec3(
-            canoaPosicionChinampa.x - canoaAnchoChinampa / 2.0f + canoaMargen,
-            canoaAlturaAgua,
-            canoaPosicionChinampa.z + canoaAltoChinampa / 2.0f - canoaMargen
-        );
-        canoaRotacionObjetivo = 0.0f;
+        entidad->posicionLocal = canoaEsquinaNorte;
+        canoaRotacionActual = 0.0f;
+        entidad->rotacionLocal.y = canoaRotacionActual;
     }
     
-    // Estados:
-    // 0: mover a esquina inferior izquierda
-    // 1: girar 90 grados (hacia la derecha)
-    // 2: mover a esquina inferior derecha
-    // 3: girar 90 grados
-    // 4: mover a esquina superior derecha
-    // 5: girar 90 grados
-    // 6: mover a esquina superior izquierda
-    // 7: girar 90 grados
+    canoaTiempo += deltaTime;
     
-    bool estadoPar = (canoaEstado % 2 == 0);
+    switch (canoaEstado) {
+    case 0: { // Avanzar hacia Z positivo (Sur) - desde esquina Norte hasta esquina Oeste
+        float distancia = canoaRadioOrbita * 2.0f;
+        float duracion = distancia / CANOA_VELOCIDAD_LINEAL;
+        float progreso = std::fmin(canoaTiempo / duracion, 1.0f);
+        
+        entidad->posicionLocal = glm::mix(canoaEsquinaNorte, canoaEsquinaOeste, progreso);
+        
+        if (progreso >= 1.0f) {
+            canoaEstado = 1;
+            canoaTiempo = 0.0f;
+            // Girar hacia X positivo (90 grados)
+            entidad->rotacionLocal.y = 90.0f;
+            canoaRotacionActual = 90.0f;
+        }
+        break;
+    }
     
-    if (estadoPar) {
-        // Estados de movimiento (0, 2, 4, 6)
-        glm::vec3 direccion = glm::normalize(canoaPosicionDestino - canoaPosicionInicio);
-        float distancia = glm::length(canoaPosicionDestino - canoaPosicionInicio);
-        float distanciaRecorrida = CANOA_VELOCIDAD * canoaTiempo;
+    case 1: { // Transición instantánea (ya girado)
+        canoaEstado = 2;
+        canoaTiempo = 0.0f;
+        break;
+    }
+    
+    case 2: { // Avanzar hacia X positivo (Este) - desde esquina Oeste hasta esquina Sur
+        float distancia = canoaRadioOrbita * 2.0f;
+        float duracion = distancia / CANOA_VELOCIDAD_LINEAL;
+        float progreso = std::fmin(canoaTiempo / duracion, 1.0f);
         
-        if (distanciaRecorrida >= distancia) {
-            // Llegó al destino, cambiar al siguiente estado (girar)
-            entidad->posicionLocal = canoaPosicionDestino;
-            canoaEstado++;
-            canoaTiempo = 0.0f;
-            
-            // Calcular nueva rotación objetivo
-            canoaRotacionObjetivo = entidad->rotacionLocal.y + 90.0f;
-        } else {
-            // Mover hacia el destino
-            entidad->posicionLocal = canoaPosicionInicio + direccion * distanciaRecorrida;
-            canoaTiempo += deltaTime;
-        }
-    } else {
-        // Estados de rotación (1, 3, 5, 7)
-        float rotacionInicial = canoaRotacionObjetivo - 90.0f;
-        float anguloRecorrido = CANOA_VELOCIDAD_ROTACION * canoaTiempo;
+        entidad->posicionLocal = glm::mix(canoaEsquinaOeste, canoaEsquinaSur, progreso);
         
-        if (anguloRecorrido >= 90.0f) {
-            // Completó el giro, cambiar al siguiente estado (mover)
-            entidad->rotacionLocal.y = canoaRotacionObjetivo;
-            if (canoaRotacionObjetivo >= 360.0f) {
-                entidad->rotacionLocal.y -= 360.0f;
-                canoaRotacionObjetivo -= 360.0f;
-            }
-            
-            canoaEstado++;
-            if (canoaEstado >= 8) {
-                canoaEstado = 0; // Reiniciar ciclo
-            }
+        if (progreso >= 1.0f) {
+            canoaEstado = 3;
             canoaTiempo = 0.0f;
-            
-            // Configurar nuevo movimiento según el estado
-            canoaPosicionInicio = entidad->posicionLocal;
-            
-            switch (canoaEstado) {
-            case 0: // Esquina inferior izquierda
-                canoaPosicionDestino = glm::vec3(
-                    canoaPosicionChinampa.x - canoaAnchoChinampa / 2.0f + canoaMargen,
-                    canoaAlturaAgua,
-                    canoaPosicionChinampa.z + canoaAltoChinampa / 2.0f - canoaMargen
-                );
-                break;
-            case 2: // Esquina inferior derecha
-                canoaPosicionDestino = glm::vec3(
-                    canoaPosicionChinampa.x + canoaAnchoChinampa / 2.0f - canoaMargen,
-                    canoaAlturaAgua,
-                    canoaPosicionChinampa.z + canoaAltoChinampa / 2.0f - canoaMargen
-                );
-                break;
-            case 4: // Esquina superior derecha
-                canoaPosicionDestino = glm::vec3(
-                    canoaPosicionChinampa.x + canoaAnchoChinampa / 2.0f - canoaMargen,
-                    canoaAlturaAgua,
-                    canoaPosicionChinampa.z - canoaAltoChinampa / 2.0f + canoaMargen
-                );
-                break;
-            case 6: // Esquina superior izquierda
-                canoaPosicionDestino = glm::vec3(
-                    canoaPosicionChinampa.x - canoaAnchoChinampa / 2.0f + canoaMargen,
-                    canoaAlturaAgua,
-                    canoaPosicionChinampa.z - canoaAltoChinampa / 2.0f + canoaMargen
-                );
-                break;
-            }
-        } else {
-            // Girar gradualmente
-            entidad->rotacionLocal.y = rotacionInicial + anguloRecorrido;
-            canoaTiempo += deltaTime;
+            // Girar hacia Z negativo (180 grados)
+            entidad->rotacionLocal.y = 180.0f;
+            canoaRotacionActual = 180.0f;
         }
+        break;
+    }
+    
+    case 3: { // Transición instantánea (ya girado)
+        canoaEstado = 4;
+        canoaTiempo = 0.0f;
+        break;
+    }
+    
+    case 4: { // Avanzar hacia Z negativo (Norte) - desde esquina Sur hasta esquina Este
+        float distancia = canoaRadioOrbita * 2.0f;
+        float duracion = distancia / CANOA_VELOCIDAD_LINEAL;
+        float progreso = std::fmin(canoaTiempo / duracion, 1.0f);
+        
+        entidad->posicionLocal = glm::mix(canoaEsquinaSur, canoaEsquinaEste, progreso);
+        
+        if (progreso >= 1.0f) {
+            canoaEstado = 5;
+            canoaTiempo = 0.0f;
+            // Girar hacia X negativo (270 grados)
+            entidad->rotacionLocal.y = 270.0f;
+            canoaRotacionActual = 270.0f;
+        }
+        break;
+    }
+    
+    case 5: { // Transición instantánea (ya girado)
+        canoaEstado = 6;
+        canoaTiempo = 0.0f;
+        break;
+    }
+    
+    case 6: { // Avanzar hacia X negativo (Oeste) - desde esquina Este hasta esquina Norte
+        float distancia = canoaRadioOrbita * 2.0f;
+        float duracion = distancia / CANOA_VELOCIDAD_LINEAL;
+        float progreso = std::fmin(canoaTiempo / duracion, 1.0f);
+        
+        entidad->posicionLocal = glm::mix(canoaEsquinaEste, canoaEsquinaNorte, progreso);
+        
+        if (progreso >= 1.0f) {
+            canoaEstado = 7;
+            canoaTiempo = 0.0f;
+            // Girar hacia Z positivo para completar el ciclo (0 grados)
+            entidad->rotacionLocal.y = 0.0f;
+            canoaRotacionActual = 0.0f;
+        }
+        break;
+    }
+    
+    case 7: { // Transición instantánea (completar ciclo)
+        canoaEstado = 0;
+        canoaTiempo = 0.0f;
+        break;
+    }
     }
     
     // Actualizar transformación de la canoa
