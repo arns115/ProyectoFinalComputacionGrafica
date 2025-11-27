@@ -73,12 +73,12 @@ void SceneRenderer::configurarLuces(DirectionalLight* directionalLight,
     }
     
     // Configurar luces puntuales
-    if (pointLights != nullptr && pointLightCount > 0) {
+    if (pointLights != nullptr) {
         shader->SetPointLights(pointLights, pointLightCount);
     }
     
     // Configurar spotlights
-    if (spotLights != nullptr && spotLightCount > 0) {
+    if (spotLights != nullptr) {
         shader->SetSpotLights(spotLights, spotLightCount);
     }
 }
