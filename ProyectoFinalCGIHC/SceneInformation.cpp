@@ -164,12 +164,18 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
 
-    // Se posiciona linterna en la posicion y direccion de la camara
-    spotLightActual = *lightManager.getSpotLight(AssetConstants::LightNames::LINTERNA);
-    posicionLuzActual = camera.getCameraPosition();
-    direccionLuzActual = camera.getCameraDirection();
-    spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
-    agregarSpotLightActual(spotLightActual);
+    anguloLuzDireccional = (acumuladorTiempoDesdeCambio / (30.0f / LIMIT_FPS)) * glm::pi<float>();
+    luzDireccional.SetDirection(0.0f, -sin(anguloLuzDireccional), -cos(anguloLuzDireccional)); 
+
+    // Se posiciona linterna en la posicion y direccion de la camar
+    if (spotLight1) {
+        spotLightActual = *lightManager.getSpotLight(AssetConstants::LightNames::LINTERNA);
+        posicionLuzActual = camera.getCameraPosition();
+        direccionLuzActual = camera.getCameraDirection();
+        spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
+		agregarSpotLightActual(spotLightActual);
+    }
+
 
     // Actualizar animación de la canoa y su sonido
     for (auto* entidad : entidades) {
@@ -248,12 +254,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
         posicionAnteriorPersonaje = posicionPersonajeActivo;
     }
 
-    // Vector temporal para almacenar luces puntuales con sus distancias
-    struct LuzConDistancia {
-        PointLight luz;
-        float distancia;
-    };
-    std::vector<LuzConDistancia> lucesTemporales;
 
     // Actualizar animaciones de las entidades que tengan componente de animacion
     for (auto* entidad : entidades) {
@@ -269,9 +269,7 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 glm::vec3 posicionLuz = entidad->posicionLocal + glm::vec3(0.0f, 1.0f, 0.0f);
                 pointLightActual.setPosition(posicionLuz);
 
-                // Calcular distancia al personaje activo
-                float distancia = glm::distance(posicionPersonajeActivo, posicionLuz);
-                lucesTemporales.push_back({ pointLightActual, distancia });
+				agregarLuzPuntualActual(pointLightActual);
             }
             // si esta activa la animacion se llama a la funcion de actualizarala
             if (entidad->nombreObjeto == "puerta_secret_room" && entidad->animacion->estaActiva(0)) {
@@ -309,39 +307,36 @@ void SceneInformation::actualizarFrame(float deltaTime)
                 }
             }
 
-            // Procesar lámparas de calle y sus luces
-            if (entidad->nombreObjeto.find("lampara_") == 0) {
-                // Esta es una lámpara de calle
-                // Buscar su hijo que es la luz
-                for (auto* hijo : entidad->hijos) {
-                    if (hijo != nullptr && hijo->nombreObjeto == "punto_luz") {
-                        // Calcular la posición mundial de la luz
-                        glm::vec3 posicionMundialLuz = glm::vec3(
-                            entidad->transformacionLocal * glm::vec4(hijo->posicionLocal, 1.0f)
-                        );
 
-                        // Crear luz puntual con color amarillo cálido
-                        pointLightActual = PointLight(
-                            1.0f, 0.9f, 0.7f,  // Color amarillo cálido
-                            0.3f, 0.8f,         // Intensidad ambiental y difusa
-                            posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
-                            0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
-                        );
+            if (!esDeDia) {
+                // Procesar lámparas de calle y sus luces
+                if (entidad->nombreObjeto.find("lampara_") == 0) {
+                    // Esta es una lámpara de calle
+                    // Buscar su hijo que es la luz
+                    for (auto* hijo : entidad->hijos) {
+                        if (hijo != nullptr && hijo->nombreObjeto == "punto_luz") {
+                            // Calcular la posición mundial de la luz
+                            glm::vec3 posicionMundialLuz = glm::vec3(
+                                entidad->transformacionLocal * glm::vec4(hijo->posicionLocal, 1.0f)
+                            );
 
-                        // Calcular distancia al personaje activo
-                        float distancia = glm::distance(posicionPersonajeActivo, posicionMundialLuz);
-                        lucesTemporales.push_back({ pointLightActual, distancia });
-                        break; // Solo necesitamos procesar una luz por lámpara
+                            // Crear luz puntual con color amarillo cálido
+                            pointLightActual = PointLight(
+                                1.0f, 0.9f, 0.7f,  // Color amarillo cálido
+                                0.3f, 0.8f,         // Intensidad ambiental y difusa
+                                posicionMundialLuz.x, posicionMundialLuz.y, posicionMundialLuz.z,
+                                0.3f, 0.1f, 0.005f   // Atenuación constante, lineal, exponencial
+                            );
+                            agregarLuzPuntualActual(pointLightActual);
+
+                            break; // Solo necesitamos procesar una luz por lámpara
+                        }
                     }
                 }
             }
-
             // Procesar lámparas del ring (base_light) y sus spotlights
             if (entidad->nombreObjeto.find("base_light_") == 0) {
                 // Solo procesar si las luces del ring están activas
-                if (!lucesRingActivas) continue;
-
-                // Esta es una base de lámpara del ring
                 // Buscar el lamp_ring hijo y su spotlight
                 for (auto* lampRing : entidad->hijos) {
                     if (lampRing != nullptr && lampRing->nombreObjeto.find("lamp_ring_") == 0) {
@@ -367,6 +362,8 @@ void SceneInformation::actualizarFrame(float deltaTime)
                                     1.0f, 0.05f, 0.01f, // Atenuación constante, lineal, exponencial
                                     30.0f               // Ángulo de apertura (edge)
                                 );
+                                if (!spotLight2 && entidad->nombreObjeto == "base_light_1") break;
+                                if (!spotLight3 && entidad->nombreObjeto == "base_light_2") break;
                                 agregarSpotLightActual(spotLightActual);
                                 break;
                             }
@@ -378,19 +375,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
         }
     }
 
-    // Ordenar luces por distancia (las más cercanas primero)
-    std::sort(lucesTemporales.begin(), lucesTemporales.end(),
-        [](const LuzConDistancia& a, const LuzConDistancia& b) {
-            return a.distancia < b.distancia;
-        });
-
-    // Agregar solo las 4 luces más cercanas
-    int lucesAgregadas = 0;
-    for (const auto& luzConDist : lucesTemporales) {
-        if (lucesAgregadas >= 4) break;
-        agregarLuzPuntualActual(luzConDist.luz);
-        lucesAgregadas++;
-    }
 
     // Actualizar animación del luchador
     Entidad* luchadorEntidad = nullptr;
@@ -487,17 +471,50 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
         teclaGPresionada = false;
     }
 
-    // O: Activar/Desactivar luces del ring
-    static bool teclaOPresionada = false;
+    // O: Activar/Desactivar linterna
     if (keys[GLFW_KEY_O]) {
         if (!teclaOPresionada) {
-            lucesRingActivas = !lucesRingActivas;
+			spotLight1 = !spotLight1;
             teclaOPresionada = true;
         }
     }
     else {
         teclaOPresionada = false;
     }
+
+    // M: Activar/Desactivar spotlight2
+    if (keys[GLFW_KEY_M]) {
+        if (!teclaMPresionada) {
+			spotLight2 = !spotLight2;
+            teclaMPresionada = true;
+        }
+    }
+    else {
+        teclaMPresionada = false;
+    }
+
+    // N: Activar/Desactivar spotlight3
+    if (keys[GLFW_KEY_N]) {
+        if (!teclaNPresionada) {
+			spotLight3 = !spotLight3;
+            teclaNPresionada = true;
+        }
+    }
+    else {
+        teclaNPresionada = false;
+    }
+
+    // V: Activar/Desactivar spotlight4
+    if (keys[GLFW_KEY_V]) {
+        if (!teclaVPresionada) {
+			spotLight4 = !spotLight4;
+            teclaVPresionada = true;
+        }
+    }
+    else {
+        teclaVPresionada = false;
+    }
+
 
     // Y: Alternar volumen del soundtrack entre 0.0 (silenciado) y 0.1 (bajo)
     static bool teclaYPresionada = false;
@@ -2232,8 +2249,8 @@ void SceneInformation::crearLamparasRing()
 
     // Crear lamp_ring como hijo
     Entidad* lampRing1 = new Entidad("lamp_ring_1",
-        glm::vec3(0.0f, 1.5f, 0.0f), // Arriba del cilindro
-        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 45.0f, 0.0f),
         escalaLampRing);
 
     lampRing1->setTipoObjeto(TipoObjeto::MODELO);
@@ -2269,8 +2286,8 @@ void SceneInformation::crearLamparasRing()
 
     // Crear lamp_ring como hijo
     Entidad* lampRing2 = new Entidad("lamp_ring_2",
-        glm::vec3(0.0f, 1.5f, 0.0f), // Arriba del cilindro
-        glm::vec3(0.0f, 180.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f), // Arriba del cilindro
+        glm::vec3(0.0f, 225.0f, 0.0f),
         escalaLampRing);
 
     lampRing2->setTipoObjeto(TipoObjeto::MODELO);
@@ -2379,15 +2396,35 @@ void SceneInformation::limpiarLucesPuntualesActuales()
 
 bool SceneInformation::agregarSpotLightActual(const SpotLight& light)
 {
-    if (spotLightCountActual >= MAX_SPOT_LIGHTS) {
-        return false; // No hay espacio para más luces actuales
+    // Si hay espacio disponible, agregar directamente
+    if (spotLightCountActual < MAX_SPOT_LIGHTS) {
+        spotLightsActuales[spotLightCountActual] = light;
+        spotLightCountActual++;
+        return true;
     }
 
-    // Agregar solo al arreglo de luces actuales
-    spotLightsActuales[spotLightCountActual] = light;
-    spotLightCountActual++;
+    // Si no hay espacio, buscar y reemplazar la luz más lejana en un solo paso
+    distanciaMaxima = glm::distance(camera.getCameraPosition(), light.GetPosition());
+    indiceLuzMasLejana = -1;
 
-    return true;
+    // Buscar la luz más lejana
+    for (int i = 0; i < spotLightCountActual; i++) {
+        distanciaLuzActual = glm::distance(camera.getCameraPosition(), spotLightsActuales[i].GetPosition());
+
+        if (distanciaLuzActual > distanciaMaxima) {
+            distanciaMaxima = distanciaLuzActual;
+            indiceLuzMasLejana = i;
+        }
+    }
+
+    // Si encontramos una luz más lejana, reemplazarla y retornar true
+    if (indiceLuzMasLejana != -1) {
+        spotLightsActuales[indiceLuzMasLejana] = light;
+        return true;
+    }
+
+    // La nueva luz está más lejos que todas las existentes, no agregarla
+    return false;
 }
 
 // Funcion para inicializar el audio de la escena

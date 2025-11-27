@@ -32,6 +32,7 @@ public:
     glm::vec3 posicionLuzActual;
     glm::vec3 direccionLuzActual;
 
+    GLfloat anguloLuzDireccional;
 
     // Inicializar la cámara con parámetros personalizados
     void inicializarCamara(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -144,7 +145,15 @@ private:
     int personajeActual = 1; // 1: Cuphead, 2: Isaac, 3: Gojo
 
     // Control para activar/desactivar luces del ring
-    bool lucesRingActivas = true;
+    bool spotLight1 = true;
+	bool spotLight2 = false;
+	bool spotLight3 = false;
+	bool spotLight4 = false;
+
+	bool teclaOPresionada = false;
+	bool teclaMPresionada = false;
+	bool teclaNPresionada = false;
+	bool teclaVPresionada = false;
 
     //Funciones para inicializar componentes de la escena
 
