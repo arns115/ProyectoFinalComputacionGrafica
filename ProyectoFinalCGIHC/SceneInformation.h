@@ -100,6 +100,7 @@ public:
 private:
     // Vector con todas las entidades de la escena
     std::vector<Entidad*> entidades;
+    std::vector<glm::vec3> posicionesGrillos;
 
     // Cámara de la escena
     Camera camera;
@@ -134,6 +135,9 @@ private:
 
     // Booleano para saber si es de dia
     bool esDeDia = false;
+    bool animacionPezActiva = false;
+    bool sonidoCaminataActivo = false;
+    glm::vec3 posicionAnteriorPersonaje = glm::vec3(0.0f);
     // Acumulador de tiempo para cambiar entre dia y noche (a los 2 minutos se cambia)
     GLfloat acumuladorTiempoDesdeCambio = 0.0f;
 
@@ -204,6 +208,9 @@ private:
     void crearCanoa();
     void crearCanchaPelotaMaya();
     void crearPoblacionMaya();
+    void generarPosicionesGrillos();
+    void activarGrillos();
+    void desactivarGrillos();
 
     // Función auxiliar para vincular texturas y modelos a las entidades
     void vincularRecursos(Entidad* entidad);
