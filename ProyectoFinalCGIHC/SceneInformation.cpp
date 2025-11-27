@@ -123,13 +123,27 @@ void SceneInformation::actualizarFrame(float deltaTime)
     acumuladorTiempoDesdeCambio += deltaTime;
     if (acumuladorTiempoDesdeCambio >= 30.0f / LIMIT_FPS) // 30 segundos = 1 minuto
     {
+        bool eraNoche = !esDeDia; // Guardar estado anterior
         esDeDia = !esDeDia; // Cambiar entre dia y noche
         acumuladorTiempoDesdeCambio = 0.0f; // Reiniciar el acumulador
+
         if (esDeDia)
         {
             // Se pone la skyboxAdecuada y la luz direccional del sol
             setSkyboxActual(AssetConstants::SkyboxNames::DAY);
             luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::SOL);
+
+            // Desactivar grillos cuando sale el sol
+            if (eraNoche) {
+                desactivarGrillos();
+            }
+
+            // NUEVO: Activar sonido del tianguis durante el día
+            if (eraNoche) {
+                glm::vec3 posicionMercado(-50.0f, -1.0f, 75.0f); // Centro del área del mercado
+                audioManager.reproducirSonidoAmbiental("tianguis", posicionMercado, 0.9f, true);
+                std::cout << "[SceneInformation] Sonido del tianguis activado (día)" << std::endl;
+            }
         }
         else
         {
@@ -137,6 +151,16 @@ void SceneInformation::actualizarFrame(float deltaTime)
             setSkyboxActual(AssetConstants::SkyboxNames::NIGHT);
             luzDireccional = *lightManager.getDirectionalLight(AssetConstants::LightNames::ESTRELLAS);
 
+            // Activar grillos cuando cae la noche
+            if (!eraNoche) {
+                activarGrillos();
+            }
+
+            // NUEVO: Desactivar sonido del tianguis durante la noche
+            if (!eraNoche) {
+                audioManager.detenerSonidoAmbiental("tianguis");
+                std::cout << "[SceneInformation] Sonido del tianguis desactivado (noche)" << std::endl;
+            }
         }
     }
 
@@ -147,28 +171,81 @@ void SceneInformation::actualizarFrame(float deltaTime)
     spotLightActual.SetFlash(posicionLuzActual, direccionLuzActual);
     agregarSpotLightActual(spotLightActual);
 
-    // Actualizar animación de la canoa
+    // Actualizar animación de la canoa y su sonido
     for (auto* entidad : entidades) {
         if (entidad != nullptr && entidad->nombreObjeto == "canoa" && entidad->animacion != nullptr) {
+            bool animacionActiva = entidad->animacion->estaActiva(0);
+
+            // Animar la canoa
             entidad->animacion->animarCanoa(0, deltaTime);
+
+            // Gestionar el SFX del remo
+            if (animacionActiva) {
+                // Obtener la posición actual de la canoa
+                glm::vec3 posicionCanoa = entidad->posicionLocal;
+
+                // Actualizar la posición del sonido si existe, o reproducirlo si no
+                if (!audioManager.actualizarPosicionSonidoAmbiental("remo_canoa", posicionCanoa)) {
+                    // Si no existe, reproducirlo
+                    audioManager.reproducirSonidoAmbiental("remo_canoa", posicionCanoa, 0.5f, true);
+                }
+            }
+            else {
+                // Si la animación se desactiva, detener el sonido
+                audioManager.detenerSonidoAmbiental("remo_canoa");
+            }
         }
     }
+
+    // Actualizar posición del listener (cámara) para audio 3D
+    audioManager.actualizarPosicionListener(camera.getCameraPosition(), camera.getCameraDirection());
 
     // Obtener posición del personaje activo
     glm::vec3 posicionPersonajeActivo(0.0f);
     Entidad* personajeActivoEntidad = nullptr;
-    
+
     // Buscar el personaje activo por nombre según personajeActual
     if (personajeActual == 1) {
         personajeActivoEntidad = buscarEntidad("cuphead_torso");
-    } else if (personajeActual == 2) {
+    }
+    else if (personajeActual == 2) {
         personajeActivoEntidad = buscarEntidad("isaac_cuerpo");
-    } else if (personajeActual == 3) {
+    }
+    else if (personajeActual == 3) {
         personajeActivoEntidad = buscarEntidad("gojo");
     }
-    
+
     if (personajeActivoEntidad != nullptr) {
         posicionPersonajeActivo = personajeActivoEntidad->posicionLocal;
+
+        // NUEVO: Gestionar sonido de caminata
+        // Calcular distancia recorrida desde el último frame
+        float distanciaRecorrida = glm::distance(posicionPersonajeActivo, posicionAnteriorPersonaje);
+        float umbralMovimiento = 0.01f; // Umbral mínimo de movimiento para considerar que está caminando
+
+        if (distanciaRecorrida > umbralMovimiento) {
+            // El personaje se está moviendo
+            if (!sonidoCaminataActivo) {
+                // Iniciar sonido de caminata
+                audioManager.reproducirSonidoAmbiental("caminando", posicionPersonajeActivo, 0.7f, true);
+                sonidoCaminataActivo = true;
+            }
+            else {
+                // Actualizar posición del sonido
+                audioManager.actualizarPosicionSonidoAmbiental("caminando", posicionPersonajeActivo);
+            }
+        }
+        else {
+            // El personaje está quieto
+            if (sonidoCaminataActivo) {
+                // Detener sonido de caminata
+                audioManager.detenerSonidoAmbiental("caminando");
+                sonidoCaminataActivo = false;
+            }
+        }
+
+        // Actualizar posición anterior
+        posicionAnteriorPersonaje = posicionPersonajeActivo;
     }
 
     // Vector temporal para almacenar luces puntuales con sus distancias
@@ -203,9 +280,33 @@ void SceneInformation::actualizarFrame(float deltaTime)
             if (entidad->nombreObjeto == "pelota") {
                 entidad->animacion->animateKeyframes();
             }
-            // En actualizarFrame(), la línea que procesa la animación del pez debe tener verificación de nullptr
+
+            // MODIFICADO: Gestionar animación y sonido del pez
             if (entidad->nombreObjeto == "pez" && entidad->animacion != nullptr) {
+                bool animacionActivaAhora = entidad->animacion->play;
+
+                // Actualizar animación
                 entidad->animacion->animateKeyframes();
+
+                // Gestionar sonido del pez
+                if (animacionActivaAhora && !animacionPezActiva) {
+                    // La animación acaba de activarse
+                    glm::vec3 posicionPez = entidad->posicionLocal;
+                    audioManager.reproducirSonidoAmbiental("pez", posicionPez, 0.8f, true);
+                    animacionPezActiva = true;
+                    std::cout << "[SceneInformation] Sonido del pez activado" << std::endl;
+                }
+                else if (!animacionActivaAhora && animacionPezActiva) {
+                    // La animación acaba de desactivarse
+                    audioManager.detenerSonidoAmbiental("pez");
+                    animacionPezActiva = false;
+                    std::cout << "[SceneInformation] Sonido del pez desactivado" << std::endl;
+                }
+                else if (animacionActivaAhora && animacionPezActiva) {
+                    // Actualizar posición del sonido mientras la animación está activa
+                    glm::vec3 posicionPez = entidad->posicionLocal;
+                    audioManager.actualizarPosicionSonidoAmbiental("pez", posicionPez);
+                }
             }
 
             // Procesar lámparas de calle y sus luces
@@ -304,7 +405,6 @@ void SceneInformation::actualizarFrame(float deltaTime)
         luchadorEntidad->animacion->animarLuchador(0, deltaTime, primoEntidad);
     }
 }
-
 // Funcion para actualizar cada frame con el input del usuario
 void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GLfloat mouseYChange, GLfloat scrollChange, float deltaTime)
 {
@@ -367,7 +467,6 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     }
 
     // G: Activar/Desactivar animación de la canoa
-    // G: Activar/Desactivar animación de la canoa
     static bool teclaGPresionada = false;
     if (keys[GLFW_KEY_G]) {
         if (!teclaGPresionada) {
@@ -398,6 +497,31 @@ void SceneInformation::actualizarFrameInput(bool* keys, GLfloat mouseXChange, GL
     }
     else {
         teclaOPresionada = false;
+    }
+
+    // Y: Alternar volumen del soundtrack entre 0.0 (silenciado) y 0.1 (bajo)
+    static bool teclaYPresionada = false;
+    static bool soundtrackActivado = true; 
+    if (keys[GLFW_KEY_Y]) {
+        if (!teclaYPresionada) {
+            soundtrackActivado = !soundtrackActivado;
+
+            if (soundtrackActivado) {
+                // Activar soundtrack con volumen bajo
+                audioManager.setVolumenSoundtrack(0.1f);
+                std::cout << "[SceneInformation] Soundtrack activado (volumen: 10%)" << std::endl;
+            }
+            else {
+                // Silenciar soundtrack
+                audioManager.setVolumenSoundtrack(0.0f);
+                std::cout << "[SceneInformation] Soundtrack silenciado" << std::endl;
+            }
+
+            teclaYPresionada = true;
+        }
+    }
+    else {
+        teclaYPresionada = false;
     }
 }
 
@@ -2279,7 +2403,30 @@ void SceneInformation::inicializarAudio()
 
     // Cargar el soundtrack principal
     audioManager.cargarSoundtrack("cuphead_song", "Audio/Soundtrack/cuphead_song.wav");
+
+    // Cargar efectos de sonido
     audioManager.cargarSonidoAmbiental("abrir_puerta", "Audio/SFX/door_open.mp3");
+
+    // Cargar SFX del remo de la canoa
+    audioManager.cargarSonidoAmbiental("remo_canoa", "Audio/SFX/remo.wav");
+
+    // Cargar SFX del pez
+    audioManager.cargarSonidoAmbiental("pez", "Audio/SFX/pez.wav");
+
+    // Cargar SFX de caminata
+    audioManager.cargarSonidoAmbiental("caminando", "Audio/SFX/caminando.wav");
+
+    // Cargar sonido ambiental del público en el ring
+    audioManager.cargarSonidoAmbiental("publico_lucha", "Audio/Environmental/publico_lucha.wav");
+
+    // Cargar sonido ambiental del tianguis (mercado)
+    audioManager.cargarSonidoAmbiental("tianguis", "Audio/Environmental/tianguis.wav");
+
+    // Cargar sonido de grillos 10 veces (una por cada posición)
+    for (int i = 0; i < 10; i++) {
+        std::string nombreGrillo = "grillo_" + std::to_string(i);
+        audioManager.cargarSonidoAmbiental(nombreGrillo, "Audio/Environmental/grillo.wav");
+    }
 
     // Reproducir el soundtrack en loop con volumen tenue (30% del máximo)
     if (!audioManager.reproducirSoundtrack("cuphead_song", 0.1f)) {
@@ -2290,11 +2437,99 @@ void SceneInformation::inicializarAudio()
         std::cout << "[SceneInformation] Soundtrack reproduciéndose en loop (volumen: 30%)" << std::endl;
     }
 
-    // Establecer volumen maestro también bajo para no interferir con efectos futuros
-    audioManager.setVolumenMaestro(0.4f); // 80% del volumen maestro
-    audioManager.setVolumenSoundtrack(0.1f); // 30% del volumen del soundtrack
+    // Establecer volumen maestro
+    audioManager.setVolumenMaestro(0.4f); // 40% del volumen maestro
+    audioManager.setVolumenSoundtrack(0.1f);
+
+    // Reproducir sonido ambiental del público en el ring
+    audioManager.reproducirSonidoAmbiental("publico_lucha", glm::vec3(2.0f, 36.2f, -149.5f), 0.6f, true);
+    std::cout << "[SceneInformation] Sonido del público en el ring activado" << std::endl;
+
+    // Generar 10 posiciones aleatorias para los grillos en el escenario
+    generarPosicionesGrillos();
 }
 
+
+void SceneInformation::generarPosicionesGrillos()
+{
+    // Definir el área del escenario donde pueden aparecer grillos
+    // Evitamos áreas específicas como el ring, la chinampa de agua, etc.
+
+    struct AreaEscenario {
+        float xMin, xMax;
+        float zMin, zMax;
+        std::string descripcion;
+    };
+
+    // Definir varias áreas del escenario
+    std::vector<AreaEscenario> areas = {
+        // Área alrededor del camino (evitando el camino mismo)
+        {-20.0f, 25.0f, -50.0f, 180.0f, "camino"},
+        // Área del mercado
+        {-80.0f, -20.0f, 20.0f, 130.0f, "mercado"},
+        // Área cerca de las chinampas (pero no en el agua)
+        {-200.0f, -160.0f, -200.0f, -100.0f, "chinampas"},
+        // Área cerca de la cancha de pelota
+        {70.0f, 130.0f, 70.0f, 130.0f, "cancha_pelota"},
+        // Área entre el camino y la boss room
+        {120.0f, 180.0f, -160.0f, -100.0f, "boss_area"}
+    };
+
+    // Limpiar vector si ya tenía datos
+    posicionesGrillos.clear();
+
+    // Inicializar generador aleatorio si no se ha hecho
+    static bool semillaInicializada = false;
+    if (!semillaInicializada) {
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        semillaInicializada = true;
+    }
+
+    // Generar 10 posiciones aleatorias
+    for (int i = 0; i < 10; i++) {
+        // Seleccionar un área aleatoria
+        int areaIndex = std::rand() % areas.size();
+        const AreaEscenario& area = areas[areaIndex];
+
+        // Generar posición aleatoria dentro del área seleccionada
+        float x = area.xMin + (std::rand() % 100) / 100.0f * (area.xMax - area.xMin);
+        float z = area.zMin + (std::rand() % 100) / 100.0f * (area.zMax - area.zMin);
+        float y = -1.0f; // Altura del suelo
+
+        glm::vec3 posicion(x, y, z);
+        posicionesGrillos.push_back(posicion);
+
+        std::cout << "[SceneInformation] Grillo " << i << " posicionado en: ("
+            << x << ", " << y << ", " << z << ") - Área: " << area.descripcion << std::endl;
+    }
+}
+
+void SceneInformation::activarGrillos()
+{
+    // Reproducir sonido de grillo en cada posición generada
+    // IMPORTANTE: Todos usan el MISMO nombre "grillo" que ya fue cargado
+    for (size_t i = 0; i < posicionesGrillos.size(); i++) {
+        std::string nombreGrillo = "grillo_" + std::to_string(i);
+
+        // CAMBIADO: Usar el nombre base "grillo" que ya fue cargado en inicializarAudio
+        audioManager.reproducirSonidoAmbiental(
+            "grillos",  // ← Usar siempre el mismo nombre base
+            posicionesGrillos[i],
+            0.9f,  // Volumen alto
+            true   // Loop activado
+        );
+    }
+
+    std::cout << "[SceneInformation] Grillos activados (noche) - 10 instancias del mismo sonido" << std::endl;
+}
+
+void SceneInformation::desactivarGrillos()
+{
+    // Detener todos los sonidos que contengan "grillo_" en su nombre
+    audioManager.detenerSonidosAmbientalesPorPatron("grillo_");
+
+    std::cout << "[SceneInformation] Grillos desactivados (día)" << std::endl;
+}
 
 void SceneInformation::limpiarSpotLightsActuales()
 {
